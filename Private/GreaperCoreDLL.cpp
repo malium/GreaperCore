@@ -8,7 +8,7 @@
 #include "LogManager.h"
 #include "ThreadManager.h"
 #include "CommandManager.h"
-#include <Core/FileStream.h>
+#include "../Public/Platform.h"
 
 #if GREAPER_CORE_DLL
 

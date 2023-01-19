@@ -4,7 +4,7 @@
 ***********************************************************************************/
 
 #include "Application.h"
-#include <Core/Platform.h>
+#include "../Public/Platform.h"
 
 using namespace greaper;
 using namespace greaper::core;

@@ -9,8 +9,7 @@
 #define CORE_THREAD_MANAGER_H 1
 
 #include "ImplPrerequisites.h"
-#include <Core/Concurrency.h>
-#include <Core/IThreadManager.h>
+#include "../Public/IThreadManager.h"
 
 namespace greaper::core
 {

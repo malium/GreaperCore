@@ -4,8 +4,8 @@
 ***********************************************************************************/
 
 #include "CommandManager.h"
-#include <Core/IGreaperLibrary.h>
-#include <Core/StringUtils.h>
+#include "../Public/IGreaperLibrary.h"
+#include "../Public/StringUtils.h"
 
 using namespace greaper;
 using namespace core;

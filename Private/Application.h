@@ -9,9 +9,9 @@
 #define CORE_APPLICATION_H 1
 
 #include "ImplPrerequisites.h"
-#include <Core/Property.h>
-#include <Core/IGreaperLibrary.h>
-#include <Core/IApplication.h>
+#include "../Public/Property.h"
+#include "../Public/IGreaperLibrary.h"
+#include "../Public/IApplication.h"
 
 namespace greaper::core
 {

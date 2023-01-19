@@ -8,7 +8,7 @@
 #ifndef CORE_IMPL_PREREQUISITES_H
 #define CORE_IMPL_PREREQUISITES_H 1
 
-#include <Core/CorePrerequisites.h>
+#include "../Public/CorePrerequisites.h"
 
 namespace greaper::core
 {

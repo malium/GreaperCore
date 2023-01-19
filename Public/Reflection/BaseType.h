@@ -15,7 +15,7 @@
 #include "../Result.h"
 #define CJSON_IMPORT_SYMBOLS
 #define CJSON_API_VISIBILITY
-#include "../../External/cJSON/cJSON.h"
+#include "../../../cJSON/cJSON.h"
 //#include <External/cJSON/cJSON.h>
 
 ENUMERATION(TypeCategory, Plain, Container, Complex);

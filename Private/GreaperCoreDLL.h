@@ -11,7 +11,7 @@
 #if GREAPER_CORE_DLL
 
 #include "ImplPrerequisites.h"
-#include <Core/IGreaperLibrary.h>
+#include "../Public/IGreaperLibrary.h"
 
 namespace greaper::core
 {

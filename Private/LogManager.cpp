@@ -5,6 +5,8 @@
 
 #include "LogManager.h"
 #include "Application.h"
+#include "ThreadManager.h"
+#include "../Public/MPMCTaskScheduler.h"
 
 using namespace greaper;
 using namespace core;

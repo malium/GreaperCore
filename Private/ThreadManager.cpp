@@ -4,7 +4,7 @@
 ***********************************************************************************/
 
 #include "ThreadManager.h"
-#include <Core/Base/IThread.h>
+#include "../Public/Base/IThread.h"
 
 using namespace greaper;
 using namespace greaper::core;

@@ -9,7 +9,7 @@
 #define CORE_COMMAND_MANAGER_H 1
 
 #include "ImplPrerequisites.h"
-#include <Core/ICommandManager.h>
+#include "../Public/ICommandManager.h"
 
 namespace greaper::core
 {
