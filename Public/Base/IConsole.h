@@ -9,9 +9,9 @@
 #define CORE_I_CONSOLE_H 1
 
 #include "../Memory.h"
-#include "../Concurrency.h"
 #include "../Enumeration.h"
 #include "../Event.h"
+#include <future>
 
 ENUMERATION(ConsoleType, VIRTUAL, EXTERNAL);
 
@@ -26,7 +26,7 @@ namespace greaper
 
         virtual void WriteToConsole(const String& msg)noexcept = 0;
         
-        virtual TAsyncOp<String> ReadFromConsole()noexcept = 0;
+        virtual std::future<String> ReadFromConsole()noexcept = 0;
 
         virtual ConsoleEvt_t* GetConsoleEvent()const noexcept = 0;
 
