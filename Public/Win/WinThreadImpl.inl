@@ -58,6 +58,8 @@ namespace greaper
 				auto mgr = winThread->m_Manager.lock();
 				mgr->GetThreadDestructionEvent()->Trigger(winThread);
 			}
+			winThread->m_OnManagerActivation.Disconnect();
+			winThread->m_OnNewManager.Disconnect();
 			winThread.reset();
 
 			return EXIT_SUCCESS;
@@ -229,6 +231,8 @@ namespace greaper
 		{
 			m_Handle = InvalidThreadHandle;
 			m_ID = InvalidThreadID;
+			m_OnManagerActivation.Disconnect();
+			m_OnNewManager.Disconnect();
 			m_JoinsAtDestruction = false;
 			m_State = ThreadState_t::UNMANAGED;
 		}
@@ -284,6 +288,8 @@ namespace greaper
 			}
 			m_Handle = InvalidThreadHandle;
 			m_ID = InvalidThreadID;
+			m_OnManagerActivation.Disconnect();
+			m_OnNewManager.Disconnect();
 			m_State = ThreadState_t::STOPPED;
 		}
 

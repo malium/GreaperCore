@@ -127,6 +127,8 @@ namespace greaper
 	template<class... Args>
 	void Event<Args...>::Connect(HandlerType& handler, HandlerFunction function) noexcept
 	{
+		if (handler.IsConnected())
+			handler.Disconnect();
 		EventHandlerID<Args...> hnd;
 		hnd.Function = std::move(function);
 		hnd.ID = m_LastID++;
@@ -189,6 +191,8 @@ namespace greaper
 
 		INLINE void Connect(HandlerType& handler, HandlerFunction function) noexcept
 		{
+			if (handler.IsConnected())
+				handler.Disconnect();
 			EventHandlerID<void> hnd;
 			hnd.Function = std::move(function);
 			hnd.ID = m_LastID++;

@@ -202,10 +202,10 @@ void LogManager::OnDeactivation(UNUSED const PInterface& newDefault) noexcept
 	if (m_Threaded)
 	{
 		StopThreadMode();
-#if LOGMANAGER_USE_MPMC
-		m_Scheduler.reset();
-#endif
 	}
+#if LOGMANAGER_USE_MPMC
+	m_Scheduler.reset();
+#endif
 	// clear messages
 	{
 		LOCK(m_MessagesMutex);
