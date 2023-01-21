@@ -241,7 +241,7 @@ void Application::InitProperties()noexcept
 
 	if (loadedLibrariesProp.expired())
 	{
-		auto loadedLibrariesResult = CreateProperty<greaper::WStringVec>(m_Library, LoadedLibrariesName, {}, ""sv, false, true, nullptr);
+		auto loadedLibrariesResult = CreateProperty<greaper::StringVec>(m_Library, LoadedLibrariesName, {}, ""sv, false, true, nullptr);
 		Verify(loadedLibrariesResult.IsOk(), "Couldn't create the property '%s' msg: %s", LoadedLibrariesName.data(), loadedLibrariesResult.GetFailMessage().c_str());
 		loadedLibrariesProp = (WPtr<LoadedLibrariesProp_t>)loadedLibrariesResult.GetValue();
 	}
@@ -294,6 +294,15 @@ TResult<PGreaperLib> greaper::core::Application::RegisterGreaperLibrary(PLibrary
 
 	if (res.HasFailed())
 		return Result::CopyFailure<PGreaperLib>(res);
+
+	auto wprop = GetLoadedLibrariesNames();
+	if (!wprop.expired())
+	{
+		auto prop = wprop.lock();
+		auto loadedLibraries = prop->GetValueCopy();
+		loadedLibraries.push_back(String{ gLib->GetLibraryName() });
+		prop->SetValue(loadedLibraries);
+	}
 
 	gLib->InitLibrary(library, (PApplication)gApplication);
 
@@ -383,6 +392,20 @@ EmptyResult Application::UnregisterGreaperLibrary(const PGreaperLib& library)noe
 			iface->Deinitialize();
 		}
 	}*/
+
+	auto wprop = GetLoadedLibrariesNames();
+	if (!wprop.expired())
+	{
+		auto prop = wprop.lock();
+		auto loadedLibraries = prop->GetValueCopy();
+		auto loadedLibrariesIdx = IndexOf(loadedLibraries, String{ libInfo.Lib->GetLibraryName() });
+		if (loadedLibrariesIdx >= 0)
+		{
+			loadedLibraries.erase(loadedLibraries.begin() + loadedLibrariesIdx);
+			prop->SetValue(loadedLibraries);
+		}
+	}
+
 	libInfo.Lib->DeinitLibrary();
 	libInfo.Lib.reset();
 	libInfo.IntefaceNameMap.clear();

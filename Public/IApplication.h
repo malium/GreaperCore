@@ -43,7 +43,7 @@ namespace greaper
 		DEF_PROP(ApplicationName, String);
 		DEF_PROP(CompilationInfo, String);
 		DEF_PROP(ApplicationVersion, uint32);
-		DEF_PROP(LoadedLibraries, WStringVec);
+		DEF_PROP(LoadedLibraries, StringVec);
 		
 		using OnInterfaceActivationEvent_t = Event<const PInterface&>;
 
