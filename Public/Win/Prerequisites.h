@@ -64,8 +64,6 @@ typedef WinTypes PlatformTypes;
 #define DLLEXPORT __declspec(dllexport)
 #endif
 
-#define FUNCTION_VARARGS_END(...)
-
 #include "Win32Base.h"
 
 #define PlatformAlloc(bytes) HeapAlloc(GetProcessHeap(), 0, bytes)

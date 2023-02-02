@@ -429,7 +429,7 @@ template<class _T_, class _Alloc_> friend void greaper::Destroy(_T_*, sizet)
 	};
 
 	template<typename T, class _Alloc_ = GenericAllocator>
-	NODISCARD BasicString<T, StdAlloc<T, _Alloc_>> Format(const T* fmt, ...)
+	NODISCARD BasicString<T, StdAlloc<T, _Alloc_>> Format(const T* fmt, ...) FUNCTION_VARARGS_END(1,2)
 	{
 		va_list argList;
 		va_start(argList, fmt);
