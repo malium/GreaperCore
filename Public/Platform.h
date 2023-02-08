@@ -22,8 +22,49 @@ namespace greaper
 			Windows,
 			Linux
 		};
-	};
+	}
 	using OSType_t = EOSType::Type;
+
+	namespace EDialogButton
+	{
+		enum Type
+		{
+			CANCEL,
+			OK,
+			YES,
+			NO,
+			ABORT,
+			RETRY,
+			IGNORE
+		};
+	}
+	using DialogButton_t = EDialogButton::Type;
+
+	namespace EDialogChoice
+	{
+		enum Type
+		{
+			OK,
+			OK_CANCEL,
+			YES_NO,
+			YES_NO_CANCEL,
+			RETRY_CANCEL,
+			ABORT_RETRY_IGNORE
+		};
+	}
+	using DialogChoice_t = EDialogChoice::Type;
+
+	namespace EDialogIcon
+	{
+		enum Type
+		{
+			INFO,
+			WARNING,
+			ERROR,
+			QUESTION
+		};
+	}
+	using DialogIcon_t = EDialogIcon::Type;
 }
 
 #if PLT_WINDOWS

@@ -16,6 +16,7 @@
 #include "../Base/CPUInfo.h"
 #include <filesystem>
 #include <array>
+#include <future>
 
 namespace greaper
 {
@@ -48,6 +49,22 @@ namespace greaper
 		static OSType_t GetOSType()noexcept { return OSType_t::Windows; }
 
 		static WindowsVersion_t GetWindowsVersion()noexcept { return WindowsVersion; }
+
+		static DialogButton_t CreateMessageBox(WStringView title, WStringView content, DialogChoice_t choice = DialogChoice_t::OK, DialogIcon_t icon = DialogIcon_t::INFO);
+
+		static std::future<DialogButton_t> CreateMessageBoxAsync(WStringView title, WStringView content, DialogChoice_t choice = DialogChoice_t::OK, DialogIcon_t icon = DialogIcon_t::INFO);
+
+		static Vector<WString> CreateOpenFileDialog(WStringView title, WStringView defaultPath = L""sv, const Vector<WStringView>& filters = { L"All files"sv, L"*"sv }, bool multiselect = false);
+
+		static std::future<Vector<WString>> CreateOpenFileDialogAsync(WStringView title, WStringView defaultPath = L""sv, const Vector<WStringView>& filters = { L"All files"sv, L"*"sv }, bool multiselect = false);
+
+		static WString CreateSaveFileDialog(WStringView title, WStringView defaultPath = L""sv, const Vector<WStringView>& filters = { L"All files"sv, L"*"sv }, bool forceOverride = false);
+
+		static std::future<WString> CreateSaveFileDialogAsync(WStringView title, WStringView defaultPath = L""sv, const Vector<WStringView>& filters = { L"All files"sv, L"*"sv }, bool forceOverride = false);
+
+		static Vector<WString> CreateSelectDirectoryDialog(WStringView title, WStringView defaultPath = L""sv);
+
+		static std::future<Vector<WString>> CreateSelectDirectoryDialogAsync(WStringView title, WStringView defaultPath = L""sv);
 
 	protected:
 		static void _PerThreadInit();
