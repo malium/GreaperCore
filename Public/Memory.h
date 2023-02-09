@@ -83,7 +83,7 @@
 #define VerifyNotWithinExclusive(val, min, max, ...) { volatile bool res = (value) > (min) && (value) < (max); }
 #endif
 
-using namespace std::string_literals;
+//using namespace std::string_literals;
 using namespace std::string_view_literals;
 
 namespace greaper
