@@ -536,28 +536,22 @@ namespace greaper::Impl
 	
 	INLINE void _TriggerBreak(const String& str)
 	{
-#if PLT_WINDOWS
-		constexpr UINT mbType = MB_ICONERROR
 #if GREAPER_DEBUG_BREAK
-			| MB_ABORTRETRYIGNORE
+		DialogChoice_t choice = DialogChoice_t::ABORT_RETRY_IGNORE;
 #else
-			| MB_OK
+		DialogChoice_t choice = DialogChoice_t::OK;
 #endif
-			| MB_TASKMODAL | MB_TOPMOST;
+		WString msg{};
+		msg.resize(str.size(), L'\0');
+		for(sizet i = 0; i < str.size(); ++i)
+			msg[i] = (wchar)str[i];
 
-		const auto retVal = MessageBoxA(nullptr, str.data(), "Greaper Assertion", mbType);
+		auto retVal = OSPlatform::CreateMessageBox(L"Greaper Assertion"sv, msg, choice, DialogIcon_t::ERROR);
 
-		if (retVal == IDRETRY)
-		{
+		if (retVal == DialogButton_t::RETRY)
 			TRIGGER_BREAKPOINT();
-		}
-		else if (retVal == IDIGNORE)
-		{
+		else if(retVal == DialogButton_t::IGNORE)
 			return;
-		}
-#else // ^^^ PLT_WINDOWS // PLT_OTHER vvv
-		std::cerr << "Greaper Assertion: " << str;
-#endif
 
 #if GREAPER_DEBUG_BREAK
 		TRIGGER_BREAKPOINT();

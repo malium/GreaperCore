@@ -199,6 +199,45 @@ INLINE uint64 greaper::WinOSPlatform::GetPhysicalRAMAmountKB()noexcept
 	return 0ull;
 }
 
+INLINE DialogButton_t greaper::WinOSPlatform::CreateMessageBox(WStringView title, WStringView content, DialogChoice_t choice, DialogIcon_t icon)
+{
+	UINT uType = MB_SYSTEMMODAL;
+	switch (choice)
+	{
+	case DialogChoice_t::OK: uType |= MB_OK; break;
+	case DialogChoice_t::OK_CANCEL: uType |= MB_OKCANCEL; break;
+	case DialogChoice_t::YES_NO: uType |= MB_YESNO; break;
+	case DialogChoice_t::YES_NO_CANCEL: uType |= MB_YESNOCANCEL; break;
+	case DialogChoice_t::RETRY_CANCEL: uType |= MB_RETRYCANCEL; break;
+	case DialogChoice_t::ABORT_RETRY_IGNORE: uType |= MB_ABORTRETRYIGNORE; break;
+	default: uType |= MB_OK; break;
+	}
+
+	switch (icon)
+	{
+	case DialogIcon_t::INFO: uType |= MB_ICONINFORMATION; break;
+	case DialogIcon_t::WARNING: uType |= MB_ICONWARNING; break;
+	case DialogIcon_t::ERROR: uType |= MB_ICONERROR; break;
+	case DialogIcon_t::QUESTION: uType |= MB_ICONQUESTION; break;
+	default: uType |= MB_ICONINFORMATION;
+	}
+
+	int32 rtn = MessageBoxW(nullptr, content.data(), title.data(), uType);
+	switch (rtn)
+	{
+	case IDOK: return DialogButton_t::OK;
+	case IDCANCEL: return DialogButton_t::CANCEL;
+	case IDABORT: return DialogButton_t::ABORT;
+	case IDTRYAGAIN:
+	case IDRETRY: return DialogButton_t::RETRY;
+	case IDCONTINUE:
+	case IDIGNORE: return DialogButton_t::IGNORE;
+	case IDYES: return DialogButton_t::YES;
+	case IDNO: return DialogButton_t::NO;
+	default: return DialogButton_t::OK;
+	}
+}
+
 #define LoadProc(lib, name, var)\
 fnRes = lib.GetFunction(name); \
 if(fnRes.IsOk()) { var = (decltype(var))fnRes.GetValue(); } \

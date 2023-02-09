@@ -245,6 +245,8 @@ typedef struct tagPOINT
 #define IDIGNORE            5
 #define IDYES               6
 #define IDNO                7
+#define IDTRYAGAIN			10
+#define IDCONTINUE			11
 
 #define CP_ACP                    0           // default to ANSI code page
 #define CP_OEMCP                  1           // default to OEM  code page
