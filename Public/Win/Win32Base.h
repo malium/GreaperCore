@@ -107,6 +107,8 @@ typedef unsigned int DWORD32, * PDWORD32;
 typedef unsigned __int64 ULONG64, * PULONG64;
 typedef unsigned __int64 DWORD64, * PDWORD64;
 typedef unsigned __int64    UINT64;
+typedef float               FLOAT;
+typedef FLOAT* PFLOAT;
 
 #if ARCHITECTURE_X64
 typedef __int64 INT_PTR, *PINT_PTR;
@@ -115,6 +117,9 @@ typedef unsigned __int64 UINT_PTR, *PUINT_PTR;
 typedef __int64 LONG_PTR, *PLONG_PTR;
 typedef unsigned __int64 ULONG_PTR, *PULONG_PTR;
 #define __int3264   __int64
+typedef INT_PTR(FAR WINAPI* FARPROC)();
+typedef INT_PTR(NEAR WINAPI* NEARPROC)();
+typedef INT_PTR(WINAPI* PROC)();
 #else
 typedef int INT_PTR, * PINT_PTR;
 typedef unsigned int UINT_PTR, * PUINT_PTR;
@@ -123,6 +128,10 @@ typedef long LONG_PTR, * PLONG_PTR;
 typedef unsigned long ULONG_PTR, * PULONG_PTR;
 
 #define __int3264   __int32
+
+typedef int (FAR WINAPI* FARPROC)();
+typedef int (NEAR WINAPI* NEARPROC)();
+typedef int (WINAPI* PROC)();
 #endif
 #ifndef _UINTPTR_T_DEFINED
 #define _UINTPTR_T_DEFINED
@@ -132,6 +141,8 @@ typedef unsigned __int64  uintptr_t;
 typedef unsigned int uintptr_t;
 #endif
 #endif
+
+typedef DWORD   COLORREF;
 
 typedef DWORD near* PDWORD;
 typedef DWORD far* LPDWORD;
@@ -174,8 +185,11 @@ typedef PVOID HANDLE;
 #define INVALID_HANDLE_VALUE ((HANDLE)(LONG_PTR)-1)
 
 DECLARE_HANDLE(HWND);
+DECLARE_HANDLE(HDC);
+DECLARE_HANDLE(HGLRC);
 DECLARE_HANDLE(HINSTANCE);
 DECLARE_HANDLE(HMONITOR);
+DECLARE_HANDLE(HENHMETAFILE);
 typedef HINSTANCE HMODULE;      /* HMODULEs can be used in place of HINSTANCEs */
 typedef HANDLE              HGLOBAL;
 typedef HANDLE              HLOCAL;
@@ -1016,6 +1030,7 @@ VerifyVersionInfoW(
 #include <Windows.h>
 #include <shellapi.h>
 #include <fileapi.h>
+#include <VersionHelpers.h>
 
 #ifndef STATUS_POSSIBLE_DEADLOCK
 #define STATUS_POSSIBLE_DEADLOCK ((DWORD   )0xC0000194L)

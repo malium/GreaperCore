@@ -15,132 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Public\Core\Base\DisplayAdapter.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Core\Base\IWindow.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Core\Base\Monitor.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Core\Base\Rect.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Core\Base\VideoMode.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Core\Reflection\ReflectedField.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Core\Reflection\ReflectedPlainContainer.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Core\Reflection\ReflectedPlainEnum.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Core\Reflection\ReflectedPlainField.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Core\Reflection\ReflectedPlainType.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Core\Reflection\ReflectedProperty.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Core\Reflection\ReflectedReflField.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Core\Reflection\ReflectedTypeInfo.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Core\IWindowManager.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Math\MathPrerequisites.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Math\Base\Utils.inl">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Math\Vector2.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Math\Vector3.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Math\Vector4.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Math\Matrix2.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Math\Matrix3.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Math\Matrix4.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Math\Base\ReflectedConversions.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Math\Base\VecRef.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Math\Quaternion.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Math\Base\SSE.inl">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Core\Reflection\Rect.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Math\Reflection\Matrix2.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Math\Reflection\Matrix3.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Math\Reflection\Matrix4.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Math\Reflection\Quaternion.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Math\Reflection\Vector2.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Math\Reflection\Vector3.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Math\Reflection\Vector4.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Math\Line2.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Math\Segment2.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Math\Segment3.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Math\Line3.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Core\Base\IntersectionResult.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Math\Base\Half.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Math\Reflection\Half.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="Public\Math\Intersections.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
     <ClInclude Include="Private\Application.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
@@ -348,47 +222,35 @@
     <ClInclude Include="Public\Uuid.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Reflection\ReflectedField.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Reflection\ReflectedPlainContainer.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Reflection\ReflectedPlainEnum.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Reflection\ReflectedPlainField.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Reflection\ReflectedPlainType.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Reflection\ReflectedProperty.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Reflection\ReflectedReflField.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Reflection\ReflectedTypeInfo.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Win\Win32GDI.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Public\Math\Base\Intersections.inl">
-      <Filter>Archivos de encabezado</Filter>
-    </None>
-    <None Include="Public\Math\Base\Vector2b.inl">
-      <Filter>Archivos de encabezado</Filter>
-    </None>
-    <None Include="Public\Math\Base\Vector2Real.inl">
-      <Filter>Archivos de encabezado</Filter>
-    </None>
-    <None Include="Public\Math\Base\Vector2Signed.inl">
-      <Filter>Archivos de encabezado</Filter>
-    </None>
-    <None Include="Public\Math\Base\Vector2Unsigned.inl">
-      <Filter>Archivos de encabezado</Filter>
-    </None>
-    <None Include="Public\Math\Base\Vector3b.inl">
-      <Filter>Archivos de encabezado</Filter>
-    </None>
-    <None Include="Public\Math\Base\Vector3Real.inl">
-      <Filter>Archivos de encabezado</Filter>
-    </None>
-    <None Include="Public\Math\Base\Vector3Signed.inl">
-      <Filter>Archivos de encabezado</Filter>
-    </None>
-    <None Include="Public\Math\Base\Vector3Unsigned.inl">
-      <Filter>Archivos de encabezado</Filter>
-    </None>
-    <None Include="Public\Math\Base\Vector4b.inl">
-      <Filter>Archivos de encabezado</Filter>
-    </None>
-    <None Include="Public\Math\Base\Vector4Real.inl">
-      <Filter>Archivos de encabezado</Filter>
-    </None>
-    <None Include="Public\Math\Base\Vector4Signed.inl">
-      <Filter>Archivos de encabezado</Filter>
-    </None>
-    <None Include="Public\Math\Base\Vector4Unsigned.inl">
-      <Filter>Archivos de encabezado</Filter>
-    </None>
     <None Include="Public\Base\FileStream.inl">
       <Filter>Archivos de encabezado</Filter>
     </None>

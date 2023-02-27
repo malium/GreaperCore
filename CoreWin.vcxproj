@@ -310,6 +310,7 @@
     <ClInclude Include="Public\Win\Win32Base.h" />
     <ClInclude Include="Public\Win\Win32Concurrency.h" />
     <ClInclude Include="Public\Win\Win32DbgHelp.h" />
+    <ClInclude Include="Public\Win\Win32GDI.h" />
     <ClInclude Include="Public\Win\Win32PSAPI.h" />
     <ClInclude Include="Public\Win\Win32SysInfo.h" />
     <ClInclude Include="Public\Win\Win32Uuid.h" />
