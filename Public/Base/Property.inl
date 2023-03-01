@@ -221,9 +221,9 @@ namespace greaper
 	}
 
 	template<class T>
-	NODISCARD INLINE IProperty::ModificationEvent_t* TProperty<T>::GetOnModificationEvent()const noexcept
+	NODISCARD INLINE IProperty::ModificationEvent_t& TProperty<T>::GetOnModificationEvent()const noexcept
 	{
-		return &m_OnModificationEvent;
+		return m_OnModificationEvent;
 	}
 	
 	template<class T>

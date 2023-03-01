@@ -43,14 +43,14 @@ namespace greaper
 		return m_InitializationState;
 	}
 
-	INLINE IInterface::InitializationEvt_t* IInterface::GetInitializationEvent() const noexcept
+	INLINE IInterface::InitializationEvt_t& IInterface::GetInitializationEvent() const noexcept
 	{
-		return &m_InitEvent;
+		return m_InitEvent;
 	}
 
-	INLINE IInterface::ActivationEvt_t* IInterface::GetActivationEvent() const noexcept
+	INLINE IInterface::ActivationEvt_t& IInterface::GetActivationEvent() const noexcept
 	{
-		return &m_ActivationEvent;
+		return m_ActivationEvent;
 	}
 
 	INLINE CSpan<WIProperty> IInterface::GetProperties() const noexcept

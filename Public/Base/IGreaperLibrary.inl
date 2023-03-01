@@ -216,7 +216,7 @@ namespace greaper
 
 		if (m_LogManager != nullptr)
 		{
-			m_LogManager->GetActivationEvent()->Connect(m_OnLogActivation,
+			m_LogManager->GetActivationEvent().Connect(m_OnLogActivation,
 														[this](bool active, IInterface* oldLog, const PInterface& newLog)
 														{ OnLogActivation(active, oldLog, newLog); });
 			m_LogActivated = m_LogManager->IsActive();
@@ -225,7 +225,7 @@ namespace greaper
 		}
 		else
 		{
-			m_Application->GetOnInterfaceActivationEvent()->Connect(m_OnNewLog,
+			m_Application->GetOnInterfaceActivationEvent().Connect(m_OnNewLog,
 																	[this](const PInterface& newInterface)
 																	{ OnNewLog(newInterface); });
 		}
@@ -331,7 +331,7 @@ namespace greaper
 			m_LogManager = newInterface;
 			m_LogActivated = m_LogManager->IsActive();
 			m_OnLogActivation.Disconnect();
-			m_LogManager->GetActivationEvent()->Connect(m_OnLogActivation,
+			m_LogManager->GetActivationEvent().Connect(m_OnLogActivation,
 					[this](bool active, IInterface* oldLog, const PInterface& newLog)
 					{ OnLogActivation(active, oldLog, newLog); });
 			m_OnNewLog.Disconnect();
@@ -351,7 +351,7 @@ namespace greaper
 				m_LogManager = newLog;
 				m_LogActivated = m_LogManager->IsActive();
 				m_OnLogActivation.Disconnect();
-				m_LogManager->GetActivationEvent()->Connect(m_OnLogActivation,
+				m_LogManager->GetActivationEvent().Connect(m_OnLogActivation,
 						[this](bool active, IInterface* oldLog, const PInterface& newLog)
 						{ OnLogActivation(active, oldLog, newLog); });
 				if (m_LogActivated)
@@ -362,7 +362,7 @@ namespace greaper
 				m_OnLogActivation.Disconnect();
 				m_LogManager.reset();
 				m_LogActivated = false;
-				m_Application->GetOnInterfaceActivationEvent()->Connect(m_OnNewLog,
+				m_Application->GetOnInterfaceActivationEvent().Connect(m_OnNewLog,
 						[this](const PInterface& newInterface)
 						{ OnNewLog(newInterface); });
 			}
@@ -372,7 +372,7 @@ namespace greaper
 			m_LogManager = newLog;
 			m_LogActivated = m_LogManager->IsActive();
 			m_OnLogActivation.Disconnect();
-			m_LogManager->GetActivationEvent()->Connect(m_OnLogActivation,
+			m_LogManager->GetActivationEvent().Connect(m_OnLogActivation,
 					[this](bool active, IInterface* oldLog, const PInterface& newLog)
 					{ OnLogActivation(active, oldLog, newLog); });
 			if (m_LogActivated)

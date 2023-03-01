@@ -41,7 +41,7 @@ namespace greaper
 		virtual bool SetValueFromString(const String& value) noexcept = 0;
 		virtual String GetStringValueCopy()const noexcept = 0;
 		virtual void AccessStringValue(const std::function<void(const String&)>& accessFn)const noexcept = 0;
-		virtual ModificationEvent_t* GetOnModificationEvent()const noexcept = 0;
+		virtual ModificationEvent_t& GetOnModificationEvent()const noexcept = 0;
 		virtual const WGreaperLib& GetLibrary()const noexcept = 0;
 		virtual std::size_t GetValueHash()const noexcept = 0;
 		virtual const ReflectedTypeID_t& _ValueTypeID()const noexcept = 0;
@@ -121,7 +121,7 @@ namespace greaper
 		EmptyResult _ValueFromJSON(cJSON* json, StringView name)noexcept override;
 		int64 _GetDynamicSize()const noexcept override;
 		int64 _GetStaticSize()const noexcept override;
-		ModificationEvent_t* GetOnModificationEvent()const noexcept override;
+		ModificationEvent_t& GetOnModificationEvent()const noexcept override;
 		const WGreaperLib& GetLibrary()const noexcept override;
 		std::size_t GetValueHash()const noexcept override;
 	};

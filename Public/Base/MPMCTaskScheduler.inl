@@ -243,7 +243,7 @@ namespace greaper
 
 		m_ThreadManager = (WThreadManager)newInterface;
 		m_OnManagerActivation.Disconnect(); // double check we are not connected
-		newInterface->GetActivationEvent()->Connect(m_OnManagerActivation, [this](bool active, IInterface* oldInterface, const PInterface& newInterface) { OnManagerActivation(active, oldInterface, newInterface); });
+		newInterface->GetActivationEvent().Connect(m_OnManagerActivation, [this](bool active, IInterface* oldInterface, const PInterface& newInterface) { OnManagerActivation(active, oldInterface, newInterface); });
 		m_OnNewManager.Disconnect();
 	}
 
@@ -258,7 +258,7 @@ namespace greaper
 		{
 			const auto& newThreadMgr = (const PThreadManager&)newInterface;
 			m_OnManagerActivation.Disconnect();
-			newThreadMgr->GetActivationEvent()->Connect(m_OnManagerActivation, [this](bool active, IInterface* oldManager, const PInterface& newManager) { OnManagerActivation(active, oldManager, newManager); });
+			newThreadMgr->GetActivationEvent().Connect(m_OnManagerActivation, [this](bool active, IInterface* oldManager, const PInterface& newManager) { OnManagerActivation(active, oldManager, newManager); });
 			m_ThreadManager = (WThreadManager)newThreadMgr;
 		}
 		// ThreadManager deactivated, wait until a new one is active
@@ -272,7 +272,7 @@ namespace greaper
 			VerifyNot(appW.expired(), "Trying to connect to InterfaceActivationEvent but Application was expired.");
 			auto app = appW.lock();
 			m_OnNewManager.Disconnect(); // double check we are not connected
-			app->GetOnInterfaceActivationEvent()->Connect(m_OnNewManager, [this](const PInterface& newManager) { OnNewManager(newManager); });
+			app->GetOnInterfaceActivationEvent().Connect(m_OnNewManager, [this](const PInterface& newManager) { OnNewManager(newManager); });
 		}
 	}
 
@@ -315,7 +315,7 @@ namespace greaper
 	{
 		VerifyNot(m_ThreadManager.expired(), "Trying to initialize a MPMCTaskScheduler, but an expired ThreadManager was given.");
 		auto mgr = m_ThreadManager.lock();
-		mgr->GetActivationEvent()->Connect(m_OnManagerActivation, [this](bool active, IInterface* oldInterface, const PInterface& newInterface) { OnManagerActivation(active, oldInterface, newInterface); });
+		mgr->GetActivationEvent().Connect(m_OnManagerActivation, [this](bool active, IInterface* oldInterface, const PInterface& newInterface) { OnManagerActivation(active, oldInterface, newInterface); });
 
 		SetWorkerCount(workerCount);
 		m_AllowGrowth = allowGrowth;

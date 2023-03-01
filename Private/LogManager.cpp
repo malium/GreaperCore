@@ -238,7 +238,7 @@ void LogManager::InitProperties()noexcept
 
 	auto asyncLogProp = asyncLogPropW.lock();
 	m_Threaded = false;
-	asyncLogProp->GetOnModificationEvent()->Connect(m_OnAsyncProp, [this](IProperty* prop) { OnAsyncChanged(prop); });
+	asyncLogProp->GetOnModificationEvent().Connect(m_OnAsyncProp, [this](IProperty* prop) { OnAsyncChanged(prop); });
 
 	m_Properties[(sizet)AsyncProp] = asyncLogPropW;
 }

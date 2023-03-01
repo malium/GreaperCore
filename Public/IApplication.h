@@ -83,7 +83,7 @@ namespace greaper
 
 		virtual TResult<PInterface> GetInterface(const StringView& interfaceName, const Uuid& libraryUUID)const noexcept = 0;
 
-		virtual OnInterfaceActivationEvent_t* GetOnInterfaceActivationEvent()const noexcept = 0;
+		virtual OnInterfaceActivationEvent_t& GetOnInterfaceActivationEvent()const noexcept = 0;
 
 		virtual WPtr<ApplicationNameProp_t> GetApplicationName()const noexcept = 0;
 

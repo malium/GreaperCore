@@ -50,9 +50,9 @@ namespace greaper::core
 
 		TResult<PThread> CreateThread(const ThreadConfig& config)noexcept override;
 
-		INLINE ThreadCreationEvent_t* GetThreadCreationEvent()const noexcept override { return &m_ThreadCreationEvent; }
+		INLINE ThreadCreationEvent_t& GetThreadCreationEvent()const noexcept override { return m_ThreadCreationEvent; }
 		
-		INLINE ThreadDestructionEvent_t* GetThreadDestructionEvent()const noexcept override { return &m_ThreadDestructionEvent; }
+		INLINE ThreadDestructionEvent_t& GetThreadDestructionEvent()const noexcept override { return m_ThreadDestructionEvent; }
 
 		INLINE void AccessThreads(const std::function<void(CSpan<PThread>)>& accessFn)const noexcept override
 		{

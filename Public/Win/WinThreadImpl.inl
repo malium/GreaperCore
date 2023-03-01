@@ -40,7 +40,7 @@ namespace greaper
 			if(!winThread->m_Manager.expired())
 			{
 				auto mgr = winThread->m_Manager.lock();
-				mgr->GetThreadCreationEvent()->Trigger(winThread);
+				mgr->GetThreadCreationEvent().Trigger(winThread);
 			}
 
 			while (winThread->GetState() != ThreadState_t::RUNNING)
@@ -56,7 +56,7 @@ namespace greaper
 			if (!winThread->m_Manager.expired())
 			{
 				auto mgr = winThread->m_Manager.lock();
-				mgr->GetThreadDestructionEvent()->Trigger(winThread);
+				mgr->GetThreadDestructionEvent().Trigger(winThread);
 			}
 			winThread->m_OnManagerActivation.Disconnect();
 			winThread->m_OnNewManager.Disconnect();
@@ -132,7 +132,7 @@ namespace greaper
 			{
 				const auto& newThreadMgr = (const PThreadManager&)newManager;
 				m_OnManagerActivation.Disconnect();
-				newThreadMgr->GetActivationEvent()->Connect(m_OnManagerActivation, [this](bool active, IInterface* oldManager, const PInterface& newManager) { OnManagerActivation(active, oldManager, newManager); });
+				newThreadMgr->GetActivationEvent().Connect(m_OnManagerActivation, [this](bool active, IInterface* oldManager, const PInterface& newManager) { OnManagerActivation(active, oldManager, newManager); });
 				m_Manager = (WThreadManager)newThreadMgr;
 			}
 			else
@@ -145,7 +145,7 @@ namespace greaper
 				VerifyNot(appW.expired(), "Trying to connect to InterfaceActivationEvent but Application was expired.");
 				auto app = appW.lock();
 				m_OnNewManager.Disconnect();
-				app->GetOnInterfaceActivationEvent()->Connect(m_OnNewManager, [this](const PInterface& newManager) { OnNewManager(newManager); });
+				app->GetOnInterfaceActivationEvent().Connect(m_OnNewManager, [this](const PInterface& newManager) { OnNewManager(newManager); });
 			}
 		}
 
@@ -156,7 +156,7 @@ namespace greaper
 
 			m_Manager = (WThreadManager)newManager;
 			m_OnManagerActivation.Disconnect();
-			newManager->GetActivationEvent()->Connect(m_OnManagerActivation, [this](bool active, IInterface* oldManager, const PInterface& newManager) { OnManagerActivation(active, oldManager, newManager); });
+			newManager->GetActivationEvent().Connect(m_OnManagerActivation, [this](bool active, IInterface* oldManager, const PInterface& newManager) { OnManagerActivation(active, oldManager, newManager); });
 			m_OnNewManager.Disconnect();
 		}
 
@@ -202,7 +202,7 @@ namespace greaper
 				m_State = ThreadState_t::RUNNING;
 
 			auto mgr = m_Manager.lock();
-			mgr->GetActivationEvent()->Connect(m_OnManagerActivation, [this](bool active, IInterface* oldManager, const PInterface& newManager) { OnManagerActivation(active, oldManager, newManager); });
+			mgr->GetActivationEvent().Connect(m_OnManagerActivation, [this](bool active, IInterface* oldManager, const PInterface& newManager) { OnManagerActivation(active, oldManager, newManager); });
 			m_Barier.sync();
 		}
 
@@ -218,7 +218,7 @@ namespace greaper
 			if (setName)
 				SetName();
 			auto mgr = m_Manager.lock();
-			mgr->GetActivationEvent()->Connect(m_OnManagerActivation, [this](bool active, IInterface* oldManager, const PInterface& newManager) { OnManagerActivation(active, oldManager, newManager); });
+			mgr->GetActivationEvent().Connect(m_OnManagerActivation, [this](bool active, IInterface* oldManager, const PInterface& newManager) { OnManagerActivation(active, oldManager, newManager); });
 		}
 
 		INLINE ~WinThreadImpl()

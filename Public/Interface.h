@@ -79,9 +79,9 @@ namespace greaper
 
 		InitState_t GetInitializationState()const noexcept;
 
-		InitializationEvt_t* GetInitializationEvent()const noexcept;
+		InitializationEvt_t& GetInitializationEvent()const noexcept;
 
-		ActivationEvt_t* GetActivationEvent()const noexcept;
+		ActivationEvt_t& GetActivationEvent()const noexcept;
 
 		CSpan<WIProperty> GetProperties()const noexcept;
 

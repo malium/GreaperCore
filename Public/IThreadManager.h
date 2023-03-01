@@ -32,9 +32,9 @@ namespace greaper
 
 		virtual TResult<PThread> CreateThread(const ThreadConfig& config)noexcept = 0;
 
-		virtual ThreadCreationEvent_t* GetThreadCreationEvent()const noexcept = 0;
+		virtual ThreadCreationEvent_t& GetThreadCreationEvent()const noexcept = 0;
 
-		virtual ThreadDestructionEvent_t* GetThreadDestructionEvent()const noexcept = 0;
+		virtual ThreadDestructionEvent_t& GetThreadDestructionEvent()const noexcept = 0;
 
 		virtual void AccessThreads(const std::function<void(CSpan<PThread>)>& accessFn)const noexcept = 0;
 	};

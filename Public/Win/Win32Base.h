@@ -110,6 +110,7 @@ typedef unsigned __int64    UINT64;
 typedef float               FLOAT;
 typedef FLOAT* PFLOAT;
 
+
 #if ARCHITECTURE_X64
 typedef __int64 INT_PTR, *PINT_PTR;
 typedef unsigned __int64 UINT_PTR, *PUINT_PTR;
@@ -133,6 +134,11 @@ typedef int (FAR WINAPI* FARPROC)();
 typedef int (NEAR WINAPI* NEARPROC)();
 typedef int (WINAPI* PROC)();
 #endif
+
+typedef UINT_PTR WPARAM;
+typedef LONG_PTR LPARAM;
+typedef LONG_PTR LRESULT;
+
 #ifndef _UINTPTR_T_DEFINED
 #define _UINTPTR_T_DEFINED
 #if ARCHITECTURE_X64

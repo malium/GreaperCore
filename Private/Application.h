@@ -106,7 +106,7 @@ namespace greaper::core
 
 		TResult<PInterface> GetInterface(const StringView& interfaceName, const Uuid& libraryUUID)const noexcept override;
 
-		OnInterfaceActivationEvent_t* GetOnInterfaceActivationEvent()const noexcept override { return &m_OnInterfaceActivation; }
+		OnInterfaceActivationEvent_t& GetOnInterfaceActivationEvent()const noexcept override { return m_OnInterfaceActivation; }
 
 		WPtr<ApplicationNameProp_t> GetApplicationName()const noexcept override { return (WPtr<ApplicationNameProp_t>)m_Properties[(std::size_t)ApplicationName]; }
 
