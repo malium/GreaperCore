@@ -254,12 +254,6 @@ void Application::DeinitProperties()noexcept
 		prop.reset();
 }
 
-TResult<PGreaperLib> Application::RegisterGreaperLibrary(const WStringView& libPath)noexcept
-{
-	PLibrary lib{ Construct<Library>(libPath) };
-	return RegisterGreaperLibrary(lib);
-}
-
 TResult<PGreaperLib> greaper::core::Application::RegisterGreaperLibrary(const StringView& libPath) noexcept
 {
 	PLibrary lib{ Construct<Library>(libPath) };

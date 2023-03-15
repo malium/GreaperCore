@@ -72,8 +72,6 @@ namespace greaper::core
 
 		void DeinitProperties()noexcept override;
 
-		TResult<PGreaperLib> RegisterGreaperLibrary(const WStringView& libPath)noexcept override;
-
 		TResult<PGreaperLib> RegisterGreaperLibrary(const StringView& libPath)noexcept override;
 
 		TResult<PGreaperLib> RegisterGreaperLibrary(PLibrary library)noexcept override;

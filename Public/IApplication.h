@@ -49,8 +49,6 @@ namespace greaper
 
 		virtual ~IApplication()noexcept = default;
 
-		virtual TResult<PGreaperLib> RegisterGreaperLibrary(const WStringView& libPath)noexcept = 0;
-		
 		virtual TResult<PGreaperLib> RegisterGreaperLibrary(const StringView& libPath)noexcept = 0;
 		
 		virtual TResult<PGreaperLib> RegisterGreaperLibrary(PLibrary library)noexcept = 0;
@@ -100,18 +98,6 @@ namespace greaper
 		virtual Vector<PGreaperLib> GetRegisteredLibrariesCopy()const noexcept = 0;
 
 		virtual Vector<PInterface> GetActiveInterfacesCopy()const noexcept = 0;
-
-		template<class T>
-		INLINE TResult<SPtr<T>> RegisterGreaperLibraryT(const WStringView& libPath)noexcept
-		{
-			static_assert(std::is_base_of_v<IGreaperLibrary, T>, "Trying to register a GreaperLibrary "
-				"but its implementation doesn't derive from IGreaperLibrary.");
-			auto res = RegisterGreaperLibrary(libPath);
-			if(res.HasFailed())
-				return Result::CopyFailure<SPtr<T>>(res);
-			auto lib = (SPtr<T>)res.GetValue();
-			return Result::CreateSuccess(lib);
-		}
 
 		template<class T>
 		INLINE TResult<WPtr<T>> GetGreaperLibraryT(const StringView& libraryName)const noexcept

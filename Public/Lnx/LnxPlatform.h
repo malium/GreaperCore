@@ -23,13 +23,13 @@ namespace greaper
 
 		static OSType_t GetOSType()noexcept { return OSType_t::Linux; }
 
-		static DialogButton_t CreateMessageBox(WStringView title, WStringView content, DialogChoice_t choice = DialogChoice_t::OK, DialogIcon_t icon = DialogIcon_t::INFO);
+		static DialogButton_t CreateMessageBox(StringView title, StringView content, DialogChoice_t choice = DialogChoice_t::OK, DialogIcon_t icon = DialogIcon_t::INFO);
 
-		static Vector<WString> CreateOpenFileDialog(WStringView title, WStringView defaultPath = L""sv, const Vector<WStringView>& filters = { L"All files"sv, L"*"sv }, bool multiselect = false);
+		static Vector<String> CreateOpenFileDialog(StringView title, StringView defaultPath = ""sv, const Vector<StringView>& filters = { "All files"sv, "*"sv }, bool multiselect = false);
 
-		static WString CreateSaveFileDialog(WStringView title, WStringView defaultPath = L""sv, const Vector<WStringView>& filters = { L"All files"sv, L"*"sv }, bool forceOverride = false);
+		static String CreateSaveFileDialog(StringView title, StringView defaultPath = ""sv, const Vector<StringView>& filters = { "All files"sv, "*"sv }, bool forceOverride = false);
 
-		static Vector<WString> CreateSelectDirectoryDialog(WStringView title, WStringView defaultPath = L""sv, bool multiselect = false);
+		static Vector<String> CreateSelectDirectoryDialog(StringView title, StringView defaultPath = ""sv, bool multiselect = false);
 
 	protected:
 		static void _PerThreadInit();

@@ -199,7 +199,7 @@ INLINE uint64 greaper::WinOSPlatform::GetPhysicalRAMAmountKB()noexcept
 	return 0ull;
 }
 
-INLINE DialogButton_t greaper::WinOSPlatform::CreateMessageBox(WStringView title, WStringView content, DialogChoice_t choice, DialogIcon_t icon)
+INLINE DialogButton_t greaper::WinOSPlatform::CreateMessageBox(StringView title, StringView content, DialogChoice_t choice, DialogIcon_t icon)
 {
 	UINT uType = MB_SYSTEMMODAL;
 	switch (choice)
@@ -222,7 +222,21 @@ INLINE DialogButton_t greaper::WinOSPlatform::CreateMessageBox(WStringView title
 	default: uType |= MB_ICONINFORMATION;
 	}
 
-	int32 rtn = MessageBoxW(nullptr, content.data(), title.data(), uType);
+	auto wstrings = AllocN<wchar>(title.length() + content.length() + 2);
+	auto wtitle = wstrings;
+	auto wcontent = wstrings + title.length() + 2;
+	for(std::size_t i = 0; i < title.length(); ++i)
+		wtitle[i] = static_cast<wchar>(title[i]);
+	wtitle[title.length() + 1] = 0;
+
+	for(std::size_t i = 0; i < content.length(); ++i)
+		wcontent[i] = static_cast<wchar>(content[i]);
+	wcontent[content.length() + 1] = 0;
+
+	int32 rtn = MessageBoxW(nullptr, wcontent, wtitle, uType);
+
+	Dealloc(wstrings);
+
 	switch (rtn)
 	{
 	case IDOK: return DialogButton_t::OK;

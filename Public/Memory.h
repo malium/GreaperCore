@@ -541,12 +541,7 @@ namespace greaper::Impl
 #else
 		DialogChoice_t choice = DialogChoice_t::OK;
 #endif
-		WString msg{};
-		msg.resize(str.size(), L'\0');
-		for(sizet i = 0; i < str.size(); ++i)
-			msg[i] = (wchar)str[i];
-
-		auto retVal = OSPlatform::CreateMessageBox(L"Greaper Assertion"sv, msg, choice, DialogIcon_t::ERROR);
+		auto retVal = OSPlatform::CreateMessageBox("Greaper Assertion"sv, str, choice, DialogIcon_t::ERROR);
 
 		if (retVal == DialogButton_t::RETRY)
 			TRIGGER_BREAKPOINT();
