@@ -8,7 +8,7 @@
 
 #pragma once
 
-#if GREAPER_CORE_DLL
+#ifdef GREAPER_CORE_DLL
 
 #include "ImplPrerequisites.h"
 #include "../Public/IGreaperLibrary.h"

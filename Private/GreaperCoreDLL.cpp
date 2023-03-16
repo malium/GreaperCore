@@ -10,7 +10,7 @@
 #include "CommandManager.h"
 #include "../Public/Platform.h"
 
-#if GREAPER_CORE_DLL
+#ifdef GREAPER_CORE_DLL
 
 greaper::SPtr<greaper::core::GreaperCoreLibrary> gCoreLibrary = {};
 extern greaper::SPtr<greaper::core::Application> gApplication;

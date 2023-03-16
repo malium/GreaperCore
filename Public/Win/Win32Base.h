@@ -13,6 +13,9 @@
 #endif
 
 #if WIN32_USE_GREAPER_HEADERS
+#ifndef STRICT
+#define STRICT 1
+#endif
 extern "C" {
 #define DECLSPEC_IMPORT __declspec(dllimport)
 #define WINUSERAPI DECLSPEC_IMPORT
@@ -21,6 +24,9 @@ extern "C" {
 #define NTSYSCALLAPI DECLSPEC_IMPORT
 #ifndef _ACRTIMP
 #define _ACRTIMP __declspec(dllimport)
+#endif
+#ifndef CALLBACK
+#define CALLBACK __stdcall
 #endif
 #define WINAPI      __stdcall
 #define NTAPI __stdcall
@@ -185,9 +191,14 @@ typedef INT_PTR (FAR WINAPI *FARPROC)();
 #define LOBYTE(w)           ((BYTE)(((DWORD_PTR)(w)) & 0xff))
 #define HIBYTE(w)           ((BYTE)((((DWORD_PTR)(w)) >> 8) & 0xff))
 
-//#define DECLARE_HANDLE(name) struct name##__{int unused;}; typedef struct name##__ *name
+#ifdef STRICT
+  typedef void *HANDLE;
+#define DECLARE_HANDLE(name) struct name##__ { int unused; }; typedef struct name##__ *name
+#else
 typedef PVOID HANDLE;
 #define DECLARE_HANDLE(name) typedef HANDLE name
+#endif
+
 #define INVALID_HANDLE_VALUE ((HANDLE)(LONG_PTR)-1)
 
 DECLARE_HANDLE(HWND);
@@ -197,9 +208,17 @@ DECLARE_HANDLE(HINSTANCE);
 DECLARE_HANDLE(HMONITOR);
 DECLARE_HANDLE(HENHMETAFILE);
 DECLARE_HANDLE(HBITMAP);
+DECLARE_HANDLE(HICON);
+DECLARE_HANDLE(HMENU);
+DECLARE_HANDLE(HACCEL);
+DECLARE_HANDLE(HBRUSH);
+
 typedef HINSTANCE HMODULE;      /* HMODULEs can be used in place of HINSTANCEs */
 typedef HANDLE              HGLOBAL;
 typedef HANDLE              HLOCAL;
+
+typedef HICON HCURSOR;
+typedef DWORD COLORREF;
 
 typedef struct _LIST_ENTRY {
 	struct _LIST_ENTRY* Flink;
@@ -1018,7 +1037,157 @@ VerifyVersionInfoW(
 	DWORD dwTypeMask,
 	DWORDLONG dwlConditionMask
 );
+
+typedef LRESULT (CALLBACK *WNDPROC)(HWND,UINT,WPARAM,LPARAM);
+
+typedef struct tagWNDCLASSA {
+	UINT style;
+	WNDPROC lpfnWndProc;
+	int cbClsExtra;
+	int cbWndExtra;
+	HINSTANCE hInstance;
+	HICON hIcon;
+	HCURSOR hCursor;
+	HBRUSH hbrBackground;
+	LPCSTR lpszMenuName;
+	LPCSTR lpszClassName;
+} WNDCLASSA,*PWNDCLASSA,*NPWNDCLASSA,*LPWNDCLASSA;
+
+  typedef struct tagWNDCLASSW {
+	UINT style;
+	WNDPROC lpfnWndProc;
+	int cbClsExtra;
+	int cbWndExtra;
+	HINSTANCE hInstance;
+	HICON hIcon;
+	HCURSOR hCursor;
+	HBRUSH hbrBackground;
+	LPCWSTR lpszMenuName;
+	LPCWSTR lpszClassName;
+} WNDCLASSW,*PWNDCLASSW,*NPWNDCLASSW,*LPWNDCLASSW;
+
+typedef struct tagWNDCLASSEXA {
+	UINT cbSize;
+	UINT style;
+	WNDPROC lpfnWndProc;
+	int cbClsExtra;
+	int cbWndExtra;
+	HINSTANCE hInstance;
+	HICON hIcon;
+	HCURSOR hCursor;
+	HBRUSH hbrBackground;
+	LPCSTR lpszMenuName;
+	LPCSTR lpszClassName;
+	HICON hIconSm;
+} WNDCLASSEXA,*PWNDCLASSEXA,*NPWNDCLASSEXA,*LPWNDCLASSEXA;
+
+  typedef struct tagWNDCLASSEXW {
+	UINT cbSize;
+	UINT style;
+	WNDPROC lpfnWndProc;
+	int cbClsExtra;
+	int cbWndExtra;
+	HINSTANCE hInstance;
+	HICON hIcon;
+	HCURSOR hCursor;
+	HBRUSH hbrBackground;
+	LPCWSTR lpszMenuName;
+	LPCWSTR lpszClassName;
+	HICON hIconSm;
+} WNDCLASSEXW,*PWNDCLASSEXW,*NPWNDCLASSEXW,*LPWNDCLASSEXW;
+
+typedef struct tagMSG {
+    HWND hwnd;
+    UINT message;
+    WPARAM wParam;
+    LPARAM lParam;
+    DWORD time;
+    POINT pt;
+  } MSG,*PMSG,*NPMSG,*LPMSG;
 }
+
+#define POINTSTOPOINT(pt,pts) { (pt).x = (LONG)(SHORT)LOWORD(*(LONG*)&pts); (pt).y = (LONG)(SHORT)HIWORD(*(LONG*)&pts); }
+
+#define POINTTOPOINTS(pt) (MAKELONG((short)((pt).x),(short)((pt).y)))
+#define MAKEWPARAM(l,h) ((WPARAM)(DWORD)MAKELONG(l,h))
+#define MAKELPARAM(l,h) ((LPARAM)(DWORD)MAKELONG(l,h))
+#define MAKELRESULT(l,h) ((LRESULT)(DWORD)MAKELONG(l,h))
+
+#define WS_OVERLAPPED 0x00000000L
+#define WS_POPUP 0x80000000L
+#define WS_CHILD 0x40000000L
+#define WS_MINIMIZE 0x20000000L
+#define WS_VISIBLE 0x10000000L
+#define WS_DISABLED 0x08000000L
+#define WS_CLIPSIBLINGS 0x04000000L
+#define WS_CLIPCHILDREN 0x02000000L
+#define WS_MAXIMIZE 0x01000000L
+#define WS_CAPTION 0x00C00000L
+#define WS_BORDER 0x00800000L
+#define WS_DLGFRAME 0x00400000L
+#define WS_VSCROLL 0x00200000L
+#define WS_HSCROLL 0x00100000L
+#define WS_SYSMENU 0x00080000L
+#define WS_THICKFRAME 0x00040000L
+#define WS_GROUP 0x00020000L
+#define WS_TABSTOP 0x00010000L
+
+#define WS_MINIMIZEBOX 0x00020000L
+#define WS_MAXIMIZEBOX 0x00010000L
+
+#define WS_TILED WS_OVERLAPPED
+#define WS_ICONIC WS_MINIMIZE
+#define WS_SIZEBOX WS_THICKFRAME
+#define WS_TILEDWINDOW WS_OVERLAPPEDWINDOW
+
+#define WS_OVERLAPPEDWINDOW (WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX)
+
+#define WS_POPUPWINDOW (WS_POPUP | WS_BORDER | WS_SYSMENU)
+
+#define WS_CHILDWINDOW (WS_CHILD)
+
+#define WS_EX_DLGMODALFRAME 0x00000001L
+#define WS_EX_NOPARENTNOTIFY 0x00000004L
+#define WS_EX_TOPMOST 0x00000008L
+#define WS_EX_ACCEPTFILES 0x00000010L
+#define WS_EX_TRANSPARENT 0x00000020L
+#define WS_EX_MDICHILD 0x00000040L
+#define WS_EX_TOOLWINDOW 0x00000080L
+#define WS_EX_WINDOWEDGE 0x00000100L
+#define WS_EX_CLIENTEDGE 0x00000200L
+#define WS_EX_CONTEXTHELP 0x00000400L
+#define WS_EX_RIGHT 0x00001000L
+#define WS_EX_LEFT 0x00000000L
+#define WS_EX_RTLREADING 0x00002000L
+#define WS_EX_LTRREADING 0x00000000L
+#define WS_EX_LEFTSCROLLBAR 0x00004000L
+#define WS_EX_RIGHTSCROLLBAR 0x00000000L
+
+#define WS_EX_CONTROLPARENT 0x00010000L
+#define WS_EX_STATICEDGE 0x00020000L
+#define WS_EX_APPWINDOW 0x00040000L
+
+#define WS_EX_OVERLAPPEDWINDOW (WS_EX_WINDOWEDGE | WS_EX_CLIENTEDGE)
+#define WS_EX_PALETTEWINDOW (WS_EX_WINDOWEDGE | WS_EX_TOOLWINDOW | WS_EX_TOPMOST)
+#define WS_EX_LAYERED 0x00080000
+#define WS_EX_NOINHERITLAYOUT 0x00100000L
+#define WS_EX_LAYOUTRTL 0x00400000L
+#define WS_EX_COMPOSITED 0x02000000L
+#define WS_EX_NOACTIVATE 0x08000000L
+
+#define CS_VREDRAW 0x0001
+#define CS_HREDRAW 0x0002
+#define CS_DBLCLKS 0x0008
+#define CS_OWNDC 0x0020
+#define CS_CLASSDC 0x0040
+#define CS_PARENTDC 0x0080
+#define CS_NOCLOSE 0x0200
+#define CS_SAVEBITS 0x0800
+#define CS_BYTEALIGNCLIENT 0x1000
+#define CS_BYTEALIGNWINDOW 0x2000
+#define CS_GLOBALCLASS 0x4000
+#define CS_IME 0x00010000
+#define CS_DROPSHADOW 0x00020000
 
 #else
 
