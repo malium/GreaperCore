@@ -78,7 +78,7 @@ namespace greaper
 		TResult<Vector<Impl::HTask>> AddTasks(const Vector<std::tuple<StringView, std::function<void()>>>& tasks)noexcept;
 
 		void WaitUntilTaskIsFinish(const Impl::HTask& hTask)noexcept;
-		void WaitUntilFinishAllTasks()noexcept;
+		void WaitUntilAllTasksFinished()noexcept;
 
 		const String& GetName()const noexcept;
 

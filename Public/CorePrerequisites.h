@@ -52,8 +52,7 @@ namespace greaper
 	template<class T> class TPropertyValidator;
 	template<class... Args> class Event;
 	class MPMCTaskScheduler; using PTaskScheduler = SPtr<MPMCTaskScheduler>; using WTaskScheduler = WPtr<MPMCTaskScheduler>;
-	
-	
+	class SlimTaskScheduler; using PSlimScheduler = SPtr<SlimTaskScheduler>; using WSlimScheduler = WPtr<SlimTaskScheduler>;
 
 	class IStream;
 	class Uuid;

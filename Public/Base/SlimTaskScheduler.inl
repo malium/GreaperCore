@@ -5,48 +5,27 @@
 
 #pragma once
 
-//#include "../MPMCTaskScheduler.h"
+#include "../SlimTaskScheduler.h"
 
 namespace greaper
 {
-	namespace Impl
-	{
-		INLINE HTask::HTask(WPtr<Task> task, WPtr<MPMCTaskScheduler> scheduler)noexcept
-			:m_Task(std::move(task))
-			, m_Scheduler(std::move(scheduler))
-		{
-
-		}
-
-		INLINE TaskState_t Task::GetCurrentState()const noexcept { return m_State; }
-
-		INLINE void HTask::WaitUntilFinish()noexcept
-		{
-			if (m_Task.expired() || m_Scheduler.expired())
-				return;
-
-			auto scheduler = m_Scheduler.lock();
-			scheduler->WaitUntilTaskIsFinish(*this);
-		}
-	}
-	
 	template<class _Alloc_>
-	INLINE SPtr<MPMCTaskScheduler> MPMCTaskScheduler::Create(WThreadManager threadMgr, StringView name, sizet workerCount, bool allowGrowth) noexcept
+	INLINE PSlimScheduler SlimTaskScheduler::Create(WThreadManager threadMgr, StringView name, sizet workerCount, bool allowGrowth) noexcept
 	{
-		auto* ptr = AllocT<MPMCTaskScheduler, _Alloc_>();
-		new ((void*)ptr)MPMCTaskScheduler(threadMgr, std::move(name), workerCount, allowGrowth);
-		return SPtr<MPMCTaskScheduler>((MPMCTaskScheduler*)ptr, &Impl::DefaultDeleter<MPMCTaskScheduler, _Alloc_>);
+		auto* ptr = AllocT<SlimTaskScheduler, _Alloc_>();
+		new ((void*)ptr)SlimTaskScheduler(threadMgr, std::move(name), workerCount, allowGrowth);
+		return SPtr<SlimTaskScheduler>((SlimTaskScheduler*)ptr, &Impl::DefaultDeleter<SlimTaskScheduler, _Alloc_>);
 	}
 
-	INLINE MPMCTaskScheduler::~MPMCTaskScheduler() noexcept
+	INLINE SlimTaskScheduler::~SlimTaskScheduler() noexcept
 	{
 		Stop();
 		m_This.reset();
 	}
 
-	INLINE sizet MPMCTaskScheduler::GetWorkerCount() const noexcept { auto lck = SharedLock(m_TaskWorkersMutex); return m_TaskWorkers.size(); }
+	INLINE sizet SlimTaskScheduler::GetWorkerCount() const noexcept { auto lck = SharedLock(m_TaskWorkersMutex); return m_TaskWorkers.size(); }
 
-	inline EmptyResult MPMCTaskScheduler::SetWorkerCount(sizet count) noexcept
+	inline EmptyResult SlimTaskScheduler::SetWorkerCount(sizet count) noexcept
 	{
 		m_TaskWorkersMutex.lock();
 		if (m_TaskWorkers.size() == count)
@@ -60,10 +39,10 @@ namespace greaper
 			auto lck = Lock<decltype(m_TaskWorkersMutex)>(m_TaskWorkersMutex, AdoptLock{});
 			
 			if(!m_AllowGrowth)
-				return Result::CreateFailure("Trying to add more workers to a MPMCTaskScheduler, but it has forbidden the growth."sv);
+				return Result::CreateFailure("Trying to add more workers to a SlimTaskScheduler, but it has forbidden the growth."sv);
 
 			if (m_ThreadManager.expired())
-				return Result::CreateFailure("Trying to add more workers to a MPMCTaskScheduler, but the ThreadManager has expired."sv);
+				return Result::CreateFailure("Trying to add more workers to a SlimTaskScheduler, but the ThreadManager has expired."sv);
 
 			auto thManager = m_ThreadManager.lock();
 			for (sizet i = m_TaskWorkers.size(); i < count; ++i)
@@ -105,22 +84,21 @@ namespace greaper
 		}
 		return Result::CreateSuccess();
 	}
-
-	inline TResult<Impl::HTask> MPMCTaskScheduler::AddTask(StringView name, std::function<void()> workFn) noexcept
+	
+	inline EmptyResult SlimTaskScheduler::AddTask(SlimTask task) noexcept
 	{
 		auto wkLck = SharedLock(m_TaskWorkersMutex); // we keep the lock so if there's only 1 task worker and someone wants to remove it, we can still schedule this task
 		if (!AreThereAnyAvailableWorker())
 		{
-			return Result::CreateFailure<Impl::HTask>(
-				Format("Couldn't add the task '%s', no available workers.", name.data()));
+			return Result::CreateFailure("Couldn't add the task, no available workers."sv);
 		}
 
-		Impl::Task* taskPtr;
+		SlimTask* taskPtr;
 		{
 			auto fpLck = Lock(m_FreeTaskPoolMutex);
 			if (m_FreeTaskPool.empty())
 			{
-				taskPtr = Construct<Impl::Task>();
+				taskPtr = AllocT<SlimTask>();
 			}
 			else
 			{
@@ -128,89 +106,18 @@ namespace greaper
 				m_FreeTaskPool.pop_back();
 			}
 		}
-		taskPtr->m_Name.assign(name);
-		taskPtr->m_State = TaskState_t::Inactive;
-		taskPtr->m_WorkFn = std::move(workFn);
-		SPtr<Impl::Task> task{ taskPtr , &Impl::EmptyDeleter<Impl::Task> };
-
-		Impl::HTask hTask;
-		hTask.m_Scheduler = (WPtr<MPMCTaskScheduler>)m_This;
-		hTask.m_Task = (WPtr<Impl::Task>)task;
+		// All taskPtr will be uninitialized memory so we call the move constructor
+		new(taskPtr)SlimTask(std::move(task));
 
 		m_TaskQueueMutex.lock();
-		m_TaskQueue.push_back(task);
+		m_TaskQueue.push_back(taskPtr);
 		m_TaskQueueMutex.unlock();
 		m_TaskQueueSignal.notify_one();
 		
-		return Result::CreateSuccess(hTask);
+		return Result::CreateSuccess();
 	}
 
-	inline TResult<Vector<Impl::HTask>> MPMCTaskScheduler::AddTasks(const Vector<std::tuple<StringView, std::function<void()>>>& tasks) noexcept
-	{
-		if(tasks.empty())
-		{
-			return Result::CreateFailure<Vector<Impl::HTask>>("Trying to add multiple tasks, but an empty task vector was given."sv);
-		}
-
-		// we keep the lock so if there's only 1 task worker and someone wants to remove it, we can still schedule this task
-		auto wkLck = SharedLock(m_TaskWorkersMutex);
-		if (!AreThereAnyAvailableWorker())
-		{
-			return Result::CreateFailure<Vector<Impl::HTask>>("Couldn't add multiple tasks, no available workers."sv);
-		}
-
-		Vector<SPtr<Impl::Task>> taskPtrs;
-		Vector<Impl::HTask> hTasks;
-		taskPtrs.reserve(tasks.size());
-		hTasks.reserve(tasks.size());
-		while(taskPtrs.size() < tasks.size())
-		{
-			Impl::Task* taskPtr;
-			{
-				auto fpLck = Lock(m_FreeTaskPoolMutex);
-				if (m_FreeTaskPool.empty())
-				{
-					taskPtr = Construct<Impl::Task>();
-				}
-				else
-				{
-					taskPtr = m_FreeTaskPool.back();
-					m_FreeTaskPool.pop_back();
-				}
-			}
-			auto& tuple = tasks[taskPtrs.size()];
-			taskPtr->m_Name.assign(std::get<0>(tuple));
-			taskPtr->m_State = TaskState_t::Inactive;
-			taskPtr->m_WorkFn = std::get<1>(tuple);
-			auto task = SPtr<Impl::Task>{ taskPtr };
-			hTasks.push_back(Impl::HTask{ (WPtr<Impl::Task>)task, (WPtr<MPMCTaskScheduler>)m_This });
-			taskPtrs.push_back(task);
-		}
-
-		m_TaskQueueMutex.lock();
-		const auto oldSize = m_TaskQueue.size();
-		std::move(taskPtrs.begin(), taskPtrs.end(), m_TaskQueue.begin() + oldSize);
-		m_TaskQueueMutex.unlock();
-		for(std::size_t i = 0; i < tasks.size(); ++i)
-			m_TaskQueueSignal.notify_one();
-
-		return Result::CreateSuccess(hTasks);
-	}
-
-	INLINE void MPMCTaskScheduler::WaitUntilTaskIsFinish(const Impl::HTask& hTask) noexcept
-	{
-		if (hTask.m_Scheduler.expired() || hTask.m_Task.expired())
-			return;
-		if (hTask.m_Scheduler.lock() != m_This)
-			return;
-		auto task = hTask.m_Task.lock();
-
-		auto lck = UniqueLock<decltype(m_TaskQueueMutex)>(m_TaskQueueMutex);
-		while (Contains(m_TaskQueue, task))
-			m_TaskQueueSignal.wait(lck);
-	}
-
-	INLINE void MPMCTaskScheduler::WaitUntilAllTasksFinished() noexcept
+	INLINE void SlimTaskScheduler::WaitUntilAllTasksFinished() noexcept
 	{
 		// Don't add more tasks nor change the amount of workers
 		auto wkLck = Lock(m_TaskWorkersMutex);
@@ -221,21 +128,21 @@ namespace greaper
 			m_TaskQueueSignal.wait(lck);
 	}
 
-	INLINE const String& MPMCTaskScheduler::GetName() const noexcept { return m_Name; }
+	INLINE const String& SlimTaskScheduler::GetName() const noexcept { return m_Name; }
 
-	INLINE bool MPMCTaskScheduler::IsGrowthEnabled() const noexcept
+	INLINE bool SlimTaskScheduler::IsGrowthEnabled() const noexcept
 	{
 		auto lck = SharedLock(m_TaskWorkersMutex);
 		return m_AllowGrowth;
 	}
 
-	INLINE void MPMCTaskScheduler::EnableGrowth(bool enable) noexcept
+	INLINE void SlimTaskScheduler::EnableGrowth(bool enable) noexcept
 	{
 		LOCK(m_TaskWorkersMutex);
 		m_AllowGrowth = enable;
 	}
 
-	INLINE void MPMCTaskScheduler::OnNewManager(const PInterface& newInterface) noexcept
+	INLINE void SlimTaskScheduler::OnNewManager(const PInterface& newInterface) noexcept
 	{
 		auto lck = SharedLock(m_TaskWorkersMutex);
 		if (newInterface == nullptr || newInterface->GetInterfaceUUID() != IThreadManager::InterfaceUUID)
@@ -247,7 +154,7 @@ namespace greaper
 		m_OnNewManager.Disconnect();
 	}
 
-	INLINE void MPMCTaskScheduler::OnManagerActivation(bool active, IInterface* oldInterface, const PInterface& newInterface) noexcept
+	INLINE void SlimTaskScheduler::OnManagerActivation(bool active, IInterface* oldInterface, const PInterface& newInterface) noexcept
 	{
 		auto lck = SharedLock(m_TaskWorkersMutex);
 		if (active)
@@ -276,25 +183,21 @@ namespace greaper
 		}
 	}
 
-	INLINE void MPMCTaskScheduler::Stop() noexcept
+	INLINE void SlimTaskScheduler::Stop() noexcept
 	{
 		SetWorkerCount(0);
 		
-		for (auto& task : m_TaskQueue)
+		for (auto* task : m_TaskQueue)
 		{
-			task->m_State = TaskState_t::InProgress;
-			task->m_WorkFn();
-			task->m_State = TaskState_t::Completed;
-			Destroy(task.get());
+			(*task)();
+			Destroy(task);
 		}
 		m_TaskQueue.clear();
 		for (auto* task : m_FreeTaskPool)
-		{
-			Destroy(task);
-		}
+			Dealloc(task);
 	}
 
-	INLINE bool MPMCTaskScheduler::AreThereAnyAvailableWorker() const noexcept
+	INLINE bool SlimTaskScheduler::AreThereAnyAvailableWorker() const noexcept
 	{
 		if (m_TaskWorkers.empty())
 			return false; // There are no workers!
@@ -307,13 +210,13 @@ namespace greaper
 		return false; // There is no active worker
 	}
 
-	INLINE MPMCTaskScheduler::MPMCTaskScheduler(WThreadManager threadMgr, StringView name, sizet workerCount, bool allowGrowth)noexcept
+	INLINE SlimTaskScheduler::SlimTaskScheduler(WThreadManager threadMgr, StringView name, sizet workerCount, bool allowGrowth)noexcept
 		:m_ThreadManager(std::move(threadMgr))
 		,m_Name(name)
-		,m_This(this, &Impl::EmptyDeleter<MPMCTaskScheduler>)
+		,m_This(this, &Impl::EmptyDeleter<SlimTaskScheduler>)
 		,m_AllowGrowth(true)
 	{
-		VerifyNot(m_ThreadManager.expired(), "Trying to initialize a MPMCTaskScheduler, but an expired ThreadManager was given.");
+		VerifyNot(m_ThreadManager.expired(), "Trying to initialize a SlimTaskScheduler, but an expired ThreadManager was given.");
 		auto mgr = m_ThreadManager.lock();
 		mgr->GetActivationEvent().Connect(m_OnManagerActivation, [this](bool active, IInterface* oldInterface, const PInterface& newInterface) { OnManagerActivation(active, oldInterface, newInterface); });
 
@@ -321,17 +224,17 @@ namespace greaper
 		m_AllowGrowth = allowGrowth;
 	}
 
-	INLINE bool MPMCTaskScheduler::CanWorkerContinueWorking(sizet workerID)const noexcept
+	INLINE bool SlimTaskScheduler::CanWorkerContinueWorking(sizet workerID)const noexcept
 	{
 		auto lck = SharedLock(m_TaskWorkersMutex);
 		return m_TaskWorkers.size() > workerID && m_TaskWorkers[workerID] != nullptr;
 	}
 
-	INLINE void MPMCTaskScheduler::WorkerFn(MPMCTaskScheduler& scheduler, sizet id) noexcept
+	INLINE void SlimTaskScheduler::WorkerFn(SlimTaskScheduler& scheduler, sizet id) noexcept
 	{
 		while (true)
 		{
-			SPtr<Impl::Task> task {};
+			SlimTask* task = nullptr;
 			// Retrieve a task to do or check if we need to keep running
 			{
 				auto taskLck = UniqueLock<decltype(m_TaskQueueMutex)>(scheduler.m_TaskQueueMutex);
@@ -360,15 +263,16 @@ namespace greaper
 			if (task != nullptr)
 			{
 				// Execute the task
-				task->m_State = TaskState_t::InProgress;
-				task->m_WorkFn();
-				task->m_State = TaskState_t::Completed;
+				(*task)();
+				// all newly created tasks assume uninitialized memory so we need to call destructor now
+				task->~packaged_task();
 				// Store the task on to the free task pool
 				{
-					auto freeLck = Lock(scheduler.m_FreeTaskPoolMutex);
-					scheduler.m_FreeTaskPool.push_back(task.get());
+					LOCK(scheduler.m_FreeTaskPoolMutex);
+					scheduler.m_FreeTaskPool.push_back(task);
 				}
-				task.reset();
+
+				task = nullptr;
 			}
 		}
 	}
