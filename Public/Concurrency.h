@@ -34,24 +34,26 @@ namespace greaper
 	*	which thread owns the mutex, so when a deadlock occurs we can 
 	*	see which threads are colliding with their info
 	*/
-	class Mutex
+	template<bool Enabled> class TMutex;
+
+	template<>
+	class TMutex<true>
 	{
 		MutexHandle m_Handle;
+
 	public:
-		INLINE Mutex() noexcept
+		INLINE TMutex() noexcept
 		{
 			Impl::MutexImpl::Initialize(m_Handle);
 		}
-
-		Mutex(const Mutex&) = delete;
-		Mutex& operator=(const Mutex&) = delete;
-		INLINE Mutex(Mutex&& other) noexcept
+		TMutex(const TMutex&) = delete;
+		TMutex& operator=(const TMutex&) = delete;
+		INLINE TMutex(TMutex&& other) noexcept
 		{
-
 			DuplicateMemory(other.m_Handle, m_Handle);
 			Impl::MutexImpl::Invalidate(other.m_Handle);
 		}
-		INLINE Mutex& operator=(Mutex&& other)noexcept
+		INLINE TMutex& operator=(TMutex&& other)noexcept
 		{
 			if (this != &other)
 			{
@@ -62,7 +64,7 @@ namespace greaper
 			}
 			return *this;
 		}
-		INLINE ~Mutex()
+		INLINE ~TMutex()
 		{
 			if (Impl::MutexImpl::IsValid(m_Handle))
 				Impl::MutexImpl::Deinitialize(m_Handle);
@@ -73,20 +75,17 @@ namespace greaper
 			Verify(Impl::MutexImpl::IsValid(m_Handle), "Trying to lock an invalid mutex.");
 			Impl::MutexImpl::Lock(m_Handle);
 		}
-
 		INLINE bool try_lock() noexcept
 		{
 			if (!Impl::MutexImpl::IsValid(m_Handle))
 				return false;
 			return Impl::MutexImpl::TryLock(m_Handle);
 		}
-
 		INLINE void unlock() noexcept
 		{
 			Verify(Impl::MutexImpl::IsValid(m_Handle), "Trying to unlock an invalid mutex.");
 			return Impl::MutexImpl::Unlock(m_Handle);
 		}
-
 		NODISCARD INLINE const MutexHandle* GetHandle()const noexcept
 		{
 			return &m_Handle;
@@ -95,7 +94,30 @@ namespace greaper
 		{
 			return &m_Handle;
 		}
+		INLINE bool IsEnabled()const noexcept { return true; }
 	};
+
+	template<>
+	class TMutex<false>
+	{
+		MutexHandle m_Handle; // Avoid returning nullptr on GetHandle, even though will not be initialized
+	public:
+		INLINE TMutex() noexcept = default;
+		TMutex(const TMutex&) = delete;
+		TMutex& operator=(const TMutex&) = delete;
+		INLINE TMutex(TMutex&& other) noexcept = default;
+		INLINE TMutex& operator=(TMutex&& other)noexcept = default;
+		INLINE ~TMutex() = default;
+		INLINE void lock() noexcept { /* No-op */ }
+		INLINE bool try_lock() noexcept { return true; }
+		INLINE void unlock() noexcept { /* No-op */ }
+		NODISCARD INLINE const MutexHandle* GetHandle()const noexcept { return &m_Handle; }
+		NODISCARD INLINE MutexHandle* GetHandle() noexcept { return &m_Handle; }
+		INLINE bool IsEnabled()const noexcept { return false; }
+	};
+
+	using Mutex = TMutex<true>;
+	using MutexDisabled = TMutex<false>;
 
 	/*** Mutex that allows recursion
 	*	Multiple locking by the same thread -> expects the same unlockings afterwards
@@ -106,23 +128,25 @@ namespace greaper
 	*	see which threads are colliding with their info. Also a counter
 	*	that tells how many lockings have done the lock thread.
 	*/
-	class RecursiveMutex
+	template<bool Enabled> class TRecursiveMutex;
+	template<>
+	class TRecursiveMutex<true>
 	{
 		RecursiveMutexHandle m_Handle;
 
 	public:
-		INLINE RecursiveMutex() noexcept
+		INLINE TRecursiveMutex() noexcept
 		{
 			Impl::RecursiveMutexImpl::Initialize(m_Handle);
 		}
-		RecursiveMutex(const RecursiveMutex&) = delete;
-		RecursiveMutex& operator=(const RecursiveMutex&) = delete;
-		INLINE RecursiveMutex(RecursiveMutex&& other) noexcept
+		TRecursiveMutex(const TRecursiveMutex&) = delete;
+		TRecursiveMutex& operator=(const TRecursiveMutex&) = delete;
+		INLINE TRecursiveMutex(TRecursiveMutex&& other) noexcept
 		{
 			DuplicateMemory(other.m_Handle, m_Handle);
 			Impl::RecursiveMutexImpl::Invalidate(other.m_Handle);
 		}
-		INLINE RecursiveMutex& operator=(RecursiveMutex&& other) noexcept
+		INLINE TRecursiveMutex& operator=(TRecursiveMutex&& other) noexcept
 		{
 			if (this != &other)
 			{
@@ -133,7 +157,7 @@ namespace greaper
 			}
 			return *this;
 		}
-		INLINE ~RecursiveMutex()
+		INLINE ~TRecursiveMutex()
 		{
 			if (Impl::RecursiveMutexImpl::IsValid(m_Handle))
 				Impl::RecursiveMutexImpl::Deinitialize(m_Handle);
@@ -144,30 +168,51 @@ namespace greaper
 			Verify(Impl::RecursiveMutexImpl::IsValid(m_Handle), "Trying to lock an invalid recursive mutex");
 			Impl::RecursiveMutexImpl::Lock(m_Handle);
 		}
-
 		INLINE bool try_lock() noexcept
 		{
 			if (!Impl::RecursiveMutexImpl::IsValid(m_Handle))
 				return false;
 			return Impl::RecursiveMutexImpl::TryLock(m_Handle);
 		}
-
 		INLINE void unlock() noexcept
 		{
 			Verify(Impl::RecursiveMutexImpl::IsValid(m_Handle), "Trying to unlock an invalid recursive mutex");
 			Impl::RecursiveMutexImpl::Unlock(m_Handle);
 		}
-
 		NODISCARD INLINE const RecursiveMutexHandle* GetHandle()const noexcept
 		{
 			return &m_Handle;
 		}
-
 		NODISCARD INLINE RecursiveMutexHandle* GetHandle() noexcept
 		{
 			return &m_Handle;
 		}
+		INLINE bool IsEnabled()const noexcept { return true; }
 	};
+
+	template<>
+	class TRecursiveMutex<true>
+	{
+		RecursiveMutexHandle m_Handle; // Avoid returning nullptr on GetHandle, even though will not be initialized
+
+	public:
+		INLINE TRecursiveMutex() noexcept = default;
+		TRecursiveMutex(const TRecursiveMutex&) = delete;
+		TRecursiveMutex& operator=(const TRecursiveMutex&) = delete;
+		INLINE TRecursiveMutex(TRecursiveMutex&& other) noexcept = default;
+		INLINE TRecursiveMutex& operator=(TRecursiveMutex&& other) noexcept = default;
+		INLINE ~TRecursiveMutex() = default;
+
+		INLINE void lock() noexcept { /* No-op */ }
+		INLINE bool try_lock() noexcept { return true; }
+		INLINE void unlock() noexcept { /* No-op */ }
+		NODISCARD INLINE const RecursiveMutexHandle* GetHandle()const noexcept { return &m_Handle; }
+		NODISCARD INLINE RecursiveMutexHandle* GetHandle() noexcept { return &m_Handle; }
+		INLINE bool IsEnabled()const noexcept { return false; }
+	};
+
+	using RecursiveMutex = TRecursiveMutex<true>;
+	using RecursiveMutexDisabled = TRecursiveMutex<false>;
 
 	/*** Read-Write Mutex
 	*	A lightweight mutex to avoid locking when we are just reading
@@ -177,23 +222,26 @@ namespace greaper
 	*	which thread owns the mutex, so when a deadlock occurs we can
 	*	see which threads are colliding with their info
 	*/
-	class RWMutex
+	template<bool Enabled> class TRWMutex;
+
+	template<>
+	class TRWMutex<true>
 	{
 		RWMutexHandle m_Handle;
 
 	public:
-		INLINE RWMutex() noexcept
+		INLINE TRWMutex() noexcept
 		{
 			Impl::RWMutexImpl::Initialize(m_Handle);
 		}
-		RWMutex(const RWMutex&) = delete;
-		RWMutex& operator=(const RWMutex&) = delete;
-		INLINE RWMutex(RWMutex&& other) noexcept
+		TRWMutex(const TRWMutex&) = delete;
+		TRWMutex& operator=(const TRWMutex&) = delete;
+		INLINE TRWMutex(TRWMutex&& other) noexcept
 		{
 			DuplicateMemory(other.m_Handle, m_Handle);
 			Impl::RWMutexImpl::Invalidate(other.m_Handle);
 		}
-		INLINE RWMutex& operator=(RWMutex&& other) noexcept
+		INLINE TRWMutex& operator=(TRWMutex&& other) noexcept
 		{
 			if (this != &other)
 			{
@@ -204,7 +252,7 @@ namespace greaper
 			}
 			return *this;
 		}
-		INLINE ~RWMutex()
+		INLINE ~TRWMutex()
 		{
 			if (Impl::RWMutexImpl::IsValid(m_Handle))
 				Impl::RWMutexImpl::Deinitialize(m_Handle);
@@ -215,32 +263,27 @@ namespace greaper
 			Verify(Impl::RWMutexImpl::IsValid(m_Handle), "Trying to lock an invalid read-write mutex");
 			Impl::RWMutexImpl::Lock(m_Handle);
 		}
-
 		INLINE void lock_shared() noexcept
 		{
 			Verify(Impl::RWMutexImpl::IsValid(m_Handle), "Trying to lock shared an invalid read-write mutex");
 			Impl::RWMutexImpl::LockShared(m_Handle);
 		}
-
 		INLINE void unlock() noexcept
 		{
 			Verify(Impl::RWMutexImpl::IsValid(m_Handle), "Trying to unlock an invalid read-write mutex");
 			Impl::RWMutexImpl::Unlock(m_Handle);
 		}
-
 		INLINE void unlock_shared() noexcept
 		{
 			Verify(Impl::RWMutexImpl::IsValid(m_Handle), "Trying to unlock shared an invalid read-write mutex");
 			Impl::RWMutexImpl::UnlockShared(m_Handle);
 		}
-
 		INLINE bool try_lock() noexcept
 		{
 			if (!Impl::RWMutexImpl::IsValid(m_Handle))
 				return false;
 			return Impl::RWMutexImpl::TryLock(m_Handle);
 		}
-
 		INLINE bool try_lock_shared() noexcept
 		{
 			if (!Impl::RWMutexImpl::IsValid(m_Handle))
@@ -252,12 +295,40 @@ namespace greaper
 		{
 			return &m_Handle;
 		}
-
 		NODISCARD INLINE RWMutexHandle* GetHandle() noexcept
 		{
 			return &m_Handle;
 		}
+		INLINE bool IsEnabled()const noexcept { return true; }
 	};
+
+	template<>
+	class TRWMutex<false>
+	{
+		RWMutexHandle m_Handle; // Avoid returning nullptr on GetHandle, even though will not be initialized
+
+	public:
+		INLINE TRWMutex() noexcept = default;
+		TRWMutex(const TRWMutex&) = delete;
+		TRWMutex& operator=(const TRWMutex&) = delete;
+		INLINE TRWMutex(TRWMutex&& other) noexcept = default;
+		INLINE TRWMutex& operator=(TRWMutex&& other) noexcept = default;
+		INLINE ~TRWMutex() = default;
+
+		INLINE void lock() noexcept { /* No-op */ }
+		INLINE void lock_shared() noexcept { /* No-op */ }
+		INLINE void unlock() noexcept { /* No-op */ }
+		INLINE void unlock_shared() noexcept { /* No-op */ }
+		INLINE bool try_lock() noexcept { return true; }
+		INLINE bool try_lock_shared() noexcept { return true; }
+
+		NODISCARD INLINE const RWMutexHandle* GetHandle()const noexcept { return &m_Handle; }
+		NODISCARD INLINE RWMutexHandle* GetHandle() noexcept { return &m_Handle; }
+		INLINE bool IsEnabled()const noexcept { return false; }
+	};
+
+	using RWMutex = TRWMutex<true>;
+	using RWMutexDisabled = TRWMutex<false>;
 
 	/*** The lightweightest Mutex
 	*	It's the mutex that guaranties the lowest latency, but in exchange of huge
@@ -269,16 +340,19 @@ namespace greaper
 	*	which thread owns the mutex, so when a deadlock occurs we can
 	*	see which threads are colliding with their info
 	*/
-	class SpinLock
+	template<bool Enabled> class TSpinLock;
+
+	template<>
+	class TSpinLock<true>
 	{
 		static constexpr uint32 SpinCount = 4000;
 		std::atomic_flag m_Lock;
 
 	public:
-		SpinLock() noexcept = default;
-		SpinLock(const SpinLock&) = delete;
-		SpinLock& operator=(const SpinLock&) = delete;
-		~SpinLock() = default;
+		TSpinLock() noexcept = default;
+		TSpinLock(const TSpinLock&) = delete;
+		TSpinLock& operator=(const TSpinLock&) = delete;
+		~TSpinLock() = default;
 
 		INLINE void lock() noexcept
 		{
@@ -292,18 +366,35 @@ namespace greaper
 				THREAD_YIELD();
 			}
 		}
-
 		INLINE bool try_lock() noexcept
 		{
 			const auto res = !m_Lock.test_and_set(std::memory_order_acquire);
 			return res;
 		}
-
 		INLINE void unlock() noexcept
 		{
 			m_Lock.clear(std::memory_order_release);
 		}
+		INLINE bool IsEnabled()const noexcept { return true; }
 	};
+
+	template<>
+	class TSpinLock<false>
+	{
+	public:
+		TSpinLock() noexcept = default;
+		TSpinLock(const TSpinLock&) = delete;
+		TSpinLock& operator=(const TSpinLock&) = delete;
+		~TSpinLock() = default;
+
+		INLINE void lock() noexcept { /* No-op */ }
+		INLINE bool try_lock() noexcept { return true; }
+		INLINE void unlock() noexcept { /* No-op */ }
+		INLINE bool IsEnabled()const noexcept { return false; }
+	};
+
+	using SpinLock = TSpinLock<true>;
+	using SpinLockDisabled = TSpinLock<false>;
 
 	struct AdoptLock { constexpr explicit AdoptLock()noexcept = default; };
 	struct DeferLock { constexpr explicit DeferLock()noexcept = default; };
