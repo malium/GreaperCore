@@ -8,15 +8,12 @@
 #ifndef CORE_CONCURRENCY_H
 #define CORE_CONCURRENCY_H 1
 
-#include "CorePrerequisites.h"
-
 #if PLT_WINDOWS
 #include "Win/WinThreading.h"
 #elif PLT_LINUX
 #include "Lnx/LnxThreading.h"
 #endif
 #include <atomic>
-#include <any>
 
 /*** Cross-platform concurrency primitives and utilites
 *	

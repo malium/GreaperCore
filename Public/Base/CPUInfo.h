@@ -1,5 +1,5 @@
 /***********************************************************************************
-*   Copyright 2022 Marcos Sánchez Torrent.                                         *
+*   Copyright 2022 Marcos SÃ¡nchez Torrent.                                         *
 *   All Rights Reserved.                                                           *
 ***********************************************************************************/
 
@@ -7,8 +7,6 @@
 
 #ifndef CORE_CPU_INFO_H
 #define CORE_CPU_INFO_H 1
-
-#include "../CorePrerequisites.h"
 
 namespace greaper
 {

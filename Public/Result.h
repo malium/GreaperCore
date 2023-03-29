@@ -9,7 +9,6 @@
 #define CORE_RESULT_H 1
 
 #include "CorePrerequisites.h"
-#include "Memory.h"
 
 namespace greaper
 {

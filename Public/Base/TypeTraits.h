@@ -8,7 +8,6 @@
 #ifndef CORE_TYPETRAITS_H
 #define CORE_TYPETRAITS_H 1
 
-#include "../Memory.h"
 #include <type_traits>
 
 namespace greaper
@@ -38,10 +37,14 @@ namespace greaper
 
 	template<class T> using RemovePointer_t = typename RemovePointer<T>::Type;
 
+	template<class T> class UPtr;
+	template<class T> class SharedPointer;
+	template<class T> class WeakPointer;
+
 	template<class T> struct RemoveSmartPointer { using Type = T; };
 	template<class T> struct RemoveSmartPointer<UPtr<T>> { using Type = T; };
-	template<class T> struct RemoveSmartPointer<SPtr<T>> { using Type = T; };
-	template<class T> struct RemoveSmartPointer<WPtr<T>> { using Type = T; };
+	template<class T> struct RemoveSmartPointer<SharedPointer<T>> { using Type = T; };
+	template<class T> struct RemoveSmartPointer<WeakPointer<T>> { using Type = T; };
 
 	template<class T> using RemoveSmartPointer_t = typename RemoveSmartPointer<T>::Type;
 

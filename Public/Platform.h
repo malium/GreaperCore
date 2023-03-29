@@ -8,7 +8,6 @@
 #ifndef CORE_PLATFORM_H
 #define CORE_PLATFORM_H 1
 
-#include "CorePrerequisites.h"
 #define CJSON_IMPORT_SYMBOLS
 #define CJSON_API_VISIBILITY
 #include "../../cJSON/cJSON.h"

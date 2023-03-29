@@ -8,9 +8,6 @@
 #ifndef CORE_LIBRARY_H
 #define CORE_LIBRARY_H 1
 
-#include "CorePrerequisites.h"
-#include "Memory.h"
-
 #if PLT_WINDOWS
 #include "Win/WinLibrary.h"
 #else

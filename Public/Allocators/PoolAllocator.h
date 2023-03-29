@@ -5,9 +5,6 @@
 
 #pragma once
 
-#include "../CorePrerequisites.h"
-#include "../Concurrency.h"
-
 namespace greaper
 {
 	class IPoolAllocator

@@ -11,7 +11,7 @@ namespace greaper
 {
 	template<class T, class _Alloc_>
 	TResult<PProperty<T>> CreateProperty(WGreaperLib library, StringView propertyName, T initialValue, StringView propertyInfo,
-		bool isConstant, bool isStatic, TPropertyValidator<T>* validator)
+		bool isConstant, bool isStatic, SPtr<TPropertyValidator<T>> validator)
 	{
 		auto lib = library.lock();
 		if (lib == nullptr)
@@ -42,20 +42,19 @@ namespace greaper
 
 	template<class T>
 	INLINE TProperty<T>::TProperty(WGreaperLib library, const StringView& propertyName, T initialValue, const StringView& propertyInfo,
-			bool isConstant, bool isStatic, TPropertyValidator<T>* validator) noexcept
+			bool isConstant, bool isStatic, SPtr<TPropertyValidator<T>> validator) noexcept
 		:m_Value(std::move(initialValue))
 		,m_PropertyName(propertyName)
 		,m_PropertyInfo(propertyInfo)
 		,m_OnModificationEvent("PropertyModified"sv)
-		,m_PropertyValidator(validator)
+		,m_PropertyValidator(std::move(validator))
 		,m_Library(std::move(library))
 		,m_Static(isStatic)
 		,m_Constant(isConstant)
 	{
 		if (m_PropertyValidator == nullptr)
-		{
-			m_PropertyValidator = Construct<PropertyValidatorNone<T>>();
-		}
+			m_PropertyValidator.reset(Construct<PropertyValidatorNone<T>>());
+
 		m_PropertyValidator->Validate(m_Value, &m_Value);
 		m_StringValue = refl::TypeInfo<T>::Type::ToString(m_Value);
 	}
@@ -73,7 +72,7 @@ namespace greaper
 	}
 
 	template<class T>
-	NODISCARD INLINE TPropertyValidator<T>* TProperty<T>::GetPropertyValidator()const noexcept
+	NODISCARD INLINE const SPtr<TPropertyValidator<T>>& TProperty<T>::GetPropertyValidator()const noexcept
 	{
 		return m_PropertyValidator;
 	}

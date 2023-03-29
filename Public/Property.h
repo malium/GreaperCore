@@ -55,7 +55,7 @@ namespace greaper
 
 	template<class T, class _Alloc_ = GenericAllocator>
 	TResult<PProperty<T>> CreateProperty(WGreaperLib library, StringView propertyName, T initialValue, StringView propertyInfo = {},
-		bool isConstant = false, bool isStatic = false, TPropertyValidator<T>* validator = nullptr);
+		bool isConstant = false, bool isStatic = false, SPtr<TPropertyValidator<T>> validator = SPtr<TPropertyValidator<T>>());
 
 	/**
 	 * @brief Stores configuration information, that information must be able to be 
@@ -81,7 +81,7 @@ namespace greaper
 		String m_PropertyInfo;
 		String m_StringValue;	// When a property is changed, needs to update this value
 		mutable ModificationEvent_t m_OnModificationEvent;
-		TPropertyValidator<T>* m_PropertyValidator;
+		SPtr<TPropertyValidator<T>> m_PropertyValidator;
 		WGreaperLib m_Library;
 		mutable RWMutex m_Mutex;
 
@@ -89,11 +89,11 @@ namespace greaper
 		bool m_Constant;	// Cannot be modified
 
 		TProperty(WGreaperLib library, const StringView& propertyName, T initialValue, const StringView& propertyInfo = StringView{},
-			bool isConstant = false, bool isStatic = false, TPropertyValidator<T>* validator = nullptr) noexcept;
+			bool isConstant = false, bool isStatic = false, SPtr<TPropertyValidator<T>> validator = SPtr<TPropertyValidator<T>>()) noexcept;
 
 		template<class _T_, class _Alloc_>
 		friend TResult<PProperty<T>> CreateProperty(WGreaperLib library, StringView propertyName, _T_ initialValue, StringView propertyInfo,
-			bool isConstant, bool isStatic, TPropertyValidator<_T_>* validator);
+			bool isConstant, bool isStatic, SPtr<TPropertyValidator<T>> validator);
 		MemoryFriend();
 	public:
 		using value_type = T;
@@ -105,7 +105,7 @@ namespace greaper
 		
 		const String& GetPropertyInfo()const noexcept override;
 
-		TPropertyValidator<T>* GetPropertyValidator()const noexcept;
+		const SPtr<TPropertyValidator<T>>& GetPropertyValidator()const noexcept;
 		bool IsConstant()const noexcept override;
 		bool IsStatic()const noexcept override;
 		bool SetValue(const T& value, bool triggerEvent = true, bool ignoreConstness = false) noexcept;

@@ -9,7 +9,6 @@
 #define GREAPER_CORE_UUID_H 1
 
 #include "CorePrerequisites.h"
-#include "Memory.h"
 #include "Reflection/PlainType.h"
 
 namespace greaper

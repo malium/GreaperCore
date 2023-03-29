@@ -19,6 +19,12 @@
 #include "Allocators/BaseAllocator.h"
 #include "Allocators/StdAllocator.h"
 
+#include "Concurrency.h"
+
+#include "Allocators/PoolAllocator.h"
+
+#include "Platform.h"
+
 namespace greaper
 {
 	namespace Impl

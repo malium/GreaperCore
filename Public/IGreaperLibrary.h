@@ -92,7 +92,7 @@ namespace greaper
 
 		template<class T, class _Alloc_>
 		friend TResult<PProperty<T>> CreateProperty(WGreaperLib, StringView, T, StringView,
-			bool, bool, TPropertyValidator<T>*);
+			bool, bool, SPtr<TPropertyValidator<T>>);
 
 	private:
 		PLibrary m_Library;
