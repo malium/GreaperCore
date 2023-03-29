@@ -9,7 +9,7 @@
 #define CORE_WIN_LIBRARY_H 1
 
 #include "../PHAL.h"
-#include "../Result.h"
+//#include "../Result.h"
 
 namespace greaper
 {

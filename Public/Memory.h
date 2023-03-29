@@ -19,12 +19,6 @@
 #include "Allocators/BaseAllocator.h"
 #include "Allocators/StdAllocator.h"
 
-#include "Concurrency.h"
-
-#include "Allocators/PoolAllocator.h"
-
-#include "Platform.h"
-
 namespace greaper
 {
 	namespace Impl
@@ -53,10 +47,16 @@ namespace greaper
 }
 
 #include "Base/Formatting.inl"
+#include "Concurrency.h"
+
+#include "Allocators/PoolAllocator.h"
+#include "Result.h"
 
 #include "Base/UPtr.h"
 #include "Base/SPtr.h"
 #include "Base/WPtr.h"
+
+#include "Platform.h"
 
 #include "Base/Span.h"
 
@@ -88,7 +88,7 @@ namespace greaper::Impl
 #else
 		DialogChoice_t choice = DialogChoice_t::OK;
 #endif
-		auto retVal = OSPlatform::CreateMessageBox("Greaper Assertion"sv, str, choice, DialogIcon_t::ERROR);
+		DialogButton_t retVal = greaper::OSPlatform::CreateMessageBox("Greaper Assertion"sv, StringView{ str }, choice, DialogIcon_t::ERROR);
 
 		if (retVal == DialogButton_t::RETRY)
 			TRIGGER_BREAKPOINT();

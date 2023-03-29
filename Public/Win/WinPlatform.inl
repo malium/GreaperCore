@@ -199,7 +199,7 @@ INLINE uint64 greaper::WinOSPlatform::GetPhysicalRAMAmountKB()noexcept
 	return 0ull;
 }
 
-INLINE DialogButton_t greaper::WinOSPlatform::CreateMessageBox(StringView title, StringView content, DialogChoice_t choice, DialogIcon_t icon)
+INLINE greaper::DialogButton_t greaper::WinOSPlatform::CreateMessageBox(StringView title, StringView content, DialogChoice_t choice, DialogIcon_t icon)
 {
 	UINT uType = MB_SYSTEMMODAL;
 	switch (choice)

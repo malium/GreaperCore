@@ -8,11 +8,20 @@
 #ifndef CORE_RESULT_H
 #define CORE_RESULT_H 1
 
-#include "CorePrerequisites.h"
-
 namespace greaper
 {
 	class Result;
+	namespace Impl
+	{
+		template<class T> class TResult;
+		struct EmptyStruc {  };
+		template<class T> class TReturn;
+	}
+	template<class T> using TResult = Impl::TResult<T>;
+	using EmptyResult = Impl::TResult<Impl::EmptyStruc>;
+	template<class T> using TReturn = Impl::TReturn<T>;
+	using EmptyReturn = Impl::TReturn<Impl::EmptyStruc>;
+
 	class Return;
 	namespace Impl
 	{

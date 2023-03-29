@@ -245,6 +245,9 @@
     <ClInclude Include="Private\ImplPrerequisites.h" />
     <ClInclude Include="Private\LogManager.h" />
     <ClInclude Include="Private\ThreadManager.h" />
+    <ClInclude Include="Public\Allocators\BaseAllocator.h" />
+    <ClInclude Include="Public\Allocators\PoolAllocator.h" />
+    <ClInclude Include="Public\Allocators\StdAllocator.h" />
     <ClInclude Include="Public\Base\BasicTypeInfo.h" />
     <ClInclude Include="Public\Base\BasicTypes.h" />
     <ClInclude Include="Public\Base\Config.h" />
@@ -262,6 +265,7 @@
     <ClInclude Include="Public\Base\TypeTraits.h" />
     <ClInclude Include="Public\Base\UPtr.h" />
     <ClInclude Include="Public\Base\Utils.h" />
+    <ClInclude Include="Public\Base\VerifyMacros.h" />
     <ClInclude Include="Public\Base\WPtr.h" />
     <ClInclude Include="Public\Concurrency.h" />
     <ClInclude Include="Public\CorePrerequisites.h" />
@@ -303,6 +307,7 @@
     <ClInclude Include="Public\Reflection\Property.h" />
     <ClInclude Include="Public\Reflection\Uuid.h" />
     <ClInclude Include="Public\Result.h" />
+    <ClInclude Include="Public\SlimTaskScheduler.h" />
     <ClInclude Include="Public\Stream.h" />
     <ClInclude Include="Public\StringUtils.h" />
     <ClInclude Include="Public\Uuid.h" />
@@ -319,13 +324,17 @@
     <ClInclude Include="Public\Win\WinThreading.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Public\Allocators\BaseAllocator.inl" />
     <None Include="Public\Base\FileStream.inl" />
+    <None Include="Public\Base\Formatting.inl" />
     <None Include="Public\Base\IGreaperLibrary.inl" />
     <None Include="Public\Base\IInterface.inl" />
     <None Include="Public\Base\MemoryStream.inl" />
     <None Include="Public\Base\MPMCTaskScheduler.inl" />
     <None Include="Public\Base\Platform.inl" />
     <None Include="Public\Base\Property.inl" />
+    <None Include="Public\Base\SlimTaskScheduler.inl" />
+    <None Include="Public\Base\StdUtils.inl" />
     <None Include="Public\Base\Stream.inl" />
     <None Include="Public\Base\Uuid.inl" />
     <None Include="Public\Lnx\LnxPlatform.inl" />

@@ -194,7 +194,7 @@ void Application::InitProperties()noexcept
 
 	if (appNameProp.expired())
 	{
-		auto appNameResult = CreateProperty<greaper::String>(m_Library, ApplicationNameName, {}, ""sv, false, true, nullptr);
+		auto appNameResult = CreateProperty<greaper::String>(m_Library, ApplicationNameName, {}, ""sv, false, true, {});
 		Verify(appNameResult.IsOk(), "Couldn't create the property '%s' msg: %s", ApplicationNameName.data(), appNameResult.GetFailMessage().c_str());
 		appNameProp = (WPtr<ApplicationNameProp_t>)appNameResult.GetValue();
 	}
@@ -207,7 +207,7 @@ void Application::InitProperties()noexcept
 
 	if (appVersionProp.expired())
 	{
-		auto appVersionResult = CreateProperty<uint32>(m_Library, ApplicationVersionName, 0, ""sv, false, true, nullptr);
+		auto appVersionResult = CreateProperty<uint32>(m_Library, ApplicationVersionName, 0, ""sv, false, true, {});
 		Verify(appVersionResult.IsOk(), "Couldn't create the property '%s' msg: %s", ApplicationVersionName.data(), appVersionResult.GetFailMessage().c_str());
 		appVersionProp = (WPtr<ApplicationVersionProp_t>)appVersionResult.GetValue();
 	}
@@ -228,7 +228,7 @@ void Application::InitProperties()noexcept
 #else
 			"RELEASE"sv;
 #endif
-		auto comilationInfoResult = CreateProperty<greaper::String>(m_Library, CompilationInfoName, greaper::String{ gCompilationInfo }, ""sv, true, true, nullptr);
+		auto comilationInfoResult = CreateProperty<greaper::String>(m_Library, CompilationInfoName, greaper::String{ gCompilationInfo }, ""sv, true, true, {});
 		Verify(comilationInfoResult.IsOk(), "Couldn't create the property '%s' msg: %s", CompilationInfoName.data(), comilationInfoResult.GetFailMessage().c_str());
 		compilationInfoProp = (WPtr<CompilationInfoProp_t>)comilationInfoResult.GetValue();
 	}
@@ -241,7 +241,7 @@ void Application::InitProperties()noexcept
 
 	if (loadedLibrariesProp.expired())
 	{
-		auto loadedLibrariesResult = CreateProperty<greaper::StringVec>(m_Library, LoadedLibrariesName, {}, ""sv, false, true, nullptr);
+		auto loadedLibrariesResult = CreateProperty<greaper::StringVec>(m_Library, LoadedLibrariesName, {}, ""sv, false, true, {});
 		Verify(loadedLibrariesResult.IsOk(), "Couldn't create the property '%s' msg: %s", LoadedLibrariesName.data(), loadedLibrariesResult.GetFailMessage().c_str());
 		loadedLibrariesProp = (WPtr<LoadedLibrariesProp_t>)loadedLibrariesResult.GetValue();
 	}

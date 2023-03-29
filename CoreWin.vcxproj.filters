@@ -249,6 +249,21 @@
     <ClInclude Include="Public\Win\Win32GDI.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
+    <ClInclude Include="Public\SlimTaskScheduler.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Base\VerifyMacros.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Allocators\StdAllocator.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Allocators\BaseAllocator.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Allocators\PoolAllocator.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\Base\FileStream.inl">
@@ -288,6 +303,18 @@
       <Filter>Archivos de encabezado</Filter>
     </None>
     <None Include="Public\Win\WinThreadImpl.inl">
+      <Filter>Archivos de encabezado</Filter>
+    </None>
+    <None Include="Public\Base\Formatting.inl">
+      <Filter>Archivos de encabezado</Filter>
+    </None>
+    <None Include="Public\Base\SlimTaskScheduler.inl">
+      <Filter>Archivos de encabezado</Filter>
+    </None>
+    <None Include="Public\Base\StdUtils.inl">
+      <Filter>Archivos de encabezado</Filter>
+    </None>
+    <None Include="Public\Allocators\BaseAllocator.inl">
       <Filter>Archivos de encabezado</Filter>
     </None>
   </ItemGroup>

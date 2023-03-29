@@ -17,7 +17,6 @@
 //#include "Reflection/ReflectedPlainType.h"
 //#include "Reflection/ReflectedPlainContainer.h"
 #include "Event.h"
-#include "Concurrency.h"
 
 namespace greaper
 {

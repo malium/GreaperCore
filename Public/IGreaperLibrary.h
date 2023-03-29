@@ -8,9 +8,10 @@
 #ifndef CORE_GREAPER_LIBRARY_H
 #define CORE_GREAPER_LIBRARY_H 1
 
-#include "Library.h"
+#include "Memory.h"
+//#include "Library.h"
 #include "Uuid.h"
-#include "Result.h"
+//#include "Result.h"
 #include "ILogManager.h"
 #include "IApplication.h"
 #include "Property.h"

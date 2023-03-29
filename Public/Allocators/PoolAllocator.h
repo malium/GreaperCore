@@ -79,7 +79,7 @@ namespace greaper
 	class PoolAllocator : public IPoolAllocator
 	{
 	private:
-		constexpr sizet BlockDataSize = Impl::PoolAlignedValueSize<ElemSize, Alignment> * ElemPerBlock;
+		static constexpr sizet BlockDataSize = Impl::PoolAlignedValueSize<ElemSize, Alignment> * ElemPerBlock;
 
 	public:
 		INLINE PoolAllocator()noexcept
@@ -89,7 +89,7 @@ namespace greaper
 		{
 			static_assert(ElemSize >= sizeof(ptruint), "You must provide elements with more size.");
 			static_assert(ElemPerBlock > 0, "Number of elements per block must be at least 1.");
-			static_assert(ElemPerBlock * AlignedSize <= SIZE_MAX, "Pool containing too large objects or too many blocks.");
+			static_assert(ElemPerBlock * Impl::PoolAlignedValueSize<ElemSize, Alignment> <= SIZE_MAX, "Pool containing too large objects or too many blocks.");
 		}
 
 		PoolAllocator(const PoolAllocator&) = delete;
@@ -245,11 +245,10 @@ namespace greaper
 				constexpr auto blockDataSize = Impl::PoolAlignedValueSize<ElemSize, Alignment> * ElemPerBlock;
 				auto paddedBlockSize = blockDataSize + (Alignment - 1);
 				
-				//uint8* block = (uint8*)ALLOC(sizeof(MemBlock) + paddedBlockSize);
-				uint8* block = (uint8*)_Alloc(sizeof(MemBlock) + paddedBlockSize);
-				void* blockData = (void*)(block + sizeof(MemBlock));
+				uint8* block = (uint8*)greaper::Alloc<_Allocator_>(sizeof(MemBlock_t) + paddedBlockSize);
+				void* blockData = (void*)(block + sizeof(MemBlock_t));
 				blockData = std::align(Alignment, blockDataSize, blockData, paddedBlockSize);
-				nBlock = new((void*)block)MemBlock((uint8*)blockData);
+				nBlock = new((void*)block)MemBlock_t((uint8*)blockData);
 
 				nBlock->NextBlock = m_FreeBlock;
 			}

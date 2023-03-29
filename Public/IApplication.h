@@ -9,7 +9,7 @@
 #define CORE_I_APPLICATION_H 1
 
 #include "Interface.h"
-#include "Result.h"
+//#include "Result.h"
 
 namespace greaper
 {

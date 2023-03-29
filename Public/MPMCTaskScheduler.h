@@ -9,12 +9,10 @@
 #define CORE_MPMC_TASK_SCHEDULER_H 1
 
 #include "CorePrerequisites.h"
-#include "Concurrency.h"
 #include "IThreadManager.h"
 #include "IApplication.h"
 #include "Base/IThread.h"
 #include "Enumeration.h"
-#include "Result.h"
 
 ENUMERATION(TaskState, Inactive, InProgress, Completed);
 

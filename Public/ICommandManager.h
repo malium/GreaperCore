@@ -11,7 +11,7 @@
 #include "CorePrerequisites.h"
 #include "Interface.h"
 #include "Base/ICommand.h"
-#include "Result.h"
+//#include "Result.h"
 #include "Base/IConsole.h"
 
 namespace greaper

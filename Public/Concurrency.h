@@ -14,6 +14,7 @@
 #include "Lnx/LnxThreading.h"
 #endif
 #include <atomic>
+#include <chrono>
 
 /*** Cross-platform concurrency primitives and utilites
 *	
@@ -188,7 +189,7 @@ namespace greaper
 	};
 
 	template<>
-	class TRecursiveMutex<true>
+	class TRecursiveMutex<false>
 	{
 		RecursiveMutexHandle m_Handle; // Avoid returning nullptr on GetHandle, even though will not be initialized
 

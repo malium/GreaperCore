@@ -9,7 +9,6 @@
 #define CORE_EVENT_H 1
 
 #include "CorePrerequisites.h"
-#include "Concurrency.h"
 
 namespace greaper
 {

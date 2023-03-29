@@ -12,7 +12,7 @@
 #include "../Stream.h"
 #include "../StringUtils.h"
 #include "../Enumeration.h"
-#include "../Result.h"
+//#include "../Result.h"
 #define CJSON_IMPORT_SYMBOLS
 #define CJSON_API_VISIBILITY
 #include "../../../cJSON/cJSON.h"

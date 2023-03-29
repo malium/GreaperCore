@@ -10,7 +10,6 @@
 
 #include "../CorePrerequisites.h"
 #include "PlainType.h"
-#include "../Concurrency.h"
 
 struct cJSON;
 
