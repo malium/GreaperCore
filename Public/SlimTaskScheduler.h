@@ -77,4 +77,6 @@ namespace greaper
 	};
 }
 
+#include "Base/SlimTaskScheduler.inl"
+
 #endif /* CORE_SLIM_TASK_SCHEDULER_H */
