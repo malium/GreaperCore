@@ -39,10 +39,17 @@ typedef WinTypes PlatformTypes;
 #define GREAPER_DLLEXT ".dll"
 
 /* Supported Windows version */
-#ifndef GREAPER_MIN_WINDOWS_SUPPORTED
+#if !defined(GREAPER_MIN_WINDOWS_SUPPORTED) || (defined(GREAPER_MIN_WINDOWS_SUPPORTED) && GREAPER_MIN_WINDOWS_SUPPORTED < 0x0602)
+#undef GREAPER_MIN_WINDOWS_SUPPORTED
 #define GREAPER_MIN_WINDOWS_SUPPORTED 0x0602 //! Windows 8
 #endif
+#ifdef _WIN32_WINNT
+#undef _WIN32_WINNT
+#endif
 #define _WIN32_WINNT GREAPER_MIN_WINDOWS_SUPPORTED
+#ifdef WINVER
+#undef WINVER
+#endif
 #define WINVER GREAPER_MIN_WINDOWS_SUPPORTED
 
 /* Enable triggering a breakpoint in our IDE */
