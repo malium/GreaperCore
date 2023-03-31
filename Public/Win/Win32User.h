@@ -96,6 +96,16 @@ extern "C" {
 #define CS_IME 0x00010000
 #define CS_DROPSHADOW 0x00020000
 
+typedef struct tagHELPINFO      /* Structure pointed to by lParam of WM_HELP */
+{
+	UINT    cbSize;             /* Size in bytes of this struct  */
+	int     iContextType;       /* Either HELPINFO_WINDOW or HELPINFO_MENUITEM */
+	int     iCtrlId;            /* Control Id or a Menu item Id. */
+	HANDLE  hItemHandle;        /* hWnd of control or hMenu.     */
+	DWORD_PTR dwContextId;      /* Context Id associated with this item */
+	POINT   MousePos;           /* Mouse Position in screen co-ordinates */
+}  HELPINFO, FAR* LPHELPINFO;
+
 typedef VOID(CALLBACK* MSGBOXCALLBACK)(LPHELPINFO lpHelpInfo);
 
 typedef struct tagMSGBOXPARAMSA
@@ -154,16 +164,6 @@ int
 WINAPI
 MessageBoxIndirectW(
 	CONST MSGBOXPARAMSW* lpmbp);
-
-typedef struct tagHELPINFO      /* Structure pointed to by lParam of WM_HELP */
-{
-	UINT    cbSize;             /* Size in bytes of this struct  */
-	int     iContextType;       /* Either HELPINFO_WINDOW or HELPINFO_MENUITEM */
-	int     iCtrlId;            /* Control Id or a Menu item Id. */
-	HANDLE  hItemHandle;        /* hWnd of control or hMenu.     */
-	DWORD_PTR dwContextId;      /* Context Id associated with this item */
-	POINT   MousePos;           /* Mouse Position in screen co-ordinates */
-}  HELPINFO, FAR* LPHELPINFO;
 
 WINUSERAPI
 BOOL
