@@ -43,6 +43,7 @@ typedef WinTypes PlatformTypes;
 #define GREAPER_MIN_WINDOWS_SUPPORTED 0x0602 //! Windows 8
 #endif
 #define _WIN32_WINNT GREAPER_MIN_WINDOWS_SUPPORTED
+#define WINVER GREAPER_MIN_WINDOWS_SUPPORTED
 
 /* Enable triggering a breakpoint in our IDE */
 #ifndef TRIGGER_BREAKPOINT

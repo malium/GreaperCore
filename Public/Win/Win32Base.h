@@ -18,7 +18,6 @@
 #endif
 extern "C" {
 #define DECLSPEC_IMPORT __declspec(dllimport)
-#define WINUSERAPI DECLSPEC_IMPORT
 #define WINBASEAPI DECLSPEC_IMPORT
 #define NTSYSAPI     DECLSPEC_IMPORT
 #define NTSYSCALLAPI DECLSPEC_IMPORT
@@ -82,7 +81,6 @@ typedef CONST WCHAR *LPCWCHAR, *PCWCHAR;
 
 typedef long HRESULT;
 
-typedef int                 BOOL;
 typedef BOOL near*			PBOOL;
 typedef BOOL far*			LPBOOL;
 typedef char                CHAR;
@@ -91,12 +89,15 @@ typedef signed char         INT8;
 typedef unsigned char       UCHAR;
 typedef unsigned char       UINT8;
 typedef unsigned char       BYTE;
+typedef BYTE near*			PBYTE;
 typedef short               SHORT;
 typedef signed short        INT16;
 typedef unsigned short      USHORT;
 typedef unsigned short      UINT16;
 typedef unsigned short      WORD;
 typedef int                 INT;
+typedef int near*			PINT;
+typedef int far*			LPINT;
 typedef signed int          INT32;
 typedef unsigned int        UINT;
 typedef unsigned int        UINT32;
@@ -116,6 +117,7 @@ typedef unsigned __int64    UINT64;
 typedef float               FLOAT;
 typedef FLOAT* PFLOAT;
 
+typedef WORD                ATOM;
 
 #if ARCHITECTURE_X64
 typedef __int64 INT_PTR, *PINT_PTR;
@@ -183,6 +185,34 @@ typedef INT_PTR (FAR WINAPI *FARPROC)();
 #define NTDDI_WIN8                          0x06020000
 #define NTDDI_WINBLUE                       0x06030000
 #define NTDDI_WIN10                         0x0A000000
+#define NTDDI_WIN10_TH2                     0x0A000001
+#define NTDDI_WIN10_RS1                     0x0A000002
+#define NTDDI_WIN10_RS2                     0x0A000003
+#define NTDDI_WIN10_RS3                     0x0A000004
+#define NTDDI_WIN10_RS4                     0x0A000005
+#define NTDDI_WIN10_RS5                     0x0A000006
+#define NTDDI_WIN10_19H1                    0x0A000007
+#define NTDDI_WIN10_VB                      0x0A000008
+#define NTDDI_WIN10_MN                      0x0A000009
+#define NTDDI_WIN10_FE                      0x0A00000A
+
+#define NTDDI_VERSION_FROM_WIN32_WINNT2(ver)    ver##0000
+#define NTDDI_VERSION_FROM_WIN32_WINNT(ver)     NTDDI_VERSION_FROM_WIN32_WINNT2(ver)
+
+#ifndef NTDDI_VERSION
+#ifdef _WIN32_WINNT
+#if (_WIN32_WINNT <= _WIN32_WINNT_WINBLUE)
+// set NTDDI_VERSION based on _WIN32_WINNT
+#define NTDDI_VERSION   NTDDI_VERSION_FROM_WIN32_WINNT(_WIN32_WINNT)
+#elif (_WIN32_WINNT >= _WIN32_WINNT_WIN10)
+// set NTDDI_VERSION to default to WDK_NTDDI_VERSION
+#define NTDDI_VERSION   WDK_NTDDI_VERSION 
+#endif // (_WIN32_WINNT <= _WIN32_WINNT_WINBLUE)
+#else
+// set NTDDI_VERSION to default to latest if _WIN32_WINNT isn't set
+#define NTDDI_VERSION   0x0A00000A
+#endif // _WIN32_WINNT
+#endif // NTDDI_VERSION
 
 #define MAKEWORD(a, b)      ((WORD)(((BYTE)(((DWORD_PTR)(a)) & 0xff)) | ((WORD)((BYTE)(((DWORD_PTR)(b)) & 0xff))) << 8))
 #define MAKELONG(a, b)      ((LONG)(((WORD)(((DWORD_PTR)(a)) & 0xffff)) | ((DWORD)((WORD)(((DWORD_PTR)(b)) & 0xffff))) << 16))
@@ -203,6 +233,7 @@ typedef PVOID HANDLE;
 
 DECLARE_HANDLE(HWND);
 DECLARE_HANDLE(HDC);
+DECLARE_HANDLE(HRGN);
 DECLARE_HANDLE(HGLRC);
 DECLARE_HANDLE(HINSTANCE);
 DECLARE_HANDLE(HMONITOR);
@@ -212,6 +243,7 @@ DECLARE_HANDLE(HICON);
 DECLARE_HANDLE(HMENU);
 DECLARE_HANDLE(HACCEL);
 DECLARE_HANDLE(HBRUSH);
+DECLARE_HANDLE(HHOOK);
 
 typedef HINSTANCE HMODULE;      /* HMODULEs can be used in place of HINSTANCEs */
 typedef HANDLE              HGLOBAL;
@@ -232,6 +264,8 @@ typedef struct tagRECT
 	LONG    right;
 	LONG    bottom;
 } RECT, *PRECT, NEAR *NPRECT, FAR *LPRECT;
+
+typedef const RECT FAR* LPCRECT;
 
 typedef struct tagPOINT
 {
@@ -378,23 +412,6 @@ WINAPI
 OutputDebugStringW(
 	LPCWSTR lpOutputString
 );
-
-WINUSERAPI
-int
-WINAPI
-MessageBoxA(
-	HWND hWnd,
-	LPCSTR lpText,
-	LPCSTR lpCaption,
-	UINT uType);
-WINUSERAPI
-int
-WINAPI
-MessageBoxW(
-	HWND hWnd,
-	LPCWSTR lpText,
-	LPCWSTR lpCaption,
-	UINT uType);
 
 WINBASEAPI
 HMODULE
@@ -1097,14 +1114,13 @@ typedef struct tagWNDCLASSEXA {
 } WNDCLASSEXW,*PWNDCLASSEXW,*NPWNDCLASSEXW,*LPWNDCLASSEXW;
 
 typedef struct tagMSG {
-    HWND hwnd;
-    UINT message;
-    WPARAM wParam;
-    LPARAM lParam;
-    DWORD time;
-    POINT pt;
+	HWND hwnd;
+	UINT message;
+	WPARAM wParam;
+	LPARAM lParam;
+	DWORD time;
+	POINT pt;
   } MSG,*PMSG,*NPMSG,*LPMSG;
-}
 
 #define POINTSTOPOINT(pt,pts) { (pt).x = (LONG)(SHORT)LOWORD(*(LONG*)&pts); (pt).y = (LONG)(SHORT)HIWORD(*(LONG*)&pts); }
 
@@ -1113,81 +1129,7 @@ typedef struct tagMSG {
 #define MAKELPARAM(l,h) ((LPARAM)(DWORD)MAKELONG(l,h))
 #define MAKELRESULT(l,h) ((LRESULT)(DWORD)MAKELONG(l,h))
 
-#define WS_OVERLAPPED 0x00000000L
-#define WS_POPUP 0x80000000L
-#define WS_CHILD 0x40000000L
-#define WS_MINIMIZE 0x20000000L
-#define WS_VISIBLE 0x10000000L
-#define WS_DISABLED 0x08000000L
-#define WS_CLIPSIBLINGS 0x04000000L
-#define WS_CLIPCHILDREN 0x02000000L
-#define WS_MAXIMIZE 0x01000000L
-#define WS_CAPTION 0x00C00000L
-#define WS_BORDER 0x00800000L
-#define WS_DLGFRAME 0x00400000L
-#define WS_VSCROLL 0x00200000L
-#define WS_HSCROLL 0x00100000L
-#define WS_SYSMENU 0x00080000L
-#define WS_THICKFRAME 0x00040000L
-#define WS_GROUP 0x00020000L
-#define WS_TABSTOP 0x00010000L
-
-#define WS_MINIMIZEBOX 0x00020000L
-#define WS_MAXIMIZEBOX 0x00010000L
-
-#define WS_TILED WS_OVERLAPPED
-#define WS_ICONIC WS_MINIMIZE
-#define WS_SIZEBOX WS_THICKFRAME
-#define WS_TILEDWINDOW WS_OVERLAPPEDWINDOW
-
-#define WS_OVERLAPPEDWINDOW (WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX)
-
-#define WS_POPUPWINDOW (WS_POPUP | WS_BORDER | WS_SYSMENU)
-
-#define WS_CHILDWINDOW (WS_CHILD)
-
-#define WS_EX_DLGMODALFRAME 0x00000001L
-#define WS_EX_NOPARENTNOTIFY 0x00000004L
-#define WS_EX_TOPMOST 0x00000008L
-#define WS_EX_ACCEPTFILES 0x00000010L
-#define WS_EX_TRANSPARENT 0x00000020L
-#define WS_EX_MDICHILD 0x00000040L
-#define WS_EX_TOOLWINDOW 0x00000080L
-#define WS_EX_WINDOWEDGE 0x00000100L
-#define WS_EX_CLIENTEDGE 0x00000200L
-#define WS_EX_CONTEXTHELP 0x00000400L
-#define WS_EX_RIGHT 0x00001000L
-#define WS_EX_LEFT 0x00000000L
-#define WS_EX_RTLREADING 0x00002000L
-#define WS_EX_LTRREADING 0x00000000L
-#define WS_EX_LEFTSCROLLBAR 0x00004000L
-#define WS_EX_RIGHTSCROLLBAR 0x00000000L
-
-#define WS_EX_CONTROLPARENT 0x00010000L
-#define WS_EX_STATICEDGE 0x00020000L
-#define WS_EX_APPWINDOW 0x00040000L
-
-#define WS_EX_OVERLAPPEDWINDOW (WS_EX_WINDOWEDGE | WS_EX_CLIENTEDGE)
-#define WS_EX_PALETTEWINDOW (WS_EX_WINDOWEDGE | WS_EX_TOOLWINDOW | WS_EX_TOPMOST)
-#define WS_EX_LAYERED 0x00080000
-#define WS_EX_NOINHERITLAYOUT 0x00100000L
-#define WS_EX_LAYOUTRTL 0x00400000L
-#define WS_EX_COMPOSITED 0x02000000L
-#define WS_EX_NOACTIVATE 0x08000000L
-
-#define CS_VREDRAW 0x0001
-#define CS_HREDRAW 0x0002
-#define CS_DBLCLKS 0x0008
-#define CS_OWNDC 0x0020
-#define CS_CLASSDC 0x0040
-#define CS_PARENTDC 0x0080
-#define CS_NOCLOSE 0x0200
-#define CS_SAVEBITS 0x0800
-#define CS_BYTEALIGNCLIENT 0x1000
-#define CS_BYTEALIGNWINDOW 0x2000
-#define CS_GLOBALCLASS 0x4000
-#define CS_IME 0x00010000
-#define CS_DROPSHADOW 0x00020000
+}
 
 #else
 

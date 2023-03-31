@@ -199,6 +199,8 @@ INLINE uint64 greaper::WinOSPlatform::GetPhysicalRAMAmountKB()noexcept
 	return 0ull;
 }
 
+extern "C" DECLSPEC_IMPORT int WINAPI MessageBoxW(HWND hWnd,LPCWSTR lpText, LPCWSTR lpCaption, UINT uType);
+
 INLINE greaper::DialogButton_t greaper::WinOSPlatform::CreateMessageBox(StringView title, StringView content, DialogChoice_t choice, DialogIcon_t icon)
 {
 	UINT uType = MB_SYSTEMMODAL;

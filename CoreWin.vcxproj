@@ -318,6 +318,7 @@
     <ClInclude Include="Public\Win\Win32GDI.h" />
     <ClInclude Include="Public\Win\Win32PSAPI.h" />
     <ClInclude Include="Public\Win\Win32SysInfo.h" />
+    <ClInclude Include="Public\Win\Win32User.h" />
     <ClInclude Include="Public\Win\Win32Uuid.h" />
     <ClInclude Include="Public\Win\WinLibrary.h" />
     <ClInclude Include="Public\Win\WinPlatform.h" />
