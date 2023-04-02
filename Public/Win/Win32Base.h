@@ -273,6 +273,12 @@ typedef struct tagPOINT
 	LONG  y;
 } POINT, *PPOINT, NEAR *NPPOINT, FAR *LPPOINT;
 
+typedef struct _POINTL      /* ptl  */
+{
+	LONG  x;
+	LONG  y;
+} POINTL, * PPOINTL;
+
 #define MB_OK                       0x00000000L
 #define MB_OKCANCEL                 0x00000001L
 #define MB_ABORTRETRYIGNORE         0x00000002L
@@ -335,6 +341,12 @@ typedef struct tagPOINT
 #define MB_COMPOSITE              0x00000002  // DEPRECATED: use multiple discrete characters when possible.
 #define MB_USEGLYPHCHARS          0x00000004  // DEPRECATED: use glyph chars, not ctrl chars
 #define MB_ERR_INVALID_CHARS      0x00000008  // error for invalid chars
+
+#ifndef STD_INPUT_HANDLE
+#define STD_INPUT_HANDLE    ((DWORD)-10)
+#define STD_OUTPUT_HANDLE   ((DWORD)-11)
+#define STD_ERROR_HANDLE    ((DWORD)-12)
+#endif
 
 #define SUCCEEDED(hr) (((HRESULT)(hr)) >= 0)
 #define FAILED(hr) (((HRESULT)(hr)) < 0)

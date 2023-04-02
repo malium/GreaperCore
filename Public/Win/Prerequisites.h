@@ -82,7 +82,7 @@ typedef WinTypes PlatformTypes;
 
 INLINE LPSTR* CommandLineToArgvA(LPSTR lpCmdLine, INT* pNumArgs) noexcept
 {
-	constexpr size_t BufferSize = 128;
+	constexpr size_t BufferSize = 64;
 	static char errorMsgBuffer[BufferSize];
 	int retVal = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, lpCmdLine, -1, nullptr, 0);
 	if (!SUCCEEDED(retVal))
