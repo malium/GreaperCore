@@ -104,11 +104,11 @@ static INLINE constexpr name##_t FromString(const greaper::StringView& type)noex
 	return name##_t::COUNT; \
 }
 
-#define _ENUMDEF_FROMSTRING(name)\
-static INLINE name##_t FromString(const greaper::String& type)noexcept \
-{ \
-	return FromString(greaper::StringView{type.c_str(), type.size()}); \
-}
+#define _ENUMDEF_FROMSTRING(name)//\
+//static INLINE name##_t FromString(const greaper::String& type)noexcept \
+//{ \
+//	return FromString(greaper::StringView{type.c_str(), type.size()}); \
+//}
 
 #define _ENUMDEF_ENUM_BEGIN()\
 	enum Type {

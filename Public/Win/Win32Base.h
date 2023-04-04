@@ -184,6 +184,7 @@ typedef INT_PTR (FAR WINAPI *FARPROC)();
 #define NTDDI_WIN7                          0x06010000
 #define NTDDI_WIN8                          0x06020000
 #define NTDDI_WINBLUE                       0x06030000
+#define NTDDI_WINTHRESHOLD                  0x0A000000
 #define NTDDI_WIN10                         0x0A000000
 #define NTDDI_WIN10_TH2                     0x0A000001
 #define NTDDI_WIN10_RS1                     0x0A000002

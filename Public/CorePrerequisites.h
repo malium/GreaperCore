@@ -119,7 +119,13 @@ namespace greaper
 		template<class T> struct ContainerType {  };
 		template<class T> struct ComplexType;
 
-		template<class T> struct TypeInfo { static constexpr ReflectedTypeID_t ID = RTI_Unknown; using Type = void; static constexpr StringView Name = "Unknown"sv; };
+		template<class T> struct TypeInfo
+		{
+			static constexpr ReflectedTypeID_t ID = std::is_enum_v<T> ? RTI_Enum : RTI_Unknown;
+			using Type = std::conditional_t<std::is_enum_v<T>, PlainType<TEnum<T>>, void>;
+			static constexpr StringView Name = std::is_enum_v<T> ? "Enum"sv : "Unknown"sv;
+		};
+
 		template<class T> using TypeInfo_t = TypeInfo<RemoveEverything_t<T>>;
 	}
 }

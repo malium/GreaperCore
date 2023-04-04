@@ -235,7 +235,7 @@ namespace greaper::refl
 		}
 		NODISCARD static String ToString(const T& data)
 		{
-			return TEnum<T>::ToString(data);
+			return String{ TEnum<T>::ToString(data) };
 		}
 		static EmptyResult FromString(const String& str, T& data)
 		{

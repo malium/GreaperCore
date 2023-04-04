@@ -16,94 +16,94 @@
 
 extern "C" {
 typedef struct _POINTFLOAT {
-    FLOAT   x;
-    FLOAT   y;
+	FLOAT   x;
+	FLOAT   y;
 } POINTFLOAT, * PPOINTFLOAT;
 
 /* Pixel format descriptor */
 typedef struct tagPIXELFORMATDESCRIPTOR
 {
-    WORD  nSize;
-    WORD  nVersion;
-    DWORD dwFlags;
-    BYTE  iPixelType;
-    BYTE  cColorBits;
-    BYTE  cRedBits;
-    BYTE  cRedShift;
-    BYTE  cGreenBits;
-    BYTE  cGreenShift;
-    BYTE  cBlueBits;
-    BYTE  cBlueShift;
-    BYTE  cAlphaBits;
-    BYTE  cAlphaShift;
-    BYTE  cAccumBits;
-    BYTE  cAccumRedBits;
-    BYTE  cAccumGreenBits;
-    BYTE  cAccumBlueBits;
-    BYTE  cAccumAlphaBits;
-    BYTE  cDepthBits;
-    BYTE  cStencilBits;
-    BYTE  cAuxBuffers;
-    BYTE  iLayerType;
-    BYTE  bReserved;
-    DWORD dwLayerMask;
-    DWORD dwVisibleMask;
-    DWORD dwDamageMask;
+	WORD  nSize;
+	WORD  nVersion;
+	DWORD dwFlags;
+	BYTE  iPixelType;
+	BYTE  cColorBits;
+	BYTE  cRedBits;
+	BYTE  cRedShift;
+	BYTE  cGreenBits;
+	BYTE  cGreenShift;
+	BYTE  cBlueBits;
+	BYTE  cBlueShift;
+	BYTE  cAlphaBits;
+	BYTE  cAlphaShift;
+	BYTE  cAccumBits;
+	BYTE  cAccumRedBits;
+	BYTE  cAccumGreenBits;
+	BYTE  cAccumBlueBits;
+	BYTE  cAccumAlphaBits;
+	BYTE  cDepthBits;
+	BYTE  cStencilBits;
+	BYTE  cAuxBuffers;
+	BYTE  iLayerType;
+	BYTE  bReserved;
+	DWORD dwLayerMask;
+	DWORD dwVisibleMask;
+	DWORD dwDamageMask;
 } PIXELFORMATDESCRIPTOR, * PPIXELFORMATDESCRIPTOR, FAR* LPPIXELFORMATDESCRIPTOR;
 
 /* Layer plane descriptor */
 typedef struct tagLAYERPLANEDESCRIPTOR { // lpd
-    WORD  nSize;
-    WORD  nVersion;
-    DWORD dwFlags;
-    BYTE  iPixelType;
-    BYTE  cColorBits;
-    BYTE  cRedBits;
-    BYTE  cRedShift;
-    BYTE  cGreenBits;
-    BYTE  cGreenShift;
-    BYTE  cBlueBits;
-    BYTE  cBlueShift;
-    BYTE  cAlphaBits;
-    BYTE  cAlphaShift;
-    BYTE  cAccumBits;
-    BYTE  cAccumRedBits;
-    BYTE  cAccumGreenBits;
-    BYTE  cAccumBlueBits;
-    BYTE  cAccumAlphaBits;
-    BYTE  cDepthBits;
-    BYTE  cStencilBits;
-    BYTE  cAuxBuffers;
-    BYTE  iLayerPlane;
-    BYTE  bReserved;
-    COLORREF crTransparent;
+	WORD  nSize;
+	WORD  nVersion;
+	DWORD dwFlags;
+	BYTE  iPixelType;
+	BYTE  cColorBits;
+	BYTE  cRedBits;
+	BYTE  cRedShift;
+	BYTE  cGreenBits;
+	BYTE  cGreenShift;
+	BYTE  cBlueBits;
+	BYTE  cBlueShift;
+	BYTE  cAlphaBits;
+	BYTE  cAlphaShift;
+	BYTE  cAccumBits;
+	BYTE  cAccumRedBits;
+	BYTE  cAccumGreenBits;
+	BYTE  cAccumBlueBits;
+	BYTE  cAccumAlphaBits;
+	BYTE  cDepthBits;
+	BYTE  cStencilBits;
+	BYTE  cAuxBuffers;
+	BYTE  iLayerPlane;
+	BYTE  bReserved;
+	COLORREF crTransparent;
 } LAYERPLANEDESCRIPTOR, * PLAYERPLANEDESCRIPTOR, FAR* LPLAYERPLANEDESCRIPTOR;
 
 typedef struct _GLYPHMETRICSFLOAT {
-    FLOAT       gmfBlackBoxX;
-    FLOAT       gmfBlackBoxY;
-    POINTFLOAT  gmfptGlyphOrigin;
-    FLOAT       gmfCellIncX;
-    FLOAT       gmfCellIncY;
+	FLOAT       gmfBlackBoxX;
+	FLOAT       gmfBlackBoxY;
+	POINTFLOAT  gmfptGlyphOrigin;
+	FLOAT       gmfCellIncX;
+	FLOAT       gmfCellIncY;
 } GLYPHMETRICSFLOAT, * PGLYPHMETRICSFLOAT, FAR* LPGLYPHMETRICSFLOAT;
 
 WINGDIAPI BOOL  WINAPI SwapBuffers(HDC);
 
 typedef struct _DISPLAY_DEVICEA {
-    DWORD  cb;
-    CHAR   DeviceName[32];
-    CHAR   DeviceString[128];
-    DWORD  StateFlags;
-    CHAR   DeviceID[128];
-    CHAR   DeviceKey[128];
+	DWORD  cb;
+	CHAR   DeviceName[32];
+	CHAR   DeviceString[128];
+	DWORD  StateFlags;
+	CHAR   DeviceID[128];
+	CHAR   DeviceKey[128];
 } DISPLAY_DEVICEA, * PDISPLAY_DEVICEA, * LPDISPLAY_DEVICEA;
 typedef struct _DISPLAY_DEVICEW {
-    DWORD  cb;
-    WCHAR  DeviceName[32];
-    WCHAR  DeviceString[128];
-    DWORD  StateFlags;
-    WCHAR  DeviceID[128];
-    WCHAR  DeviceKey[128];
+	DWORD  cb;
+	WCHAR  DeviceName[32];
+	WCHAR  DeviceString[128];
+	DWORD  StateFlags;
+	WCHAR  DeviceID[128];
+	WCHAR  DeviceKey[128];
 } DISPLAY_DEVICEW, * PDISPLAY_DEVICEW, * LPDISPLAY_DEVICEW;
 
 #define DISPLAY_DEVICE_ATTACHED_TO_DESKTOP      0x00000001
@@ -134,107 +134,115 @@ typedef struct _DISPLAY_DEVICEW {
 #define CCHFORMNAME 32
 #endif
 
+#if COMPILER_MSVC
+#pragma warning(push)
+#pragma warning(disable : 4201)
+#endif
+
 typedef struct _devicemodeA {
-    BYTE   dmDeviceName[CCHDEVICENAME];
-    WORD dmSpecVersion;
-    WORD dmDriverVersion;
-    WORD dmSize;
-    WORD dmDriverExtra;
-    DWORD dmFields;
-    union {
-        /* printer only fields */
-        struct {
-            short dmOrientation;
-            short dmPaperSize;
-            short dmPaperLength;
-            short dmPaperWidth;
-            short dmScale;
-            short dmCopies;
-            short dmDefaultSource;
-            short dmPrintQuality;
-        } ;
-        /* display only fields */
-        struct {
-            POINTL dmPosition;
-            DWORD  dmDisplayOrientation;
-            DWORD  dmDisplayFixedOutput;
-        } ;
-    } ;
-    short dmColor;
-    short dmDuplex;
-    short dmYResolution;
-    short dmTTOption;
-    short dmCollate;
-    BYTE   dmFormName[CCHFORMNAME];
-    WORD   dmLogPixels;
-    DWORD  dmBitsPerPel;
-    DWORD  dmPelsWidth;
-    DWORD  dmPelsHeight;
-    union {
-        DWORD  dmDisplayFlags;
-        DWORD  dmNup;
-    } ;
-    DWORD  dmDisplayFrequency;
-    DWORD  dmICMMethod;
-    DWORD  dmICMIntent;
-    DWORD  dmMediaType;
-    DWORD  dmDitherType;
-    DWORD  dmReserved1;
-    DWORD  dmReserved2;
-    DWORD  dmPanningWidth;
-    DWORD  dmPanningHeight;
+	BYTE   dmDeviceName[CCHDEVICENAME];
+	WORD dmSpecVersion;
+	WORD dmDriverVersion;
+	WORD dmSize;
+	WORD dmDriverExtra;
+	DWORD dmFields;
+	union {
+		/* printer only fields */
+		struct {
+			short dmOrientation;
+			short dmPaperSize;
+			short dmPaperLength;
+			short dmPaperWidth;
+			short dmScale;
+			short dmCopies;
+			short dmDefaultSource;
+			short dmPrintQuality;
+		} ;
+		/* display only fields */
+		struct {
+			POINTL dmPosition;
+			DWORD  dmDisplayOrientation;
+			DWORD  dmDisplayFixedOutput;
+		} ;
+	} ;
+	short dmColor;
+	short dmDuplex;
+	short dmYResolution;
+	short dmTTOption;
+	short dmCollate;
+	BYTE   dmFormName[CCHFORMNAME];
+	WORD   dmLogPixels;
+	DWORD  dmBitsPerPel;
+	DWORD  dmPelsWidth;
+	DWORD  dmPelsHeight;
+	union {
+		DWORD  dmDisplayFlags;
+		DWORD  dmNup;
+	} ;
+	DWORD  dmDisplayFrequency;
+	DWORD  dmICMMethod;
+	DWORD  dmICMIntent;
+	DWORD  dmMediaType;
+	DWORD  dmDitherType;
+	DWORD  dmReserved1;
+	DWORD  dmReserved2;
+	DWORD  dmPanningWidth;
+	DWORD  dmPanningHeight;
 } DEVMODEA, * PDEVMODEA, * NPDEVMODEA, * LPDEVMODEA;
 
 typedef struct _devicemodeW {
-    WCHAR  dmDeviceName[CCHDEVICENAME];
-    WORD dmSpecVersion;
-    WORD dmDriverVersion;
-    WORD dmSize;
-    WORD dmDriverExtra;
-    DWORD dmFields;
-    union {
-        /* printer only fields */
-        struct {
-            short dmOrientation;
-            short dmPaperSize;
-            short dmPaperLength;
-            short dmPaperWidth;
-            short dmScale;
-            short dmCopies;
-            short dmDefaultSource;
-            short dmPrintQuality;
-        } ;
-        /* display only fields */
-        struct {
-            POINTL dmPosition;
-            DWORD  dmDisplayOrientation;
-            DWORD  dmDisplayFixedOutput;
-        } ;
-    } ;
-    short dmColor;
-    short dmDuplex;
-    short dmYResolution;
-    short dmTTOption;
-    short dmCollate;
-    WCHAR  dmFormName[CCHFORMNAME];
-    WORD   dmLogPixels;
-    DWORD  dmBitsPerPel;
-    DWORD  dmPelsWidth;
-    DWORD  dmPelsHeight;
-    union {
-        DWORD  dmDisplayFlags;
-        DWORD  dmNup;
-    } ;
-    DWORD  dmDisplayFrequency;
-    DWORD  dmICMMethod;
-    DWORD  dmICMIntent;
-    DWORD  dmMediaType;
-    DWORD  dmDitherType;
-    DWORD  dmReserved1;
-    DWORD  dmReserved2;
-    DWORD  dmPanningWidth;
-    DWORD  dmPanningHeight;
+	WCHAR  dmDeviceName[CCHDEVICENAME];
+	WORD dmSpecVersion;
+	WORD dmDriverVersion;
+	WORD dmSize;
+	WORD dmDriverExtra;
+	DWORD dmFields;
+	union {
+		/* printer only fields */
+		struct {
+			short dmOrientation;
+			short dmPaperSize;
+			short dmPaperLength;
+			short dmPaperWidth;
+			short dmScale;
+			short dmCopies;
+			short dmDefaultSource;
+			short dmPrintQuality;
+		} ;
+		/* display only fields */
+		struct {
+			POINTL dmPosition;
+			DWORD  dmDisplayOrientation;
+			DWORD  dmDisplayFixedOutput;
+		} ;
+	} ;
+	short dmColor;
+	short dmDuplex;
+	short dmYResolution;
+	short dmTTOption;
+	short dmCollate;
+	WCHAR  dmFormName[CCHFORMNAME];
+	WORD   dmLogPixels;
+	DWORD  dmBitsPerPel;
+	DWORD  dmPelsWidth;
+	DWORD  dmPelsHeight;
+	union {
+		DWORD  dmDisplayFlags;
+		DWORD  dmNup;
+	} ;
+	DWORD  dmDisplayFrequency;
+	DWORD  dmICMMethod;
+	DWORD  dmICMIntent;
+	DWORD  dmMediaType;
+	DWORD  dmDitherType;
+	DWORD  dmReserved1;
+	DWORD  dmReserved2;
+	DWORD  dmPanningWidth;
+	DWORD  dmPanningHeight;
 } DEVMODEW, * PDEVMODEW, * NPDEVMODEW, * LPDEVMODEW;
+#if COMPILER_MSVC
+#pragma warning(pop)
+#endif
 
 /* Device Parameters for GetDeviceCaps() */
 #define DRIVERVERSION 0     /* Device driver version                    */
@@ -280,22 +288,24 @@ typedef struct _devicemodeW {
 // Display driver specific
 
 #define VREFRESH        116  /* Current vertical refresh rate of the    */
-                             /* display device (for displays only) in Hz*/
+							 /* display device (for displays only) in Hz*/
 #define DESKTOPVERTRES  117  /* Horizontal width of entire desktop in   */
-                             /* pixels                                  */
+							 /* pixels                                  */
 #define DESKTOPHORZRES  118  /* Vertical height of entire desktop in    */
-                             /* pixels                                  */
+							 /* pixels                                  */
 #define BLTALIGNMENT    119  /* Preferred blt alignment                 */
 
 #define SHADEBLENDCAPS  120  /* Shading and blending caps               */
 #define COLORMGMTCAPS   121  /* Color Management caps                   */
 
-WINGDIAPI int   WINAPI GetDeviceCaps(HDC hdc, int index);
+WINGDIAPI int WINAPI GetDeviceCaps(HDC hdc, int index);
 
 }
 
 #else
 #include <wingdi.h>
 #endif
+
+#pragma comment(lib, "Gdi32.lib")
 
 #endif /* CORE_WIN32_GDI_H */
