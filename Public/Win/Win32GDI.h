@@ -236,6 +236,62 @@ typedef struct _devicemodeW {
     DWORD  dmPanningHeight;
 } DEVMODEW, * PDEVMODEW, * NPDEVMODEW, * LPDEVMODEW;
 
+/* Device Parameters for GetDeviceCaps() */
+#define DRIVERVERSION 0     /* Device driver version                    */
+#define TECHNOLOGY    2     /* Device classification                    */
+#define HORZSIZE      4     /* Horizontal size in millimeters           */
+#define VERTSIZE      6     /* Vertical size in millimeters             */
+#define HORZRES       8     /* Horizontal width in pixels               */
+#define VERTRES       10    /* Vertical height in pixels                */
+#define BITSPIXEL     12    /* Number of bits per pixel                 */
+#define PLANES        14    /* Number of planes                         */
+#define NUMBRUSHES    16    /* Number of brushes the device has         */
+#define NUMPENS       18    /* Number of pens the device has            */
+#define NUMMARKERS    20    /* Number of markers the device has         */
+#define NUMFONTS      22    /* Number of fonts the device has           */
+#define NUMCOLORS     24    /* Number of colors the device supports     */
+#define PDEVICESIZE   26    /* Size required for device descriptor      */
+#define CURVECAPS     28    /* Curve capabilities                       */
+#define LINECAPS      30    /* Line capabilities                        */
+#define POLYGONALCAPS 32    /* Polygonal capabilities                   */
+#define TEXTCAPS      34    /* Text capabilities                        */
+#define CLIPCAPS      36    /* Clipping capabilities                    */
+#define RASTERCAPS    38    /* Bitblt capabilities                      */
+#define ASPECTX       40    /* Length of the X leg                      */
+#define ASPECTY       42    /* Length of the Y leg                      */
+#define ASPECTXY      44    /* Length of the hypotenuse                 */
+
+#define LOGPIXELSX    88    /* Logical pixels/inch in X                 */
+#define LOGPIXELSY    90    /* Logical pixels/inch in Y                 */
+
+#define SIZEPALETTE  104    /* Number of entries in physical palette    */
+#define NUMRESERVED  106    /* Number of reserved entries in palette    */
+#define COLORRES     108    /* Actual color resolution                  */
+
+// Printing related DeviceCaps. These replace the appropriate Escapes
+
+#define PHYSICALWIDTH   110 /* Physical Width in device units           */
+#define PHYSICALHEIGHT  111 /* Physical Height in device units          */
+#define PHYSICALOFFSETX 112 /* Physical Printable Area x margin         */
+#define PHYSICALOFFSETY 113 /* Physical Printable Area y margin         */
+#define SCALINGFACTORX  114 /* Scaling factor x                         */
+#define SCALINGFACTORY  115 /* Scaling factor y                         */
+
+// Display driver specific
+
+#define VREFRESH        116  /* Current vertical refresh rate of the    */
+                             /* display device (for displays only) in Hz*/
+#define DESKTOPVERTRES  117  /* Horizontal width of entire desktop in   */
+                             /* pixels                                  */
+#define DESKTOPHORZRES  118  /* Vertical height of entire desktop in    */
+                             /* pixels                                  */
+#define BLTALIGNMENT    119  /* Preferred blt alignment                 */
+
+#define SHADEBLENDCAPS  120  /* Shading and blending caps               */
+#define COLORMGMTCAPS   121  /* Color Management caps                   */
+
+WINGDIAPI int   WINAPI GetDeviceCaps(HDC hdc, int index);
+
 }
 
 #else

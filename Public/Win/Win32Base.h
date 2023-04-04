@@ -195,6 +195,7 @@ typedef INT_PTR (FAR WINAPI *FARPROC)();
 #define NTDDI_WIN10_VB                      0x0A000008
 #define NTDDI_WIN10_MN                      0x0A000009
 #define NTDDI_WIN10_FE                      0x0A00000A
+#define WDK_NTDDI_VERSION                   NTDDI_WIN10_FE
 
 #define NTDDI_VERSION_FROM_WIN32_WINNT2(ver)    ver##0000
 #define NTDDI_VERSION_FROM_WIN32_WINNT(ver)     NTDDI_VERSION_FROM_WIN32_WINNT2(ver)

@@ -267,6 +267,9 @@
     <ClInclude Include="Public\Win\Win32User.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Win\Win32ShellScalingAPI.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Public\Base\FileStream.inl">
