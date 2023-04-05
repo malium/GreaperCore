@@ -79,8 +79,6 @@ typedef WCHAR *NWPSTR, *LPWSTR, *PWSTR;
 typedef CONST WCHAR *LPCWSTR, *PCWSTR;
 typedef CONST WCHAR *LPCWCHAR, *PCWCHAR;
 
-typedef long HRESULT;
-
 typedef BOOL near*			PBOOL;
 typedef BOOL far*			LPBOOL;
 typedef char                CHAR;
@@ -118,6 +116,12 @@ typedef float               FLOAT;
 typedef FLOAT* PFLOAT;
 
 typedef WORD                ATOM;
+
+typedef long HRESULT;
+
+typedef LONG SCODE;
+
+typedef SCODE* PSCODE;
 
 #if ARCHITECTURE_X64
 typedef __int64 INT_PTR, *PINT_PTR;
@@ -352,6 +356,8 @@ typedef struct _POINTL      /* ptl  */
 
 #define SUCCEEDED(hr) (((HRESULT)(hr)) >= 0)
 #define FAILED(hr) (((HRESULT)(hr)) < 0)
+#define S_OK                                   ((HRESULT)0L)
+#define S_FALSE                                ((HRESULT)1L)
 
 #define STDMETHODCALLTYPE       __stdcall
 #define STDMETHODVCALLTYPE      __cdecl
@@ -382,6 +388,30 @@ typedef struct _POINTL      /* ptl  */
 #define WAIT_ABANDONED         ((STATUS_ABANDONED_WAIT_0 ) + 0 )
 #define WAIT_ABANDONED_0       ((STATUS_ABANDONED_WAIT_0 ) + 0 )
 #define WAIT_TIMEOUT                     258L
+
+#define MAKE_HRESULT(sev,fac,code) \
+    ((HRESULT) (((unsigned long)(sev)<<31) | ((unsigned long)(fac)<<16) | ((unsigned long)(code))) )
+
+#define MAKE_SCODE(sev,fac,code) \
+    ((SCODE) (((unsigned long)(sev)<<31) | ((unsigned long)(fac)<<16) | ((unsigned long)(code))) )
+
+#define FACILITY_NT_BIT                 0x10000000
+
+#define __HRESULT_FROM_WIN32(x) ((HRESULT)(x) <= 0 ? ((HRESULT)(x)) : ((HRESULT) (((x) & 0x0000FFFF) | (FACILITY_WIN32 << 16) | 0x80000000)))
+#define HRESULT_FROM_WIN32(x) __HRESULT_FROM_WIN32(x)
+#define _HRESULT_TYPEDEF_(_sc) ((HRESULT)_sc)
+
+#define NOERROR             0
+#define E_UNEXPECTED                     _HRESULT_TYPEDEF_(0x8000FFFFL)
+#define E_NOTIMPL                        _HRESULT_TYPEDEF_(0x80004001L)
+#define E_OUTOFMEMORY                    _HRESULT_TYPEDEF_(0x8007000EL)
+#define E_INVALIDARG                     _HRESULT_TYPEDEF_(0x80070057L)
+#define E_NOINTERFACE                    _HRESULT_TYPEDEF_(0x80004002L)
+#define E_POINTER                        _HRESULT_TYPEDEF_(0x80004003L)
+#define E_HANDLE                         _HRESULT_TYPEDEF_(0x80070006L)
+#define E_ABORT                          _HRESULT_TYPEDEF_(0x80004004L)
+#define E_FAIL                           _HRESULT_TYPEDEF_(0x80004005L)
+#define E_ACCESSDENIED                   _HRESULT_TYPEDEF_(0x80070005L)
 
 WINBASEAPI
 DECLSPEC_ALLOCATOR
