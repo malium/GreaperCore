@@ -390,10 +390,10 @@ typedef struct _POINTL      /* ptl  */
 #define WAIT_TIMEOUT                     258L
 
 #define MAKE_HRESULT(sev,fac,code) \
-    ((HRESULT) (((unsigned long)(sev)<<31) | ((unsigned long)(fac)<<16) | ((unsigned long)(code))) )
+	((HRESULT) (((unsigned long)(sev)<<31) | ((unsigned long)(fac)<<16) | ((unsigned long)(code))) )
 
 #define MAKE_SCODE(sev,fac,code) \
-    ((SCODE) (((unsigned long)(sev)<<31) | ((unsigned long)(fac)<<16) | ((unsigned long)(code))) )
+	((SCODE) (((unsigned long)(sev)<<31) | ((unsigned long)(fac)<<16) | ((unsigned long)(code))) )
 
 #define FACILITY_NT_BIT                 0x10000000
 
@@ -1172,6 +1172,15 @@ typedef struct tagMSG {
 #define MAKEWPARAM(l,h) ((WPARAM)(DWORD)MAKELONG(l,h))
 #define MAKELPARAM(l,h) ((LPARAM)(DWORD)MAKELONG(l,h))
 #define MAKELRESULT(l,h) ((LRESULT)(DWORD)MAKELONG(l,h))
+
+WINBASEAPI
+int
+WINAPI
+MulDiv(
+	int nNumber,
+	int nNumerator,
+	int nDenominator
+);
 
 }
 

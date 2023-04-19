@@ -140,7 +140,8 @@ STDAPI_(UINT) GetDpiForShellUIComponent(
 
 #else
 #include <ShellScalingApi.h>
-#pragma comment(lib, "Shcore.lib")
 #endif
+
+#pragma comment(lib, "Shcore.lib")
 
 #endif /* CORE_WIN32_SHELL_SCALLING_API_H */
