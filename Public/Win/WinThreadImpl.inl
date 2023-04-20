@@ -24,7 +24,7 @@ namespace greaper
 		String m_Name;
 		IInterface::ActivationEvt_t::HandlerType m_OnManagerActivation;
 		IApplication::OnInterfaceActivationEvent_t::HandlerType m_OnNewManager;
-		PThread m_This;
+		//PThread m_This;
 		Barrier m_Barier;
 
 		static INLINE unsigned STDCALL RunFn(void* data)
@@ -32,7 +32,7 @@ namespace greaper
 			OSPlatform::PerThreadInit();
 
 			auto* thread = (PThread*)data;
-			PThread& winThread = *thread;
+			PThread winThread = *thread;
 			
 			if (winThread == nullptr)
 				return EXIT_FAILURE;
@@ -169,7 +169,7 @@ namespace greaper
 			,m_ThreadFn(config.ThreadFN)
 			,m_JoinsAtDestruction(config.JoinAtDestruction)
 			,m_Name(config.Name)
-			,m_This(std::move(self))
+			//,m_This(std::move(self))
 			,m_Barier(2)
 		{
 			if (m_Manager.expired() || m_ThreadFn == nullptr)
@@ -178,7 +178,7 @@ namespace greaper
 				return;
 			}
 
-			auto hnd = _beginthreadex(nullptr, config.StackSize, &WinThreadImpl::RunFn, &m_This,
+			auto hnd = _beginthreadex(nullptr, config.StackSize, &WinThreadImpl::RunFn, &self,
 				config.StartSuspended ? CREATE_SUSPENDED : 0, &m_ID);
 
 			if (hnd == 0)

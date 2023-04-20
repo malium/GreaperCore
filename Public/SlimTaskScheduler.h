@@ -34,7 +34,7 @@ namespace greaper
 		sizet GetWorkerCount()const noexcept;
 		EmptyResult SetWorkerCount(sizet count)noexcept;
 
-		EmptyResult AddTask(SlimTask task)noexcept;
+		TResult<std::future<void>> AddTask(SlimTask task)noexcept;
 
 		void WaitUntilAllTasksFinished()noexcept;
 

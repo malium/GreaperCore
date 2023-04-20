@@ -75,7 +75,7 @@ namespace greaper
 			auto time = std::chrono::system_clock::to_time_t(logData.Time);
 			std::strftime(gTimeBuff, ArraySize(gTimeBuff), "%H:%M:%S", std::localtime(&time));
 
-			auto message = Format("[%s][%s][%s]: %s\r\n", logData.LibraryName.data(), gLevelName[(sizet)logData.Level], gTimeBuff, logData.Message.c_str());
+			auto message = Format("[%s][%s][%s]: %s\r\n", gLevelName[(sizet)logData.Level], gTimeBuff, logData.LibraryName.data(), logData.Message.c_str());
 			m_Stream->Write(message.c_str(), message.length() - 1);
 		}
 	};

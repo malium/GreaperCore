@@ -85,12 +85,12 @@ namespace greaper
 		return Result::CreateSuccess();
 	}
 	
-	inline EmptyResult SlimTaskScheduler::AddTask(SlimTask task) noexcept
+	inline TResult<std::future<void>> SlimTaskScheduler::AddTask(SlimTask task) noexcept
 	{
 		auto wkLck = SharedLock(m_TaskWorkersMutex); // we keep the lock so if there's only 1 task worker and someone wants to remove it, we can still schedule this task
 		if (!AreThereAnyAvailableWorker())
 		{
-			return Result::CreateFailure("Couldn't add the task, no available workers."sv);
+			return Result::CreateFailure<std::future<void>>("Couldn't add the task, no available workers."sv);
 		}
 
 		SlimTask* taskPtr;
@@ -114,13 +114,13 @@ namespace greaper
 		m_TaskQueueMutex.unlock();
 		m_TaskQueueSignal.notify_one();
 		
-		return Result::CreateSuccess();
+		return Result::CreateSuccess(taskPtr->get_future());
 	}
 
 	INLINE void SlimTaskScheduler::WaitUntilAllTasksFinished() noexcept
 	{
 		// Don't add more tasks nor change the amount of workers
-		auto wkLck = Lock(m_TaskWorkersMutex);
+		auto wkLck = SharedLock(m_TaskWorkersMutex);
 
 		// Wait until no more tasks
 		auto lck = UniqueLock<decltype(m_TaskQueueMutex)>(m_TaskQueueMutex);

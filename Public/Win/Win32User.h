@@ -96,6 +96,22 @@ extern "C" {
 #define CS_IME 0x00010000
 #define CS_DROPSHADOW 0x00020000
 
+#define SW_HIDE             0
+#define SW_SHOWNORMAL       1
+#define SW_NORMAL           1
+#define SW_SHOWMINIMIZED    2
+#define SW_SHOWMAXIMIZED    3
+#define SW_MAXIMIZE         3
+#define SW_SHOWNOACTIVATE   4
+#define SW_SHOW             5
+#define SW_MINIMIZE         6
+#define SW_SHOWMINNOACTIVE  7
+#define SW_SHOWNA           8
+#define SW_RESTORE          9
+#define SW_SHOWDEFAULT      10
+#define SW_FORCEMINIMIZE    11
+#define SW_MAX              11
+
 typedef struct tagHELPINFO      /* Structure pointed to by lParam of WM_HELP */
 {
 	UINT    cbSize;             /* Size in bytes of this struct  */
@@ -214,6 +230,223 @@ PeekMessageW(
 #define PM_NOREMOVE         0x0000
 #define PM_REMOVE           0x0001
 #define PM_NOYIELD          0x0002
+
+#define MOD_ALT             0x0001
+#define MOD_CONTROL         0x0002
+#define MOD_SHIFT           0x0004
+#define MOD_WIN             0x0008
+#if(WINVER >= 0x0601)
+#define MOD_NOREPEAT        0x4000
+#endif /* WINVER >= 0x0601 */
+
+WINUSERAPI
+BOOL
+WINAPI
+PostMessageA(
+	HWND hWnd,
+	UINT Msg,
+	WPARAM wParam,
+	LPARAM lParam);
+
+WINUSERAPI
+BOOL
+WINAPI
+PostMessageW(
+	HWND hWnd,
+	UINT Msg,
+	WPARAM wParam,
+	LPARAM lParam);
+
+WINUSERAPI
+BOOL
+WINAPI
+PostThreadMessageA(
+	DWORD idThread,
+	UINT Msg,
+	WPARAM wParam,
+	LPARAM lParam);
+
+WINUSERAPI
+BOOL
+WINAPI
+PostThreadMessageW(
+	DWORD idThread,
+	UINT Msg,
+	WPARAM wParam,
+	LPARAM lParam);
+
+#define HWND_BROADCAST  ((HWND)0xffff)
+
+#if(WINVER >= 0x0500)
+#define HWND_MESSAGE     ((HWND)-3)
+#endif /* WINVER >= 0x0500 */
+
+WINUSERAPI
+BOOL
+WINAPI
+AttachThreadInput(
+	DWORD idAttach,
+	DWORD idAttachTo,
+	BOOL fAttach);
+
+WINUSERAPI
+BOOL
+WINAPI
+ReplyMessage(
+	LRESULT lResult);
+
+WINUSERAPI
+BOOL
+WINAPI
+WaitMessage(
+	VOID);
+
+WINUSERAPI
+DWORD
+WINAPI
+WaitForInputIdle(
+	HANDLE hProcess,
+	DWORD dwMilliseconds);
+
+WINUSERAPI
+LRESULT
+WINAPI
+DefWindowProcA(
+	HWND hWnd,
+	UINT Msg,
+	WPARAM wParam,
+	LPARAM lParam);
+
+WINUSERAPI
+LRESULT
+WINAPI
+DefWindowProcW(
+	HWND hWnd,
+	UINT Msg,
+	WPARAM wParam,
+	LPARAM lParam);
+
+WINUSERAPI
+VOID
+WINAPI
+PostQuitMessage(
+	int nExitCode);
+
+#ifdef STRICT
+WINUSERAPI
+LRESULT
+WINAPI
+CallWindowProcA(
+	WNDPROC lpPrevWndFunc,
+	HWND hWnd,
+	UINT Msg,
+	WPARAM wParam,
+	LPARAM lParam);
+
+WINUSERAPI
+LRESULT
+WINAPI
+CallWindowProcW(
+	WNDPROC lpPrevWndFunc,
+	HWND hWnd,
+	UINT Msg,
+	WPARAM wParam,
+	LPARAM lParam);
+#else /* !STRICT */
+WINUSERAPI
+LRESULT
+WINAPI
+CallWindowProcA(
+	FARPROC lpPrevWndFunc,
+	HWND hWnd,
+	UINT Msg,
+	WPARAM wParam,
+	LPARAM lParam);
+
+WINUSERAPI
+LRESULT
+WINAPI
+CallWindowProcW(
+	FARPROC lpPrevWndFunc,
+	HWND hWnd,
+	UINT Msg,
+	WPARAM wParam,
+	LPARAM lParam);
+#endif /* !STRICT */
+
+WINUSERAPI
+ATOM
+WINAPI
+RegisterClassA(
+	CONST WNDCLASSA* lpWndClass);
+
+WINUSERAPI
+ATOM
+WINAPI
+RegisterClassW(
+	CONST WNDCLASSW* lpWndClass);
+
+WINUSERAPI
+BOOL
+WINAPI
+UnregisterClassA(
+	LPCSTR lpClassName,
+	HINSTANCE hInstance);
+
+WINUSERAPI
+BOOL
+WINAPI
+UnregisterClassW(
+	LPCWSTR lpClassName,
+	HINSTANCE hInstance);
+
+WINUSERAPI
+BOOL
+WINAPI
+GetClassInfoA(
+	HINSTANCE hInstance,
+	LPCSTR lpClassName,
+	LPWNDCLASSA lpWndClass);
+
+WINUSERAPI
+BOOL
+WINAPI
+GetClassInfoW(
+	HINSTANCE hInstance,
+	LPCWSTR lpClassName,
+	LPWNDCLASSW lpWndClass);
+
+WINUSERAPI
+ATOM
+WINAPI
+RegisterClassExA(
+	CONST WNDCLASSEXA*);
+
+WINUSERAPI
+ATOM
+WINAPI
+RegisterClassExW(
+	CONST WNDCLASSEXW*);
+
+
+WINUSERAPI
+BOOL
+WINAPI
+GetClassInfoExA(
+	HINSTANCE hInstance,
+	LPCSTR lpszClass,
+	LPWNDCLASSEXA lpwcx);
+
+WINUSERAPI
+BOOL
+WINAPI
+GetClassInfoExW(
+	HINSTANCE hInstance,
+	LPCWSTR lpszClass,
+	LPWNDCLASSEXW lpwcx);
+
+#define CW_USEDEFAULT       ((int)0x80000000)
+#define HWND_DESKTOP        ((HWND)0)
 
 WINUSERAPI
 DWORD
@@ -1409,6 +1642,83 @@ ChildWindowFromPointEx(
 	HWND hwnd,
 	POINT pt,
 	UINT flags);
+
+#define CTLCOLOR_MSGBOX         0
+#define CTLCOLOR_EDIT           1
+#define CTLCOLOR_LISTBOX        2
+#define CTLCOLOR_BTN            3
+#define CTLCOLOR_DLG            4
+#define CTLCOLOR_SCROLLBAR      5
+#define CTLCOLOR_STATIC         6
+#define CTLCOLOR_MAX            7
+
+#define COLOR_SCROLLBAR         0
+#define COLOR_BACKGROUND        1
+#define COLOR_ACTIVECAPTION     2
+#define COLOR_INACTIVECAPTION   3
+#define COLOR_MENU              4
+#define COLOR_WINDOW            5
+#define COLOR_WINDOWFRAME       6
+#define COLOR_MENUTEXT          7
+#define COLOR_WINDOWTEXT        8
+#define COLOR_CAPTIONTEXT       9
+#define COLOR_ACTIVEBORDER      10
+#define COLOR_INACTIVEBORDER    11
+#define COLOR_APPWORKSPACE      12
+#define COLOR_HIGHLIGHT         13
+#define COLOR_HIGHLIGHTTEXT     14
+#define COLOR_BTNFACE           15
+#define COLOR_BTNSHADOW         16
+#define COLOR_GRAYTEXT          17
+#define COLOR_BTNTEXT           18
+#define COLOR_INACTIVECAPTIONTEXT 19
+#define COLOR_BTNHIGHLIGHT      20
+
+#if(WINVER >= 0x0400)
+#define COLOR_3DDKSHADOW        21
+#define COLOR_3DLIGHT           22
+#define COLOR_INFOTEXT          23
+#define COLOR_INFOBK            24
+#endif /* WINVER >= 0x0400 */
+
+#if(WINVER >= 0x0500)
+#define COLOR_HOTLIGHT          26
+#define COLOR_GRADIENTACTIVECAPTION 27
+#define COLOR_GRADIENTINACTIVECAPTION 28
+#if(WINVER >= 0x0501)
+#define COLOR_MENUHILIGHT       29
+#define COLOR_MENUBAR           30
+#endif /* WINVER >= 0x0501 */
+#endif /* WINVER >= 0x0500 */
+
+#if(WINVER >= 0x0400)
+#define COLOR_DESKTOP           COLOR_BACKGROUND
+#define COLOR_3DFACE            COLOR_BTNFACE
+#define COLOR_3DSHADOW          COLOR_BTNSHADOW
+#define COLOR_3DHIGHLIGHT       COLOR_BTNHIGHLIGHT
+#define COLOR_3DHILIGHT         COLOR_BTNHIGHLIGHT
+#define COLOR_BTNHILIGHT        COLOR_BTNHIGHLIGHT
+#endif /* WINVER >= 0x0400 */
+
+WINUSERAPI
+DWORD
+WINAPI
+GetSysColor(
+	int nIndex);
+
+WINUSERAPI
+HBRUSH
+WINAPI
+GetSysColorBrush(
+	int nIndex);
+
+WINUSERAPI
+BOOL
+WINAPI
+SetSysColors(
+	int cElements,
+	CONST INT* lpaElements,
+	CONST COLORREF* lpaRgbValues);
 
 #define DWL_MSGRESULT   0
 #define DWL_DLGPROC     4
