@@ -85,47 +85,73 @@ namespace greaper
 		return Result::CreateSuccess();
 	}
 	
-	inline TResult<std::future<void>> SlimTaskScheduler::AddTask(SlimTask task) noexcept
+	INLINE TResult<uint32> SlimTaskScheduler::AddTask(std::function<void()> task) noexcept
 	{
 		auto wkLck = SharedLock(m_TaskWorkersMutex); // we keep the lock so if there's only 1 task worker and someone wants to remove it, we can still schedule this task
 		if (!AreThereAnyAvailableWorker())
 		{
-			return Result::CreateFailure<std::future<void>>("Couldn't add the task, no available workers."sv);
+			return Result::CreateFailure<uint32>("Couldn't add the task, no available workers."sv);
 		}
-
-		SlimTask* taskPtr;
-		{
-			auto fpLck = Lock(m_FreeTaskPoolMutex);
-			if (m_FreeTaskPool.empty())
-			{
-				taskPtr = AllocT<SlimTask>();
-			}
-			else
-			{
-				taskPtr = m_FreeTaskPool.back();
-				m_FreeTaskPool.pop_back();
-			}
-		}
-		// All taskPtr will be uninitialized memory so we call the move constructor
-		new(taskPtr)SlimTask(std::move(task));
 
 		m_TaskQueueMutex.lock();
-		m_TaskQueue.push_back(taskPtr);
+		uint32 taskSlotIdx = m_LastTaskSlotUsed++;
+		if (m_LastTaskSlotUsed >= m_TaskSlots.size())
+			m_LastTaskSlotUsed = 0;
+		auto& taskSlot = m_TaskSlots[taskSlotIdx];
+		taskSlot.Task = std::move(task);
+		taskSlot.State = SlimTask::READY;
 		m_TaskQueueMutex.unlock();
 		m_TaskQueueSignal.notify_one();
+
+		//SlimTask* taskPtr;
+		//{
+		//	auto fpLck = Lock(m_FreeTaskPoolMutex);
+		//	if (m_FreeTaskPool.empty())
+		//	{
+		//		taskPtr = AllocT<SlimTask>();
+		//	}
+		//	else
+		//	{
+		//		taskPtr = m_FreeTaskPool.back();
+		//		m_FreeTaskPool.pop_back();
+		//	}
+		//}
+		// All taskPtr will be uninitialized memory so we call the move constructor
+		//new(taskPtr)SlimTask(std::move(task));
+		//
+		//m_TaskQueueMutex.lock();
+		//m_TaskQueue.push_back(taskPtr);
+		//m_TaskQueueMutex.unlock();
+		//m_TaskQueueSignal.notify_one();
 		
-		return Result::CreateSuccess(taskPtr->get_future());
+		return Result::CreateSuccess(taskSlotIdx);
 	}
 
-	INLINE void SlimTaskScheduler::WaitUntilAllTasksFinished() noexcept
+	INLINE void SlimTaskScheduler::WaitUntilTaskFinished(uint32 taskID)const noexcept
+	{
+		if (taskID >= m_TaskSlots.size())
+			return; // Invalid ID
+
+		// Don't add more tasks nor change the amount of workers
+		auto wkLck = SharedLock(m_TaskWorkersMutex);
+
+		// Wait until no more tasks
+		//auto lck = UniqueLock<decltype(m_TaskQueueMutex)>(m_TaskQueueMutex);
+		while (m_TaskSlots[taskID].State != SlimTask::DONE)
+			//m_TaskQueueSignal.wait(lck);
+			THREAD_YIELD();
+	}
+
+	INLINE void SlimTaskScheduler::WaitUntilAllTasksFinished()const noexcept
 	{
 		// Don't add more tasks nor change the amount of workers
 		auto wkLck = SharedLock(m_TaskWorkersMutex);
 
 		// Wait until no more tasks
-		auto lck = UniqueLock<decltype(m_TaskQueueMutex)>(m_TaskQueueMutex);
-		while (!m_TaskQueue.empty())
-			m_TaskQueueSignal.wait(lck);
+		//auto lck = UniqueLock<decltype(m_TaskQueueMutex)>(m_TaskQueueMutex);
+		while (!IsTaskQueueEmpty())
+			THREAD_YIELD();
+			//m_TaskQueueSignal.wait(lck);
 	}
 
 	INLINE const String& SlimTaskScheduler::GetName() const noexcept { return m_Name; }
@@ -186,15 +212,24 @@ namespace greaper
 	INLINE void SlimTaskScheduler::Stop() noexcept
 	{
 		SetWorkerCount(0);
-		
-		for (auto* task : m_TaskQueue)
+
+		for (auto& task : m_TaskSlots)
 		{
-			(*task)();
-			Destroy(task);
+			if (task.State == SlimTask::READY)
+				task.Task();
+
+			task.Task = nullptr;
+			task.State = SlimTask::DONE;
 		}
-		m_TaskQueue.clear();
-		for (auto* task : m_FreeTaskPool)
-			Dealloc(task);
+		
+		//for (auto* task : m_TaskQueue)
+		//{
+		//	(*task)();
+		//	Destroy(task);
+		//}
+		//m_TaskQueue.clear();
+		//for (auto* task : m_FreeTaskPool)
+		//	Dealloc(task);
 	}
 
 	INLINE bool SlimTaskScheduler::AreThereAnyAvailableWorker() const noexcept
@@ -234,14 +269,15 @@ namespace greaper
 	{
 		while (true)
 		{
-			SlimTask* task = nullptr;
+			SlimTask* task;
 			// Retrieve a task to do or check if we need to keep running
 			{
 				auto taskLck = UniqueLock<decltype(m_TaskQueueMutex)>(scheduler.m_TaskQueueMutex);
 				bool canWork = scheduler.CanWorkerContinueWorking(id);
 				
+				uint32 queuedTaskID;
 				// Wait for work or an stop request
-				while (scheduler.m_TaskQueue.empty() && canWork)
+				while (!scheduler.IsAnyTaskReady(queuedTaskID) && canWork)
 				{
 					scheduler.m_TaskQueueSignal.wait(taskLck);
 					canWork = scheduler.CanWorkerContinueWorking(id);
@@ -252,28 +288,58 @@ namespace greaper
 					break;
 
 				// Retrieve one task
-				if (!scheduler.m_TaskQueue.empty())
-				{
-					task = scheduler.m_TaskQueue.front();
-					scheduler.m_TaskQueue.pop_front();
-				}
+				//if (!scheduler.IsTaskQueueEmpty())
+				//{
+				//	task = scheduler.m_TaskQueue.front();
+				//	scheduler.m_TaskQueue.pop_front();
+				//}
+				task = &scheduler.m_TaskSlots[queuedTaskID];
+				task->State = SlimTask::SCHEDULED; // Avoid re-scheduling
 			}
 
 			// Do actual task work, and store the task memory on the free pool
 			if (task != nullptr)
 			{
 				// Execute the task
-				(*task)();
+				task->Task();
+				task->State = SlimTask::DONE;
+				task->Task = nullptr;
+				
 				// all newly created tasks assume uninitialized memory so we need to call destructor now
-				task->~packaged_task();
+				//task->~packaged_task();
 				// Store the task on to the free task pool
-				{
-					LOCK(scheduler.m_FreeTaskPoolMutex);
-					scheduler.m_FreeTaskPool.push_back(task);
-				}
+				//{
+				//	LOCK(scheduler.m_FreeTaskPoolMutex);
+				//	scheduler.m_FreeTaskPool.push_back(task);
+				//}
 
 				task = nullptr;
+				scheduler.m_TaskQueueSignal.notify_all();
 			}
 		}
+	}
+	
+	INLINE bool SlimTaskScheduler::IsTaskQueueEmpty()const noexcept
+	{
+		for(auto it = m_TaskSlots.begin(); it != m_TaskSlots.end(); ++it)
+		{
+			if (it->State != SlimTask::DONE)
+				return false;
+		}
+		return true;
+	}
+
+	INLINE bool SlimTaskScheduler::IsAnyTaskReady(uint32& queueTaskID)const noexcept
+	{
+		for (auto it = m_TaskSlots.begin(); it != m_TaskSlots.end(); ++it)
+		{
+			const auto& slot = *it;
+			if (slot.State == SlimTask::READY)
+			{
+				queueTaskID = static_cast<uint32>(std::distance(m_TaskSlots.begin(), it));
+				return true;
+			}
+		}
+		return false;
 	}
 }

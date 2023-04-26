@@ -18,7 +18,19 @@
 
 namespace greaper
 {
-	using SlimTask = std::packaged_task<void()>;
+	struct SlimTask
+	{
+		enum TaskState
+		{
+			READY,
+			SCHEDULED,
+			WORKING,
+			DONE
+		};
+
+		std::function<void()> Task = nullptr;
+		std::atomic_int State = DONE;
+	};
 
 	class SlimTaskScheduler
 	{
@@ -34,9 +46,11 @@ namespace greaper
 		sizet GetWorkerCount()const noexcept;
 		EmptyResult SetWorkerCount(sizet count)noexcept;
 
-		TResult<std::future<void>> AddTask(SlimTask task)noexcept;
+		TResult<uint32> AddTask(std::function<void()> task)noexcept;
 
-		void WaitUntilAllTasksFinished()noexcept;
+		void WaitUntilTaskFinished(uint32 taskID)const noexcept;
+
+		void WaitUntilAllTasksFinished()const noexcept;
 
 		const String& GetName()const noexcept;
 
@@ -49,12 +63,15 @@ namespace greaper
 
 		Vector<PThread> m_TaskWorkers;
 		mutable RWMutex m_TaskWorkersMutex;
-		Deque<SlimTask*> m_TaskQueue;
-		mutable Mutex m_TaskQueueMutex;
-		Signal m_TaskQueueSignal;
 
-		Vector<SlimTask*> m_FreeTaskPool;
-		mutable Mutex m_FreeTaskPoolMutex;
+		uint32 m_LastTaskSlotUsed;
+		std::array<SlimTask, 256> m_TaskSlots;
+		mutable Mutex m_TaskQueueMutex;
+		mutable Signal m_TaskQueueSignal;
+		//Deque<SlimTask*> m_TaskQueue;
+
+		//Vector<SlimTask*> m_FreeTaskPool;
+		//mutable Mutex m_FreeTaskPoolMutex;
 
 		SPtr<SlimTaskScheduler> m_This;
 		bool m_AllowGrowth;
@@ -74,6 +91,10 @@ namespace greaper
 		bool CanWorkerContinueWorking(sizet workerID)const noexcept;
 
 		static void WorkerFn(SlimTaskScheduler& scheduler, sizet id)noexcept;
+
+		bool IsTaskQueueEmpty()const noexcept;
+
+		bool IsAnyTaskReady(uint32& queueTaskID)const noexcept;
 	};
 }
 
