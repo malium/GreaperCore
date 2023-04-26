@@ -269,6 +269,7 @@ namespace greaper
 	{
 		while (true)
 		{
+			uint32 prevHandledTask = 0;
 			SlimTask* task;
 			// Retrieve a task to do or check if we need to keep running
 			{
@@ -277,7 +278,7 @@ namespace greaper
 				
 				uint32 queuedTaskID;
 				// Wait for work or an stop request
-				while (!scheduler.IsAnyTaskReady(queuedTaskID) && canWork)
+				while (!scheduler.IsAnyTaskReady(queuedTaskID, prevHandledTask) && canWork)
 				{
 					scheduler.m_TaskQueueSignal.wait(taskLck);
 					canWork = scheduler.CanWorkerContinueWorking(id);
@@ -295,6 +296,7 @@ namespace greaper
 				//}
 				task = &scheduler.m_TaskSlots[queuedTaskID];
 				task->State = SlimTask::SCHEDULED; // Avoid re-scheduling
+				prevHandledTask = queuedTaskID;
 			}
 
 			// Do actual task work, and store the task memory on the free pool
@@ -329,17 +331,24 @@ namespace greaper
 		return true;
 	}
 
-	INLINE bool SlimTaskScheduler::IsAnyTaskReady(uint32& queueTaskID)const noexcept
+	INLINE bool SlimTaskScheduler::IsAnyTaskReady(uint32& queueTaskID, uint32 prevHandledTask)const noexcept
 	{
-		for (auto it = m_TaskSlots.begin(); it != m_TaskSlots.end(); ++it)
+#define SLOT_CHECK()\
+const auto& slot = *it;\
+if (slot.State == SlimTask::READY) {\
+	queueTaskID = static_cast<uint32>(std::distance(m_TaskSlots.begin(), it));\
+	return true;}
+
+		for (auto it = m_TaskSlots.begin() + prevHandledTask; it != m_TaskSlots.end(); ++it)
 		{
-			const auto& slot = *it;
-			if (slot.State == SlimTask::READY)
-			{
-				queueTaskID = static_cast<uint32>(std::distance(m_TaskSlots.begin(), it));
-				return true;
-			}
+			SLOT_CHECK();
 		}
+
+		for (auto it = m_TaskSlots.begin(); it != m_TaskSlots.begin() + prevHandledTask; ++it)
+		{
+			SLOT_CHECK();
+		}
+
 		return false;
 	}
 }

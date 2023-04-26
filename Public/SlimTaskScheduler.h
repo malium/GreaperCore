@@ -94,7 +94,7 @@ namespace greaper
 
 		bool IsTaskQueueEmpty()const noexcept;
 
-		bool IsAnyTaskReady(uint32& queueTaskID)const noexcept;
+		bool IsAnyTaskReady(uint32& queueTaskID, uint32 prevHandledTask = 0)const noexcept;
 	};
 }
 
