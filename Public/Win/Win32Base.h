@@ -65,6 +65,7 @@ typedef unsigned int        *PUINT;
 #define VOID void
 typedef void* PVOID;
 typedef void far* LPVOID;
+typedef CONST void far* LPCVOID;
 
 typedef char CHAR;
 typedef CHAR *PCHAR, *LPCH, *PCH;
@@ -1099,80 +1100,6 @@ VerifyVersionInfoW(
 	DWORDLONG dwlConditionMask
 );
 
-typedef LRESULT (CALLBACK *WNDPROC)(HWND,UINT,WPARAM,LPARAM);
-
-typedef struct tagWNDCLASSA {
-	UINT style;
-	WNDPROC lpfnWndProc;
-	int cbClsExtra;
-	int cbWndExtra;
-	HINSTANCE hInstance;
-	HICON hIcon;
-	HCURSOR hCursor;
-	HBRUSH hbrBackground;
-	LPCSTR lpszMenuName;
-	LPCSTR lpszClassName;
-} WNDCLASSA,*PWNDCLASSA,*NPWNDCLASSA,*LPWNDCLASSA;
-
-  typedef struct tagWNDCLASSW {
-	UINT style;
-	WNDPROC lpfnWndProc;
-	int cbClsExtra;
-	int cbWndExtra;
-	HINSTANCE hInstance;
-	HICON hIcon;
-	HCURSOR hCursor;
-	HBRUSH hbrBackground;
-	LPCWSTR lpszMenuName;
-	LPCWSTR lpszClassName;
-} WNDCLASSW,*PWNDCLASSW,*NPWNDCLASSW,*LPWNDCLASSW;
-
-typedef struct tagWNDCLASSEXA {
-	UINT cbSize;
-	UINT style;
-	WNDPROC lpfnWndProc;
-	int cbClsExtra;
-	int cbWndExtra;
-	HINSTANCE hInstance;
-	HICON hIcon;
-	HCURSOR hCursor;
-	HBRUSH hbrBackground;
-	LPCSTR lpszMenuName;
-	LPCSTR lpszClassName;
-	HICON hIconSm;
-} WNDCLASSEXA,*PWNDCLASSEXA,*NPWNDCLASSEXA,*LPWNDCLASSEXA;
-
-  typedef struct tagWNDCLASSEXW {
-	UINT cbSize;
-	UINT style;
-	WNDPROC lpfnWndProc;
-	int cbClsExtra;
-	int cbWndExtra;
-	HINSTANCE hInstance;
-	HICON hIcon;
-	HCURSOR hCursor;
-	HBRUSH hbrBackground;
-	LPCWSTR lpszMenuName;
-	LPCWSTR lpszClassName;
-	HICON hIconSm;
-} WNDCLASSEXW,*PWNDCLASSEXW,*NPWNDCLASSEXW,*LPWNDCLASSEXW;
-
-typedef struct tagMSG {
-	HWND hwnd;
-	UINT message;
-	WPARAM wParam;
-	LPARAM lParam;
-	DWORD time;
-	POINT pt;
-  } MSG,*PMSG,*NPMSG,*LPMSG;
-
-#define POINTSTOPOINT(pt,pts) { (pt).x = (LONG)(SHORT)LOWORD(*(LONG*)&pts); (pt).y = (LONG)(SHORT)HIWORD(*(LONG*)&pts); }
-
-#define POINTTOPOINTS(pt) (MAKELONG((short)((pt).x),(short)((pt).y)))
-#define MAKEWPARAM(l,h) ((WPARAM)(DWORD)MAKELONG(l,h))
-#define MAKELPARAM(l,h) ((LPARAM)(DWORD)MAKELONG(l,h))
-#define MAKELRESULT(l,h) ((LRESULT)(DWORD)MAKELONG(l,h))
-
 WINBASEAPI
 int
 WINAPI
@@ -1181,6 +1108,60 @@ MulDiv(
 	int nNumerator,
 	int nDenominator
 );
+
+#define FORMAT_MESSAGE_IGNORE_INSERTS  0x00000200
+#define FORMAT_MESSAGE_FROM_STRING     0x00000400
+#define FORMAT_MESSAGE_FROM_HMODULE    0x00000800
+#define FORMAT_MESSAGE_FROM_SYSTEM     0x00001000
+#define FORMAT_MESSAGE_ARGUMENT_ARRAY  0x00002000
+#define FORMAT_MESSAGE_MAX_WIDTH_MASK  0x000000FF
+#define FORMAT_MESSAGE_ALLOCATE_BUFFER 0x00000100
+
+WINBASEAPI
+DWORD
+WINAPI
+FormatMessageA(
+	DWORD dwFlags,
+	LPCVOID lpSource,
+	DWORD dwMessageId,
+	DWORD dwLanguageId,
+	LPSTR lpBuffer,
+	DWORD nSize,
+	va_list * Arguments
+);
+
+WINBASEAPI
+DWORD
+WINAPI
+FormatMessageW(
+	DWORD dwFlags,
+	LPCVOID lpSource,
+	DWORD dwMessageId,
+	DWORD dwLanguageId,
+	LPWSTR lpBuffer,
+	DWORD nSize,
+	va_list * Arguments
+);
+
+#define LANG_NEUTRAL                     0x00
+
+#define SUBLANG_DEFAULT                             0x01    // user default
+#define SUBLANG_SYS_DEFAULT                         0x02    // system default
+
+#define SORT_DEFAULT                     0x0     // sorting default
+
+#define MAKELANGID(p, s)       ((((WORD  )(s)) << 10) | (WORD  )(p))
+
+#define MAKELCID(lgid, srtid)  ((DWORD)((((DWORD)((WORD  )(srtid))) << 16) |  \
+										 ((DWORD)((WORD  )(lgid)))))
+
+#define LOCALE_NAME_MAX_LENGTH   85
+
+#define LANG_SYSTEM_DEFAULT    (MAKELANGID(LANG_NEUTRAL, SUBLANG_SYS_DEFAULT))
+#define LANG_USER_DEFAULT      (MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT))
+
+#define LOCALE_SYSTEM_DEFAULT  (MAKELCID(LANG_SYSTEM_DEFAULT, SORT_DEFAULT))
+#define LOCALE_USER_DEFAULT    (MAKELCID(LANG_USER_DEFAULT, SORT_DEFAULT))
 
 }
 

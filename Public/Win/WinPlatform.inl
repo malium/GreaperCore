@@ -98,7 +98,8 @@ INLINE void greaper::WinOSPlatform::WriteMiniDump(std::filesystem::path path, PE
 	{
 		// something went wrong
 		const auto errorCode = GetLastError();
-		DEBUG_OUTPUT(Format("Something went wrong while creating the MiniDump file. Error code: " I32_HEX_FMT, errorCode).c_str());
+		const auto outputMessage = Format("Something went wrong while creating the MiniDump file. Error code: " I32_HEX_FMT " Message: %S.", errorCode, GetLastErrorAsString(errorCode).c_str());
+		DEBUG_OUTPUT(outputMessage.c_str());
 		return;
 	}
 
@@ -195,7 +196,9 @@ INLINE uint64 greaper::WinOSPlatform::GetPhysicalRAMAmountKB()noexcept
 	if (ret == TRUE)
 		return amount;
 	const auto err = GetLastError();
-	DEBUG_OUTPUT(Format("Couldn't GetPhysicallyInstalledSystemMemory, error code: " I32_HEX_FMT, err).c_str());
+	const auto outMessage = Format("Couldn't GetPhysicallyInstalledSystemMemory, error code: " I32_HEX_FMT " error message: %S.", err,
+		GetLastErrorAsString(err).c_str());
+	DEBUG_OUTPUT(outMessage.c_str());
 	return 0ull;
 }
 
@@ -310,7 +313,9 @@ INLINE void greaper::WinOSPlatform::LoadSymbols()
 	{
 		// Something went wrong
 		const auto errorCode = GetLastError();
-		DEBUG_OUTPUT(Format("SymInitialize() failed. Error code: " I32_HEX_FMT, errorCode).c_str());
+		const auto outMessage = Format("SymInitialize() failed. Error code: " I32_HEX_FMT " Error message: %S.", errorCode,
+			GetLastErrorAsString(errorCode).c_str());
+		DEBUG_OUTPUT(outMessage.c_str());
 		return;
 	}
 
@@ -352,8 +357,9 @@ INLINE void greaper::WinOSPlatform::LoadSymbols()
 			{
 				// error
 				const auto errorCode = GetLastError();
-				DEBUG_OUTPUT(Format("Failed retrieving module information for module '%s'. Error code: " I32_HEX_FMT, moduleName.data(),
-					errorCode).c_str());
+				const auto outMessage = Format("Failed retrieving module information for module '%s'. Error code: " I32_HEX_FMT " Error message: %S.",
+					moduleName.data(), errorCode, GetLastErrorAsString(errorCode).c_str());
+				DEBUG_OUTPUT(outMessage.c_str());
 				continue;
 			}
 		}
@@ -361,8 +367,9 @@ INLINE void greaper::WinOSPlatform::LoadSymbols()
 		{
 			// error
 			const auto errorCode = GetLastError();
-			DEBUG_OUTPUT(Format("Failed loading module '%s', Search path '%s', Image name '%s'. Error code: " I32_HEX_FMT, moduleName.data(),
-				pdbSearchPath.data(), imageName.data(), errorCode).c_str());
+			const auto outMessage = Format("Failed loading module '%s', Search path '%s', Image name '%s'. Error code: " I32_HEX_FMT " Error message: %S.",
+				moduleName.data(), pdbSearchPath.data(), imageName.data(), errorCode, GetLastErrorAsString(errorCode).c_str());
+			DEBUG_OUTPUT(outMessage.c_str());
 			continue;
 		}
 	}
@@ -481,6 +488,23 @@ INLINE greaper::String greaper::WinOSPlatform::GetStackTrace(CONTEXT context, ui
 	}
 
 	return output;
+}
+
+INLINE greaper::WString greaper::WinOSPlatform::GetLastErrorAsString(DWORD errorCode) noexcept
+{
+	WCHAR* message;
+	const auto ret = FormatMessageW(FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_MAX_WIDTH_MASK,
+		nullptr, errorCode, LANG_SYSTEM_DEFAULT, (LPWSTR)&message, 0, nullptr
+	);
+
+	if (ret > 0)
+	{
+		WString msg{ message, ret };
+		LocalFree(message);
+		return msg;
+	}
+	const auto err = GetLastError();
+	return Format(L"Error code: " I32_HEX_FMT ", also FormatMessage call failed with code " I32_HEX_FMT, errorCode, err);
 }
 
 #if COMPILER_MSVC

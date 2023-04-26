@@ -57,6 +57,8 @@ namespace greaper
 
 		static Vector<String> CreateSelectDirectoryDialog(StringView title, StringView defaultPath = ""sv, bool multiselect = false);
 
+		static WString GetLastErrorAsString(DWORD errorCode)noexcept;
+
 	protected:
 		static void _PerThreadInit();
 		

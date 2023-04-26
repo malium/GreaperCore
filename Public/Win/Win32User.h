@@ -96,6 +96,405 @@ extern "C" {
 #define CS_IME 0x00010000
 #define CS_DROPSHADOW 0x00020000
 
+#define PRF_CHECKVISIBLE    0x00000001L
+#define PRF_NONCLIENT       0x00000002L
+#define PRF_CLIENT          0x00000004L
+#define PRF_ERASEBKGND      0x00000008L
+#define PRF_CHILDREN        0x00000010L
+#define PRF_OWNED           0x00000020L
+
+#define BDR_RAISEDOUTER 0x0001
+#define BDR_SUNKENOUTER 0x0002
+#define BDR_RAISEDINNER 0x0004
+#define BDR_SUNKENINNER 0x0008
+
+#define BDR_OUTER       (BDR_RAISEDOUTER | BDR_SUNKENOUTER)
+#define BDR_INNER       (BDR_RAISEDINNER | BDR_SUNKENINNER)
+#define BDR_RAISED      (BDR_RAISEDOUTER | BDR_RAISEDINNER)
+#define BDR_SUNKEN      (BDR_SUNKENOUTER | BDR_SUNKENINNER)
+
+#define EDGE_RAISED     (BDR_RAISEDOUTER | BDR_RAISEDINNER)
+#define EDGE_SUNKEN     (BDR_SUNKENOUTER | BDR_SUNKENINNER)
+#define EDGE_ETCHED     (BDR_SUNKENOUTER | BDR_RAISEDINNER)
+#define EDGE_BUMP       (BDR_RAISEDOUTER | BDR_SUNKENINNER)
+
+#define BF_LEFT         0x0001
+#define BF_TOP          0x0002
+#define BF_RIGHT        0x0004
+#define BF_BOTTOM       0x0008
+
+#define BF_TOPLEFT      (BF_TOP | BF_LEFT)
+#define BF_TOPRIGHT     (BF_TOP | BF_RIGHT)
+#define BF_BOTTOMLEFT   (BF_BOTTOM | BF_LEFT)
+#define BF_BOTTOMRIGHT  (BF_BOTTOM | BF_RIGHT)
+#define BF_RECT         (BF_LEFT | BF_TOP | BF_RIGHT | BF_BOTTOM)
+
+#define BF_DIAGONAL     0x0010
+
+#define BF_DIAGONAL_ENDTOPRIGHT     (BF_DIAGONAL | BF_TOP | BF_RIGHT)
+#define BF_DIAGONAL_ENDTOPLEFT      (BF_DIAGONAL | BF_TOP | BF_LEFT)
+#define BF_DIAGONAL_ENDBOTTOMLEFT   (BF_DIAGONAL | BF_BOTTOM | BF_LEFT)
+#define BF_DIAGONAL_ENDBOTTOMRIGHT  (BF_DIAGONAL | BF_BOTTOM | BF_RIGHT)
+
+
+#define BF_MIDDLE       0x0800  /* Fill in the middle */
+#define BF_SOFT         0x1000  /* For softer buttons */
+#define BF_ADJUST       0x2000  /* Calculate the space left over */
+#define BF_FLAT         0x4000  /* For flat rather than 3D borders */
+#define BF_MONO         0x8000  /* For monochrome borders */
+
+WINUSERAPI
+BOOL
+WINAPI
+DrawEdge(
+	HDC hdc,
+	LPRECT qrc,
+	UINT edge,
+	UINT grfFlags);
+
+#define DFC_CAPTION             1
+#define DFC_MENU                2
+#define DFC_SCROLL              3
+#define DFC_BUTTON              4
+#define DFC_POPUPMENU           5
+
+#define DFCS_CAPTIONCLOSE       0x0000
+#define DFCS_CAPTIONMIN         0x0001
+#define DFCS_CAPTIONMAX         0x0002
+#define DFCS_CAPTIONRESTORE     0x0003
+#define DFCS_CAPTIONHELP        0x0004
+
+#define DFCS_MENUARROW          0x0000
+#define DFCS_MENUCHECK          0x0001
+#define DFCS_MENUBULLET         0x0002
+#define DFCS_MENUARROWRIGHT     0x0004
+#define DFCS_SCROLLUP           0x0000
+#define DFCS_SCROLLDOWN         0x0001
+#define DFCS_SCROLLLEFT         0x0002
+#define DFCS_SCROLLRIGHT        0x0003
+#define DFCS_SCROLLCOMBOBOX     0x0005
+#define DFCS_SCROLLSIZEGRIP     0x0008
+#define DFCS_SCROLLSIZEGRIPRIGHT 0x0010
+
+#define DFCS_BUTTONCHECK        0x0000
+#define DFCS_BUTTONRADIOIMAGE   0x0001
+#define DFCS_BUTTONRADIOMASK    0x0002
+#define DFCS_BUTTONRADIO        0x0004
+#define DFCS_BUTTON3STATE       0x0008
+#define DFCS_BUTTONPUSH         0x0010
+
+#define DFCS_INACTIVE           0x0100
+#define DFCS_PUSHED             0x0200
+#define DFCS_CHECKED            0x0400
+#define DFCS_TRANSPARENT        0x0800
+#define DFCS_HOT                0x1000
+
+#define DFCS_ADJUSTRECT         0x2000
+#define DFCS_FLAT               0x4000
+#define DFCS_MONO               0x8000
+
+WINUSERAPI
+BOOL
+WINAPI
+DrawFrameControl(
+	HDC,
+	LPRECT,
+	UINT,
+	UINT);
+
+#define DC_ACTIVE           0x0001
+#define DC_SMALLCAP         0x0002
+#define DC_ICON             0x0004
+#define DC_TEXT             0x0008
+#define DC_INBUTTON         0x0010
+#define DC_GRADIENT         0x0020
+#define DC_BUTTONS          0x1000
+
+WINUSERAPI
+BOOL
+WINAPI
+DrawCaption(
+	HWND hwnd,
+	HDC hdc,
+	CONST RECT* lprect,
+	UINT flags);
+
+#define IDANI_OPEN          1
+#define IDANI_CAPTION       3
+
+WINUSERAPI
+BOOL
+WINAPI
+DrawAnimatedRects(
+	HWND hwnd,
+	int idAni,
+	CONST RECT* lprcFrom,
+	CONST RECT* lprcTo);
+
+#define CF_TEXT             1
+#define CF_BITMAP           2
+#define CF_METAFILEPICT     3
+#define CF_SYLK             4
+#define CF_DIF              5
+#define CF_TIFF             6
+#define CF_OEMTEXT          7
+#define CF_DIB              8
+#define CF_PALETTE          9
+#define CF_PENDATA          10
+#define CF_RIFF             11
+#define CF_WAVE             12
+#define CF_UNICODETEXT      13
+#define CF_ENHMETAFILE      14
+
+#define CF_HDROP            15
+#define CF_LOCALE           16
+
+#define CF_DIBV5            17
+
+#define CF_MAX              18
+
+#define CF_OWNERDISPLAY     0x0080
+#define CF_DSPTEXT          0x0081
+#define CF_DSPBITMAP        0x0082
+#define CF_DSPMETAFILEPICT  0x0083
+#define CF_DSPENHMETAFILE   0x008E
+
+#define CF_PRIVATEFIRST     0x0200
+#define CF_PRIVATELAST      0x02FF
+
+#define CF_GDIOBJFIRST      0x0300
+#define CF_GDIOBJLAST       0x03FF
+
+#define FVIRTKEY  TRUE          /* Assumed to be == TRUE */
+#define FNOINVERT 0x02
+#define FSHIFT    0x04
+#define FCONTROL  0x08
+#define FALT      0x10
+
+typedef LRESULT(CALLBACK* WNDPROC)(HWND, UINT, WPARAM, LPARAM);
+
+typedef struct tagWNDCLASSA {
+	UINT style;
+	WNDPROC lpfnWndProc;
+	int cbClsExtra;
+	int cbWndExtra;
+	HINSTANCE hInstance;
+	HICON hIcon;
+	HCURSOR hCursor;
+	HBRUSH hbrBackground;
+	LPCSTR lpszMenuName;
+	LPCSTR lpszClassName;
+} WNDCLASSA, * PWNDCLASSA, * NPWNDCLASSA, * LPWNDCLASSA;
+
+typedef struct tagWNDCLASSW {
+	UINT style;
+	WNDPROC lpfnWndProc;
+	int cbClsExtra;
+	int cbWndExtra;
+	HINSTANCE hInstance;
+	HICON hIcon;
+	HCURSOR hCursor;
+	HBRUSH hbrBackground;
+	LPCWSTR lpszMenuName;
+	LPCWSTR lpszClassName;
+} WNDCLASSW, * PWNDCLASSW, * NPWNDCLASSW, * LPWNDCLASSW;
+
+typedef struct tagWNDCLASSEXA {
+	UINT cbSize;
+	UINT style;
+	WNDPROC lpfnWndProc;
+	int cbClsExtra;
+	int cbWndExtra;
+	HINSTANCE hInstance;
+	HICON hIcon;
+	HCURSOR hCursor;
+	HBRUSH hbrBackground;
+	LPCSTR lpszMenuName;
+	LPCSTR lpszClassName;
+	HICON hIconSm;
+} WNDCLASSEXA, * PWNDCLASSEXA, * NPWNDCLASSEXA, * LPWNDCLASSEXA;
+
+typedef struct tagWNDCLASSEXW {
+	UINT cbSize;
+	UINT style;
+	WNDPROC lpfnWndProc;
+	int cbClsExtra;
+	int cbWndExtra;
+	HINSTANCE hInstance;
+	HICON hIcon;
+	HCURSOR hCursor;
+	HBRUSH hbrBackground;
+	LPCWSTR lpszMenuName;
+	LPCWSTR lpszClassName;
+	HICON hIconSm;
+} WNDCLASSEXW, * PWNDCLASSEXW, * NPWNDCLASSEXW, * LPWNDCLASSEXW;
+
+typedef struct tagMSG {
+	HWND hwnd;
+	UINT message;
+	WPARAM wParam;
+	LPARAM lParam;
+	DWORD time;
+	POINT pt;
+} MSG, * PMSG, * NPMSG, * LPMSG;
+
+#define POINTSTOPOINT(pt,pts) { (pt).x = (LONG)(SHORT)LOWORD(*(LONG*)&pts); (pt).y = (LONG)(SHORT)HIWORD(*(LONG*)&pts); }
+
+#define POINTTOPOINTS(pt) (MAKELONG((short)((pt).x),(short)((pt).y)))
+#define MAKEWPARAM(l,h) ((WPARAM)(DWORD)MAKELONG(l,h))
+#define MAKELPARAM(l,h) ((LPARAM)(DWORD)MAKELONG(l,h))
+#define MAKELRESULT(l,h) ((LRESULT)(DWORD)MAKELONG(l,h))
+
+#define GWL_STYLE           (-16)
+#define GWL_EXSTYLE         (-20)
+#define GWL_ID              (-12)
+#if ARCHITECTURE_X86
+#define GWL_WNDPROC         (-4)
+#define GWL_HINSTANCE       (-6)
+#define GWL_HWNDPARENT      (-8)
+#define GWL_USERDATA        (-21)
+#endif
+
+#define GWLP_WNDPROC        (-4)
+#define GWLP_HINSTANCE      (-6)
+#define GWLP_HWNDPARENT     (-8)
+#define GWLP_USERDATA       (-21)
+#define GWLP_ID             (-12)
+
+typedef struct tagACCEL {
+	BYTE   fVirt;               /* Also called the flags field */
+	WORD   key;
+	WORD   cmd;
+} ACCEL, * LPACCEL;
+
+typedef struct tagCREATESTRUCTA {
+	LPVOID      lpCreateParams;
+	HINSTANCE   hInstance;
+	HMENU       hMenu;
+	HWND        hwndParent;
+	int         cy;
+	int         cx;
+	int         y;
+	int         x;
+	LONG        style;
+	LPCSTR      lpszName;
+	LPCSTR      lpszClass;
+	DWORD       dwExStyle;
+} CREATESTRUCTA, * LPCREATESTRUCTA;
+
+typedef struct tagCREATESTRUCTW {
+	LPVOID      lpCreateParams;
+	HINSTANCE   hInstance;
+	HMENU       hMenu;
+	HWND        hwndParent;
+	int         cy;
+	int         cx;
+	int         y;
+	int         x;
+	LONG        style;
+	LPCWSTR     lpszName;
+	LPCWSTR     lpszClass;
+	DWORD       dwExStyle;
+} CREATESTRUCTW, * LPCREATESTRUCTW;
+
+#define WPF_SETMINPOSITION          0x0001
+#define WPF_RESTORETOMAXIMIZED      0x0002
+#define WPF_ASYNCWINDOWPLACEMENT    0x0004
+
+typedef struct tagNMHDR
+{
+	HWND      hwndFrom;
+	UINT_PTR  idFrom;
+	UINT      code;         // NM_ code
+}   NMHDR;
+typedef NMHDR FAR* LPNMHDR;
+
+typedef struct tagSTYLESTRUCT
+{
+	DWORD   styleOld;
+	DWORD   styleNew;
+} STYLESTRUCT, * LPSTYLESTRUCT;
+
+#define ODT_MENU        1
+#define ODT_LISTBOX     2
+#define ODT_COMBOBOX    3
+#define ODT_BUTTON      4
+#define ODT_STATIC      5
+
+#define ODA_DRAWENTIRE  0x0001
+#define ODA_SELECT      0x0002
+#define ODA_FOCUS       0x0004
+
+#define ODS_SELECTED    0x0001
+#define ODS_GRAYED      0x0002
+#define ODS_DISABLED    0x0004
+#define ODS_CHECKED     0x0008
+#define ODS_FOCUS       0x0010
+#define ODS_DEFAULT         0x0020
+#define ODS_COMBOBOXEDIT    0x1000
+#define ODS_HOTLIGHT        0x0040
+#define ODS_INACTIVE        0x0080
+#define ODS_NOACCEL         0x0100
+#define ODS_NOFOCUSRECT     0x0200
+
+typedef struct tagMEASUREITEMSTRUCT {
+	UINT       CtlType;
+	UINT       CtlID;
+	UINT       itemID;
+	UINT       itemWidth;
+	UINT       itemHeight;
+	ULONG_PTR  itemData;
+} MEASUREITEMSTRUCT, NEAR* PMEASUREITEMSTRUCT, FAR* LPMEASUREITEMSTRUCT;
+
+typedef struct tagDRAWITEMSTRUCT {
+	UINT        CtlType;
+	UINT        CtlID;
+	UINT        itemID;
+	UINT        itemAction;
+	UINT        itemState;
+	HWND        hwndItem;
+	HDC         hDC;
+	RECT        rcItem;
+	ULONG_PTR   itemData;
+} DRAWITEMSTRUCT, NEAR* PDRAWITEMSTRUCT, FAR* LPDRAWITEMSTRUCT;
+
+typedef struct tagDELETEITEMSTRUCT {
+	UINT       CtlType;
+	UINT       CtlID;
+	UINT       itemID;
+	HWND       hwndItem;
+	ULONG_PTR  itemData;
+} DELETEITEMSTRUCT, NEAR* PDELETEITEMSTRUCT, FAR* LPDELETEITEMSTRUCT;
+
+typedef struct tagCOMPAREITEMSTRUCT {
+	UINT        CtlType;
+	UINT        CtlID;
+	HWND        hwndItem;
+	UINT        itemID1;
+	ULONG_PTR   itemData1;
+	UINT        itemID2;
+	ULONG_PTR   itemData2;
+	DWORD       dwLocaleId;
+} COMPAREITEMSTRUCT, NEAR* PCOMPAREITEMSTRUCT, FAR* LPCOMPAREITEMSTRUCT;
+
+WINUSERAPI
+BOOL
+WINAPI
+GetMessageA(
+	LPMSG lpMsg,
+	HWND hWnd,
+	UINT wMsgFilterMin,
+	UINT wMsgFilterMax);
+
+WINUSERAPI
+BOOL
+WINAPI
+GetMessageW(
+	LPMSG lpMsg,
+	HWND hWnd,
+	UINT wMsgFilterMin,
+	UINT wMsgFilterMax);
+
 #define SW_HIDE             0
 #define SW_SHOWNORMAL       1
 #define SW_NORMAL           1
@@ -3393,9 +3792,593 @@ DefRawInputProc(
 
 #endif /* _WIN32_WINNT >= 0x0501 */
 
+#if(WINVER >= 0x0601)
+
+#define MSGFLTINFO_NONE                         (0)
+#define MSGFLTINFO_ALREADYALLOWED_FORWND        (1)
+#define MSGFLTINFO_ALREADYDISALLOWED_FORWND     (2)
+#define MSGFLTINFO_ALLOWED_HIGHER               (3)
+
+typedef struct tagCHANGEFILTERSTRUCT {
+	DWORD cbSize;
+	DWORD ExtStatus;
+} CHANGEFILTERSTRUCT, * PCHANGEFILTERSTRUCT;
+
+#define MSGFLT_RESET                            (0)
+#define MSGFLT_ALLOW                            (1)
+#define MSGFLT_DISALLOW                         (2)
+
+WINUSERAPI
+BOOL
+WINAPI
+ChangeWindowMessageFilterEx(
+	HWND hwnd,                                         // Window
+	UINT message,                                      // WM_ message
+	DWORD action,                                      // Message filter action value
+	PCHANGEFILTERSTRUCT pChangeFilterStruct);   // Optional
+
+#endif /* WINVER >= 0x0601 */
+
+#define WM_NULL                         0x0000
+#define WM_CREATE                       0x0001
+#define WM_DESTROY                      0x0002
+#define WM_MOVE                         0x0003
+#define WM_SIZE                         0x0005
+
+#define WM_ACTIVATE                     0x0006
+
+#define     WA_INACTIVE     0
+#define     WA_ACTIVE       1
+#define     WA_CLICKACTIVE  2
+
+#define WM_SETFOCUS                     0x0007
+#define WM_KILLFOCUS                    0x0008
+#define WM_ENABLE                       0x000A
+#define WM_SETREDRAW                    0x000B
+#define WM_SETTEXT                      0x000C
+#define WM_GETTEXT                      0x000D
+#define WM_GETTEXTLENGTH                0x000E
+#define WM_PAINT                        0x000F
+#define WM_CLOSE                        0x0010
+
+#define WM_QUERYENDSESSION              0x0011
+#define WM_QUERYOPEN                    0x0013
+#define WM_ENDSESSION                   0x0016
+
+#define WM_QUIT                         0x0012
+#define WM_ERASEBKGND                   0x0014
+#define WM_SYSCOLORCHANGE               0x0015
+#define WM_SHOWWINDOW                   0x0018
+#define WM_WININICHANGE                 0x001A
+
+#define WM_SETTINGCHANGE                WM_WININICHANGE
+
+#define WM_DEVMODECHANGE                0x001B
+#define WM_ACTIVATEAPP                  0x001C
+#define WM_FONTCHANGE                   0x001D
+#define WM_TIMECHANGE                   0x001E
+#define WM_CANCELMODE                   0x001F
+#define WM_SETCURSOR                    0x0020
+#define WM_MOUSEACTIVATE                0x0021
+#define WM_CHILDACTIVATE                0x0022
+#define WM_QUEUESYNC                    0x0023
+
+#define WM_GETMINMAXINFO                0x0024
+
+typedef struct tagMINMAXINFO {
+	POINT ptReserved;
+	POINT ptMaxSize;
+	POINT ptMaxPosition;
+	POINT ptMinTrackSize;
+	POINT ptMaxTrackSize;
+} MINMAXINFO, * PMINMAXINFO, * LPMINMAXINFO;
+
+#define WM_PAINTICON                    0x0026
+#define WM_ICONERASEBKGND               0x0027
+#define WM_NEXTDLGCTL                   0x0028
+#define WM_SPOOLERSTATUS                0x002A
+#define WM_DRAWITEM                     0x002B
+#define WM_MEASUREITEM                  0x002C
+#define WM_DELETEITEM                   0x002D
+#define WM_VKEYTOITEM                   0x002E
+#define WM_CHARTOITEM                   0x002F
+#define WM_SETFONT                      0x0030
+#define WM_GETFONT                      0x0031
+#define WM_SETHOTKEY                    0x0032
+#define WM_GETHOTKEY                    0x0033
+#define WM_QUERYDRAGICON                0x0037
+#define WM_COMPAREITEM                  0x0039
+
+#define WM_GETOBJECT                    0x003D
+
+#define WM_COMPACTING                   0x0041
+#define WM_COMMNOTIFY                   0x0044  /* no longer suported */
+#define WM_WINDOWPOSCHANGING            0x0046
+#define WM_WINDOWPOSCHANGED             0x0047
+
+#define WM_POWER                        0x0048
+
+#define WM_COPYDATA                     0x004A
+#define WM_CANCELJOURNAL                0x004B
+
+typedef struct tagCOPYDATASTRUCT {
+	ULONG_PTR dwData;
+	DWORD cbData;
+	PVOID lpData;
+} COPYDATASTRUCT, * PCOPYDATASTRUCT;
+
+typedef struct tagMDINEXTMENU
+{
+	HMENU   hmenuIn;
+	HMENU   hmenuNext;
+	HWND    hwndNext;
+} MDINEXTMENU, * PMDINEXTMENU, FAR* LPMDINEXTMENU;
+
+#define WM_NOTIFY                       0x004E
+#define WM_INPUTLANGCHANGEREQUEST       0x0050
+#define WM_INPUTLANGCHANGE              0x0051
+#define WM_TCARD                        0x0052
+#define WM_HELP                         0x0053
+#define WM_USERCHANGED                  0x0054
+#define WM_NOTIFYFORMAT                 0x0055
+
+#define WM_CONTEXTMENU                  0x007B
+#define WM_STYLECHANGING                0x007C
+#define WM_STYLECHANGED                 0x007D
+#define WM_DISPLAYCHANGE                0x007E
+#define WM_GETICON                      0x007F
+#define WM_SETICON                      0x0080
+
+#define WM_NCCREATE                     0x0081
+#define WM_NCDESTROY                    0x0082
+#define WM_NCCALCSIZE                   0x0083
+#define WM_NCHITTEST                    0x0084
+#define WM_NCPAINT                      0x0085
+#define WM_NCACTIVATE                   0x0086
+#define WM_GETDLGCODE                   0x0087
+
+#define WM_SYNCPAINT                    0x0088
+
+#define WM_NCMOUSEMOVE                  0x00A0
+#define WM_NCLBUTTONDOWN                0x00A1
+#define WM_NCLBUTTONUP                  0x00A2
+#define WM_NCLBUTTONDBLCLK              0x00A3
+#define WM_NCRBUTTONDOWN                0x00A4
+#define WM_NCRBUTTONUP                  0x00A5
+#define WM_NCRBUTTONDBLCLK              0x00A6
+#define WM_NCMBUTTONDOWN                0x00A7
+#define WM_NCMBUTTONUP                  0x00A8
+#define WM_NCMBUTTONDBLCLK              0x00A9
+
+#define WM_NCXBUTTONDOWN                0x00AB
+#define WM_NCXBUTTONUP                  0x00AC
+#define WM_NCXBUTTONDBLCLK              0x00AD
+
+#define WM_INPUT_DEVICE_CHANGE          0x00FE
+
+#define WM_INPUT                        0x00FF
+
+#define WM_KEYFIRST                     0x0100
+#define WM_KEYDOWN                      0x0100
+#define WM_KEYUP                        0x0101
+#define WM_CHAR                         0x0102
+#define WM_DEADCHAR                     0x0103
+#define WM_SYSKEYDOWN                   0x0104
+#define WM_SYSKEYUP                     0x0105
+#define WM_SYSCHAR                      0x0106
+#define WM_SYSDEADCHAR                  0x0107
+
+#define WM_UNICHAR                      0x0109
+#define WM_KEYLAST                      0x0109
+
+#define WM_IME_STARTCOMPOSITION         0x010D
+#define WM_IME_ENDCOMPOSITION           0x010E
+#define WM_IME_COMPOSITION              0x010F
+#define WM_IME_KEYLAST                  0x010F
+
+#define WM_INITDIALOG                   0x0110
+#define WM_COMMAND                      0x0111
+#define WM_SYSCOMMAND                   0x0112
+#define WM_TIMER                        0x0113
+#define WM_HSCROLL                      0x0114
+#define WM_VSCROLL                      0x0115
+#define WM_INITMENU                     0x0116
+#define WM_INITMENUPOPUP                0x0117
+
+#if(WINVER >= 0x0601)
+#define WM_GESTURE                      0x0119
+#define WM_GESTURENOTIFY                0x011A
+#endif /* WINVER >= 0x0601 */
+
+#define WM_MENUSELECT                   0x011F
+#define WM_MENUCHAR                     0x0120
+#define WM_ENTERIDLE                    0x0121
+
+#define WM_MENURBUTTONUP                0x0122
+#define WM_MENUDRAG                     0x0123
+#define WM_MENUGETOBJECT                0x0124
+#define WM_UNINITMENUPOPUP              0x0125
+#define WM_MENUCOMMAND                  0x0126
+
+#define WM_CHANGEUISTATE                0x0127
+#define WM_UPDATEUISTATE                0x0128
+#define WM_QUERYUISTATE                 0x0129
+
+#define UIS_SET                         1
+#define UIS_CLEAR                       2
+#define UIS_INITIALIZE                  3
+
+#define UISF_HIDEFOCUS                  0x1
+#define UISF_HIDEACCEL                  0x2
+
+#define UISF_ACTIVE                     0x4
+
+#define WM_CTLCOLORMSGBOX               0x0132
+#define WM_CTLCOLOREDIT                 0x0133
+#define WM_CTLCOLORLISTBOX              0x0134
+#define WM_CTLCOLORBTN                  0x0135
+#define WM_CTLCOLORDLG                  0x0136
+#define WM_CTLCOLORSCROLLBAR            0x0137
+#define WM_CTLCOLORSTATIC               0x0138
+#define MN_GETHMENU                     0x01E1
+
+#define WM_MOUSEFIRST                   0x0200
+#define WM_MOUSEMOVE                    0x0200
+#define WM_LBUTTONDOWN                  0x0201
+#define WM_LBUTTONUP                    0x0202
+#define WM_LBUTTONDBLCLK                0x0203
+#define WM_RBUTTONDOWN                  0x0204
+#define WM_RBUTTONUP                    0x0205
+#define WM_RBUTTONDBLCLK                0x0206
+#define WM_MBUTTONDOWN                  0x0207
+#define WM_MBUTTONUP                    0x0208
+#define WM_MBUTTONDBLCLK                0x0209
+
+#define WM_MOUSEWHEEL                   0x020A
+
+#define WM_XBUTTONDOWN                  0x020B
+#define WM_XBUTTONUP                    0x020C
+#define WM_XBUTTONDBLCLK                0x020D
+
+#define WM_MOUSEHWHEEL                  0x020E
+
+#define WM_MOUSELAST                    0x020E
+
+#define WHEEL_DELTA                     120
+
+#define GET_WHEEL_DELTA_WPARAM(wParam)  ((short)HIWORD(wParam))
+
+#define WHEEL_PAGESCROLL                (UINT_MAX)
+
+#define GET_KEYSTATE_WPARAM(wParam)     (LOWORD(wParam))
+#define GET_NCHITTEST_WPARAM(wParam)    ((short)LOWORD(wParam))
+#define GET_XBUTTON_WPARAM(wParam)      (HIWORD(wParam))
+
+#define XBUTTON1      0x0001
+#define XBUTTON2      0x0002
+
+#define WM_PARENTNOTIFY                 0x0210
+#define WM_ENTERMENULOOP                0x0211
+#define WM_EXITMENULOOP                 0x0212
+
+#define WM_NEXTMENU                     0x0213
+#define WM_SIZING                       0x0214
+#define WM_CAPTURECHANGED               0x0215
+#define WM_MOVING                       0x0216
+
+#define WM_POWERBROADCAST               0x0218
+
+#define PBT_APMQUERYSUSPEND             0x0000
+#define PBT_APMQUERYSTANDBY             0x0001
+
+#define PBT_APMQUERYSUSPENDFAILED       0x0002
+#define PBT_APMQUERYSTANDBYFAILED       0x0003
+
+#define PBT_APMSUSPEND                  0x0004
+#define PBT_APMSTANDBY                  0x0005
+
+#define PBT_APMRESUMECRITICAL           0x0006
+#define PBT_APMRESUMESUSPEND            0x0007
+#define PBT_APMRESUMESTANDBY            0x0008
+
+#define PBTF_APMRESUMEFROMFAILURE       0x00000001
+
+#define PBT_APMBATTERYLOW               0x0009
+#define PBT_APMPOWERSTATUSCHANGE        0x000A
+
+#define PBT_APMOEMEVENT                 0x000B
+
+#define PBT_APMRESUMEAUTOMATIC          0x0012
+
+#ifndef PBT_POWERSETTINGCHANGE
+#define PBT_POWERSETTINGCHANGE          0x8013
+
+typedef struct {
+	GUID PowerSetting;
+	DWORD DataLength;
+	UCHAR Data[1];
+} POWERBROADCAST_SETTING, * PPOWERBROADCAST_SETTING;
+
+#endif // PBT_POWERSETTINGCHANGE
+
+#define WM_DEVICECHANGE                 0x0219
+
+#define WM_MDICREATE                    0x0220
+#define WM_MDIDESTROY                   0x0221
+#define WM_MDIACTIVATE                  0x0222
+#define WM_MDIRESTORE                   0x0223
+#define WM_MDINEXT                      0x0224
+#define WM_MDIMAXIMIZE                  0x0225
+#define WM_MDITILE                      0x0226
+#define WM_MDICASCADE                   0x0227
+#define WM_MDIICONARRANGE               0x0228
+#define WM_MDIGETACTIVE                 0x0229
+
+
+#define WM_MDISETMENU                   0x0230
+#define WM_ENTERSIZEMOVE                0x0231
+#define WM_EXITSIZEMOVE                 0x0232
+#define WM_DROPFILES                    0x0233
+#define WM_MDIREFRESHMENU               0x0234
+
+#if(WINVER >= 0x0602)
+#define WM_POINTERDEVICECHANGE          0x238
+#define WM_POINTERDEVICEINRANGE         0x239
+#define WM_POINTERDEVICEOUTOFRANGE      0x23A
+#endif /* WINVER >= 0x0602 */
+
+#if(WINVER >= 0x0601)
+#define WM_TOUCH                        0x0240
+#endif /* WINVER >= 0x0601 */
+
+#if(WINVER >= 0x0602)
+#define WM_NCPOINTERUPDATE              0x0241
+#define WM_NCPOINTERDOWN                0x0242
+#define WM_NCPOINTERUP                  0x0243
+#define WM_POINTERUPDATE                0x0245
+#define WM_POINTERDOWN                  0x0246
+#define WM_POINTERUP                    0x0247
+#define WM_POINTERENTER                 0x0249
+#define WM_POINTERLEAVE                 0x024A
+#define WM_POINTERACTIVATE              0x024B
+#define WM_POINTERCAPTURECHANGED        0x024C
+#define WM_TOUCHHITTESTING              0x024D
+#define WM_POINTERWHEEL                 0x024E
+#define WM_POINTERHWHEEL                0x024F
+#define DM_POINTERHITTEST               0x0250
+#define WM_POINTERROUTEDTO              0x0251
+#define WM_POINTERROUTEDAWAY            0x0252
+#define WM_POINTERROUTEDRELEASED        0x0253
+#endif /* WINVER >= 0x0602 */
+
+#define WM_IME_SETCONTEXT               0x0281
+#define WM_IME_NOTIFY                   0x0282
+#define WM_IME_CONTROL                  0x0283
+#define WM_IME_COMPOSITIONFULL          0x0284
+#define WM_IME_SELECT                   0x0285
+#define WM_IME_CHAR                     0x0286
+
+#define WM_IME_REQUEST                  0x0288
+
+#define WM_IME_KEYDOWN                  0x0290
+#define WM_IME_KEYUP                    0x0291
+
+#define WM_MOUSEHOVER                   0x02A1
+#define WM_MOUSELEAVE                   0x02A3
+
+#define WM_NCMOUSEHOVER                 0x02A0
+#define WM_NCMOUSELEAVE                 0x02A2
+
+#define WM_WTSSESSION_CHANGE            0x02B1
+
+#define WM_TABLET_FIRST                 0x02c0
+#define WM_TABLET_LAST                  0x02df
+
+#if(WINVER >= 0x0601)
+#define WM_DPICHANGED                   0x02E0
+#endif /* WINVER >= 0x0601 */
+
+#if(WINVER >= 0x0605)
+#define WM_DPICHANGED_BEFOREPARENT      0x02E2
+#define WM_DPICHANGED_AFTERPARENT       0x02E3
+#define WM_GETDPISCALEDSIZE             0x02E4
+#endif /* WINVER >= 0x0605 */
+
+#define WM_CUT                          0x0300
+#define WM_COPY                         0x0301
+#define WM_PASTE                        0x0302
+#define WM_CLEAR                        0x0303
+#define WM_UNDO                         0x0304
+#define WM_RENDERFORMAT                 0x0305
+#define WM_RENDERALLFORMATS             0x0306
+#define WM_DESTROYCLIPBOARD             0x0307
+#define WM_DRAWCLIPBOARD                0x0308
+#define WM_PAINTCLIPBOARD               0x0309
+#define WM_VSCROLLCLIPBOARD             0x030A
+#define WM_SIZECLIPBOARD                0x030B
+#define WM_ASKCBFORMATNAME              0x030C
+#define WM_CHANGECBCHAIN                0x030D
+#define WM_HSCROLLCLIPBOARD             0x030E
+#define WM_QUERYNEWPALETTE              0x030F
+#define WM_PALETTEISCHANGING            0x0310
+#define WM_PALETTECHANGED               0x0311
+#define WM_HOTKEY                       0x0312
+
+#define WM_PRINT                        0x0317
+#define WM_PRINTCLIENT                  0x0318
+
+#define WM_APPCOMMAND                   0x0319
+
+#define WM_THEMECHANGED                 0x031A
+
+#define WM_CLIPBOARDUPDATE              0x031D
+
+#if(_WIN32_WINNT >= 0x0600)
+#define WM_DWMCOMPOSITIONCHANGED        0x031E
+#define WM_DWMNCRENDERINGCHANGED        0x031F
+#define WM_DWMCOLORIZATIONCOLORCHANGED  0x0320
+#define WM_DWMWINDOWMAXIMIZEDCHANGE     0x0321
+#endif /* _WIN32_WINNT >= 0x0600 */
+
+#if(_WIN32_WINNT >= 0x0601)
+#define WM_DWMSENDICONICTHUMBNAIL           0x0323
+#define WM_DWMSENDICONICLIVEPREVIEWBITMAP   0x0326
+#endif /* _WIN32_WINNT >= 0x0601 */
+
+#if(WINVER >= 0x0600)
+#define WM_GETTITLEBARINFOEX            0x033F
+#endif /* WINVER >= 0x0600 */
+
+#define WM_HANDHELDFIRST                0x0358
+#define WM_HANDHELDLAST                 0x035F
+
+#define WM_AFXFIRST                     0x0360
+#define WM_AFXLAST                      0x037F
+
+#define WM_PENWINFIRST                  0x0380
+#define WM_PENWINLAST                   0x038F
+
+#define WM_APP                          0x8000
+
+#define WM_USER                         0x0400
+
+#define WMSZ_LEFT           1
+#define WMSZ_RIGHT          2
+#define WMSZ_TOP            3
+#define WMSZ_TOPLEFT        4
+#define WMSZ_TOPRIGHT       5
+#define WMSZ_BOTTOM         6
+#define WMSZ_BOTTOMLEFT     7
+#define WMSZ_BOTTOMRIGHT    8
+
+#define HTERROR             (-2)
+#define HTTRANSPARENT       (-1)
+#define HTNOWHERE           0
+#define HTCLIENT            1
+#define HTCAPTION           2
+#define HTSYSMENU           3
+#define HTGROWBOX           4
+#define HTSIZE              HTGROWBOX
+#define HTMENU              5
+#define HTHSCROLL           6
+#define HTVSCROLL           7
+#define HTMINBUTTON         8
+#define HTMAXBUTTON         9
+#define HTLEFT              10
+#define HTRIGHT             11
+#define HTTOP               12
+#define HTTOPLEFT           13
+#define HTTOPRIGHT          14
+#define HTBOTTOM            15
+#define HTBOTTOMLEFT        16
+#define HTBOTTOMRIGHT       17
+#define HTBORDER            18
+#define HTREDUCE            HTMINBUTTON
+#define HTZOOM              HTMAXBUTTON
+#define HTSIZEFIRST         HTLEFT
+#define HTSIZELAST          HTBOTTOMRIGHT
+#define HTOBJECT            19
+#define HTCLOSE             20
+#define HTHELP              21
+
+#define SMTO_NORMAL         0x0000
+#define SMTO_BLOCK          0x0001
+#define SMTO_ABORTIFHUNG    0x0002
+#define SMTO_NOTIMEOUTIFNOTHUNG 0x0008
+#define SMTO_ERRORONEXIT    0x0020
+
+#define MA_ACTIVATE         1
+#define MA_ACTIVATEANDEAT   2
+#define MA_NOACTIVATE       3
+#define MA_NOACTIVATEANDEAT 4
+
+#define ICON_SMALL          0
+#define ICON_BIG            1
+#define ICON_SMALL2         2
+
+WINUSERAPI
+UINT
+WINAPI
+RegisterWindowMessageA(
+	LPCSTR lpString);
+
+WINUSERAPI
+UINT
+WINAPI
+RegisterWindowMessageW(
+	LPCWSTR lpString);
+
+#define SIZE_RESTORED       0
+#define SIZE_MINIMIZED      1
+#define SIZE_MAXIMIZED      2
+#define SIZE_MAXSHOW        3
+#define SIZE_MAXHIDE        4
+
+typedef struct tagWINDOWPOS {
+	HWND    hwnd;
+	HWND    hwndInsertAfter;
+	int     x;
+	int     y;
+	int     cx;
+	int     cy;
+	UINT    flags;
+} WINDOWPOS, * LPWINDOWPOS, * PWINDOWPOS;
+
+typedef struct tagNCCALCSIZE_PARAMS {
+	RECT       rgrc[3];
+	PWINDOWPOS lppos;
+} NCCALCSIZE_PARAMS, * LPNCCALCSIZE_PARAMS;
+
+#define WVR_ALIGNTOP        0x0010
+#define WVR_ALIGNLEFT       0x0020
+#define WVR_ALIGNBOTTOM     0x0040
+#define WVR_ALIGNRIGHT      0x0080
+#define WVR_HREDRAW         0x0100
+#define WVR_VREDRAW         0x0200
+#define WVR_REDRAW         (WVR_HREDRAW | \
+							WVR_VREDRAW)
+#define WVR_VALIDRECTS      0x0400
+
+#define MK_LBUTTON          0x0001
+#define MK_RBUTTON          0x0002
+#define MK_SHIFT            0x0004
+#define MK_CONTROL          0x0008
+#define MK_MBUTTON          0x0010
+#define MK_XBUTTON1         0x0020
+#define MK_XBUTTON2         0x0040
+
+#ifndef NOTRACKMOUSEEVENT
+
+#define TME_HOVER       0x00000001
+#define TME_LEAVE       0x00000002
+#define TME_NONCLIENT   0x00000010
+#define TME_QUERY       0x40000000
+#define TME_CANCEL      0x80000000
+#define HOVER_DEFAULT   0xFFFFFFFF
+
+typedef struct tagTRACKMOUSEEVENT {
+	DWORD cbSize;
+	DWORD dwFlags;
+	HWND  hwndTrack;
+	DWORD dwHoverTime;
+} TRACKMOUSEEVENT, * LPTRACKMOUSEEVENT;
+
+WINUSERAPI
+BOOL
+WINAPI
+TrackMouseEvent(
+	LPTRACKMOUSEEVENT lpEventTrack);
+
+#endif /* !NOTRACKMOUSEEVENT */
+
+
 }
 #else
 #include <WinUser.h>
+#endif
+
+#ifndef WM_COPYGLOBALDATA
+#define WM_COPYGLOBALDATA 0x0049
 #endif
 
 #endif /* CORE_WIN32_USER_H */
