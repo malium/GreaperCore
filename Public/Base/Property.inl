@@ -53,7 +53,7 @@ namespace greaper
 		,m_Constant(isConstant)
 	{
 		if (m_PropertyValidator == nullptr)
-			m_PropertyValidator.reset(Construct<PropertyValidatorNone<T>>());
+			m_PropertyValidator = (SPtr<TPropertyValidator<T>>)ConstructShared<PropertyValidatorNone<T>>(); //.reset(Construct<PropertyValidatorNone<T>>());
 
 		m_PropertyValidator->Validate(m_Value, &m_Value);
 		m_StringValue = refl::TypeInfo<T>::Type::ToString(m_Value);

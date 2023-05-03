@@ -490,7 +490,7 @@ INLINE greaper::String greaper::WinOSPlatform::GetStackTrace(CONTEXT context, ui
 	return output;
 }
 
-INLINE greaper::WString greaper::WinOSPlatform::GetLastErrorAsString(DWORD errorCode) noexcept
+inline greaper::WString greaper::WinOSPlatform::GetLastErrorAsString(DWORD errorCode) noexcept
 {
 	WCHAR* message;
 	const auto ret = FormatMessageW(FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_MAX_WIDTH_MASK,

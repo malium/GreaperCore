@@ -1,4 +1,3 @@
-#include "FileStream.h"
 /***********************************************************************************
 *   Copyright 2022 Marcos Sánchez Torrent.                                         *
 *   All Rights Reserved.                                                           *
@@ -10,7 +9,7 @@
 
 namespace greaper
 {
-	INLINE FileStream::FileStream(std::filesystem::path  filePath, uint16 accessMode, bool freeOnClose) noexcept
+	INLINE FileStream::FileStream(std::filesystem::path filePath, uint16 accessMode, bool freeOnClose) noexcept
 		:IStream(accessMode)
 		,m_Path(std::move(filePath))
 		,m_FreeOnClose(freeOnClose)
@@ -20,7 +19,7 @@ namespace greaper
 		if ((m_Access & READ) != 0)
 			openMode |= std::ios::in;
 
-		m_Stream = SPtr<std::fstream>(Construct<std::fstream>());
+		m_Stream = ConstructShared<std::fstream>();//SPtr<std::fstream>(Construct<std::fstream>());
 
 		if ((m_Access & WRITE) != 0)
 		{
@@ -129,7 +128,8 @@ namespace greaper
 
 	NODISCARD INLINE SPtr<IStream> FileStream::Clone(UNUSED bool copyData) const noexcept
 	{
-		return SPtr<IStream>(Construct<FileStream>(m_Path, GetAccessMode(), m_FreeOnClose));
+		//return SPtr<IStream>(Construct<FileStream>(m_Path, GetAccessMode(), m_FreeOnClose));
+		return (SPtr<IStream>)ConstructShared<FileStream>(m_Path, GetAccessMode(), m_FreeOnClose);
 	}
 
 	INLINE void FileStream::Close()noexcept

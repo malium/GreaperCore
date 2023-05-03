@@ -18,7 +18,7 @@ namespace greaper
 	class FileStream : public IStream
 	{
 	public:
-		explicit FileStream(std::filesystem::path  filePath, uint16 accessMode = READ, bool freeOnClose = true)noexcept;
+		explicit FileStream(std::filesystem::path filePath, uint16 accessMode = READ, bool freeOnClose = true)noexcept;
 		~FileStream()noexcept override;
 
 		INLINE bool IsFile()const noexcept override { return true; }

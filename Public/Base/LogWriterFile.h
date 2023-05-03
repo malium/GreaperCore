@@ -64,7 +64,8 @@ namespace greaper
 				name.resize(ret);
 			name.append(".log");
 
-			m_Stream = SPtr<FileStream>(Construct<FileStream>(directory / name, (uint16)(FileStream::AccessMode::WRITE | FileStream::AccessMode::READ)));
+			//m_Stream = SPtr<FileStream>(Construct<FileStream>(directory / name, (uint16)(FileStream::AccessMode::WRITE | FileStream::AccessMode::READ)));
+			m_Stream = ConstructShared<FileStream>(directory / name, (uint16)(FileStream::AccessMode::WRITE | FileStream::AccessMode::READ));
 		}
 		INLINE bool WritePreviousMessages()const noexcept override { return true; }
 

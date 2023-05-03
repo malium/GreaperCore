@@ -202,8 +202,10 @@ namespace greaper
 	INLINE SPtr<IStream> MemoryStream::Clone(const bool copyData)const noexcept
 	{
 		if (!copyData)
-			return SPtr<IStream>(Construct<MemoryStream>(m_Data, m_Size));
-		return SPtr<IStream>(Construct<MemoryStream>(*this));
+			//return SPtr<IStream>(Construct<MemoryStream>(m_Data, m_Size));
+			return (SPtr<IStream>)ConstructShared<MemoryStream>(m_Data, m_Size);
+		//return SPtr<IStream>(Construct<MemoryStream>(*this));
+		return (SPtr<IStream>)ConstructShared<MemoryStream>(*this);
 	}
 	
 	INLINE void MemoryStream::Close()noexcept

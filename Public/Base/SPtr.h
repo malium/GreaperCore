@@ -34,7 +34,6 @@ namespace greaper
 			virtual void* GetValue()const noexcept = 0;
 			virtual SPtrType GetType()const noexcept = 0;
 		};
-
 		template<class T>
 		class SharedPointerControlST final : public ISharedPointerControl
 		{
@@ -93,6 +92,64 @@ namespace greaper
 			uint32 m_SharedReferences;
 			uint32 m_WeakReferences;
 			SPtrDeleterFn_t<T> m_Deleter;
+		};
+
+		template<class T, class Allocator_ = GenericAllocator>
+		class SharedPointerControlLinearST final : public ISharedPointerControl
+		{
+		public:
+			INLINE SharedPointerControlLinearST(T* value) noexcept
+				:m_Value(value)
+				, m_SharedReferences(0)
+				, m_WeakReferences(0)
+			{
+
+			}
+			INLINE void AddSharedReference() noexcept override
+			{
+				++m_SharedReferences;
+			}
+			INLINE void DecSharedReference() noexcept override
+			{
+				if (m_SharedReferences <= 1)
+				{
+					if (m_Value != nullptr)
+					{
+						m_Value->~T();
+						m_Value = nullptr;
+					}
+					--m_SharedReferences;
+					if (m_WeakReferences <= 0)
+					{
+						Dealloc<Allocator_>(this);
+					}
+				}
+				else
+				{
+					--m_SharedReferences;
+				}
+			}
+			INLINE void AddWeakReference() noexcept override
+			{
+				++m_WeakReferences;
+			}
+			INLINE void DecWeakReference() noexcept override
+			{
+				--m_WeakReferences;
+				if (m_WeakReferences <= 0 && m_SharedReferences <= 0)
+				{
+					Dealloc<Allocator_>(this);
+				}
+			}
+			NODISCARD INLINE uint32 SharedRefCount()const noexcept override { return m_SharedReferences; }
+			NODISCARD INLINE uint32 WeakRefCount()const noexcept override { return m_WeakReferences; }
+			NODISCARD INLINE void* GetValue()const noexcept override { return m_Value; }
+			NODISCARD INLINE SPtrType GetType()const noexcept override { return SPtrType::SingleThread; }
+
+		private:
+			mutable T* m_Value;
+			uint32 m_SharedReferences;
+			uint32 m_WeakReferences;
 		};
 
 		template<class T>
@@ -154,7 +211,71 @@ namespace greaper
 			std::atomic_uint32_t m_WeakReferences;
 			SPtrDeleterFn_t<T> m_Deleter;
 		};
+
+		template<class T, class Allocator_ = GenericAllocator>
+		class SharedPointerControlLinearMT final : public ISharedPointerControl
+		{
+		public:
+			INLINE SharedPointerControlLinearMT(T* value) noexcept
+				:m_Value(value)
+				,m_SharedReferences(0)
+				,m_WeakReferences(0)
+			{
+
+			}
+			INLINE void AddSharedReference() noexcept override
+			{
+				++m_SharedReferences;
+			}
+			INLINE void DecSharedReference() noexcept override
+			{
+				if (m_SharedReferences <= 1)
+				{
+					if (m_Value != nullptr)
+					{
+						m_Value->~T();
+						m_Value = nullptr;
+					}
+					--m_SharedReferences;
+					if (m_WeakReferences <= 0)
+					{
+						Dealloc<Allocator_>(this);
+					}
+				}
+				else
+				{
+					--m_SharedReferences;
+				}
+			}
+			INLINE void AddWeakReference() noexcept override
+			{
+				++m_WeakReferences;
+			}
+			INLINE void DecWeakReference() noexcept override
+			{
+				--m_WeakReferences;
+				if (m_WeakReferences <= 0 && m_SharedReferences <= 0)
+				{
+					Dealloc<Allocator_>(this);
+				}
+			}
+			NODISCARD INLINE uint32 SharedRefCount()const noexcept override { return m_SharedReferences; }
+			NODISCARD INLINE uint32 WeakRefCount()const noexcept override { return m_WeakReferences; }
+			NODISCARD INLINE void* GetValue()const noexcept override { return m_Value; }
+			NODISCARD INLINE SPtrType GetType()const noexcept override { return SPtrType::MultiThread; }
+
+		private:
+			mutable T* m_Value;
+			std::atomic_uint32_t m_SharedReferences;
+			std::atomic_uint32_t m_WeakReferences;
+		};
 	}
+
+	template<class T2, class Allocator_ = GenericAllocator, class... Args>
+	SharedPointer<T2> ConstructShared(Args&&... args)noexcept;
+
+	template<class T2, class Allocator_ = GenericAllocator, class... Args>
+	SharedPointer<T2> ConstructSharedST(Args&&... args)noexcept;
 
 	template<class T>
 	class SharedPointer
@@ -369,7 +490,39 @@ namespace greaper
 
 		template<class T2>
 		friend class WeakPointer;
+
+		template<class T2, class Allocator_, class... Args>
+		friend SharedPointer<T2> ConstructShared(Args&&... args)noexcept;
+
+		template<class T2, class Allocator_, class... Args>
+		friend SharedPointer<T2> ConstructSharedST(Args&&... args)noexcept;
 	};
+
+	template<class T, class Allocator_, class... Args>
+	SharedPointer<T> ConstructShared(Args&&... args)noexcept
+	{
+		SharedPointer<T> sp;
+		auto* mem = (int8*)Alloc<Allocator_>(sizeof(Impl::SharedPointerControlLinearMT<T, Allocator_>) + sizeof(T));
+		sp.m_Value = reinterpret_cast<T*>(mem + sizeof(Impl::SharedPointerControlLinearMT<T, Allocator_>));
+		sp.m_Control = reinterpret_cast<Impl::SharedPointerControlLinearMT<T, Allocator_>*>(mem);
+		new(sp.m_Value)T(args...);
+		new(sp.m_Control)Impl::SharedPointerControlLinearMT<T, Allocator_>(sp.m_Value);
+		sp.m_Control->AddSharedReference();
+		return sp;
+	}
+
+	template<class T, class Allocator_, class... Args>
+	SharedPointer<T> ConstructSharedST(Args&&... args)noexcept
+	{
+		SharedPointer<T> sp;
+		auto* mem = (int8*)Alloc<Allocator_>(sizeof(Impl::SharedPointerControlLinearST<T, Allocator_>) + sizeof(T));
+		sp.m_Value = reinterpret_cast<T*>(mem + sizeof(Impl::SharedPointerControlLinearST<T, Allocator_>));
+		sp.m_Control = reinterpret_cast<Impl::SharedPointerControlLinearST<T, Allocator_>*>(mem);
+		new(sp.m_Value)T(args...);
+		new(sp.m_Control)Impl::SharedPointerControlLinearST<T, Allocator_>(sp.m_Value);
+		sp.m_Control->AddSharedReference();
+		return sp;
+	}
 
 	template<class T, class T2, typename std::enable_if<std::is_base_of_v<T, T2> || std::is_base_of_v<T2, T>, bool>::type = true>
 	NODISCARD INLINE bool operator==(const SharedPointer<T>& left, const SharedPointer<T2>& right)noexcept

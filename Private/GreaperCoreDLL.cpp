@@ -55,15 +55,15 @@ void* _Greaper()
 
 void greaper::core::GreaperCoreLibrary::AddManagers() noexcept
 {
-	m_Application.reset(Construct<Application>());
+	m_Application = ConstructShared<Application>(); //.reset(Construct<Application>());
 	gApplication = m_Application;
 	m_Application->Initialize((WGreaperLib)gCoreLibrary);
 
-	gThreadManager.reset(Construct<ThreadManager>());
+	gThreadManager = ConstructShared<ThreadManager>(); //.reset(Construct<ThreadManager>());
 	m_Managers.push_back((PInterface)gThreadManager);
-	gLogManager.reset(Construct<LogManager>());
+	gLogManager = ConstructShared<LogManager>(); //.reset(Construct<LogManager>());
 	m_Managers.push_back((PInterface)gLogManager);
-	gCommandManager.reset(Construct<CommandManager>());
+	gCommandManager = ConstructShared<CommandManager>(); //.reset(Construct<CommandManager>());
 	m_Managers.push_back((PInterface)gCommandManager);
 }
 

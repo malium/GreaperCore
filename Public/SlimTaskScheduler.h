@@ -30,6 +30,8 @@ namespace greaper
 
 		std::function<void()> Task = nullptr;
 		std::atomic_int State = DONE;
+
+		SlimTask()noexcept = default;
 	};
 
 	class SlimTaskScheduler
@@ -65,7 +67,7 @@ namespace greaper
 		mutable RWMutex m_TaskWorkersMutex;
 
 		uint32 m_LastTaskSlotUsed;
-		std::array<SlimTask, 256> m_TaskSlots;
+		std::array<SlimTask, 32> m_TaskSlots;
 		mutable Mutex m_TaskQueueMutex;
 		mutable Signal m_TaskQueueSignal;
 		//Deque<SlimTask*> m_TaskQueue;
@@ -95,6 +97,8 @@ namespace greaper
 		bool IsTaskQueueEmpty()const noexcept;
 
 		bool IsAnyTaskReady(uint32& queueTaskID, uint32 prevHandledTask = 0)const noexcept;
+
+		bool IsNextTaskAvailable()const noexcept;
 	};
 }
 

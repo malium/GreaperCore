@@ -15,15 +15,15 @@
 namespace greaper::refl{
 	template<>
 	const Vector<SPtr<IField>> ComplexType<IProperty>::Fields = Vector<SPtr<IField>>({
-		SPtr<IField>(Construct<TField<String>>("Name"sv,
-		[](const void* obj) -> const void* { return &(((IProperty*)obj)->GetPropertyName()); },
-		nullptr)),
-		SPtr<IField>(Construct<TField<ReflectedTypeID_t>>("TypeID"sv,
-		[](UNUSED const void* obj) -> const void* { return &(((IProperty*)obj)->_ValueTypeID()); },
-		nullptr)),
-		SPtr<IField>(Construct<TField<String>>("Value"sv,
-		[](const void* obj) -> const void* { static String temp{}; temp = std::move(((IProperty*)obj)->GetStringValueCopy()); return &temp; },
-		[](void* obj, const void* value) { ((IProperty*)obj)->SetValueFromString(*((const String*)value)); })),
+		(SPtr<IField>)ConstructShared<TField<String>>("Name"sv,
+		(std::function<const void* (const void*)>)[](const void* obj) -> const void* { return &(((IProperty*)obj)->GetPropertyName()); },
+		(std::function<void(void*, const void*)>)nullptr),
+		(SPtr<IField>)ConstructShared<TField<ReflectedTypeID_t>>("TypeID"sv,
+		(std::function<const void* (const void*)>)[](UNUSED const void* obj) -> const void* { return &(((IProperty*)obj)->_ValueTypeID()); },
+		(std::function<void(void*, const void*)>)nullptr),
+		(SPtr<IField>)ConstructShared<TField<String>>("Value"sv,
+		(std::function<const void* (const void*)>)[](const void* obj) -> const void* { static String temp{}; temp = std::move(((IProperty*)obj)->GetStringValueCopy()); return &temp; },
+		(std::function<void(void*, const void*)>)[](void* obj, const void* value) { ((IProperty*)obj)->SetValueFromString(*((const String*)value)); }),
 	});
 }
 
@@ -31,15 +31,15 @@ namespace greaper::refl{
 namespace greaper::refl{\
 	template<>\
 	const Vector<SPtr<IField>> ComplexType<propType>::Fields = Vector<SPtr<IField>>({\
-		SPtr<IField>(Construct<TField<String>>("Name"sv,\
-		[](const void* obj) -> const void* { return &(((propType*)obj)->GetPropertyName()); },\
-		nullptr)),\
-		SPtr<IField>(Construct<TField<ReflectedTypeID_t>>("TypeID"sv,\
-		[](UNUSED const void* obj) -> const void* { return &(((propType*)obj)->_ValueTypeID()); },\
-		nullptr)),\
-		SPtr<IField>(Construct<TField<propType::value_type>>("Value"sv,\
-		[](const void* obj) -> const void* { static propType::value_type temp; temp = std::move(((propType*)obj)->GetValueCopy()); return &temp; },\
-		[](void* obj, const void* value) { ((propType*)obj)->SetValue(*((const propType::value_type*)value)); })),\
+		(SPtr<IField>)ConstructShared<TField<String>>("Name"sv,\
+		(std::function<const void* (const void*)>)[](const void* obj) -> const void* { return &(((propType*)obj)->GetPropertyName()); },\
+		(std::function<void(void*, const void*)>)nullptr),\
+		(SPtr<IField>)ConstructShared<TField<ReflectedTypeID_t>>("TypeID"sv,\
+		(std::function<const void* (const void*)>)[](UNUSED const void* obj) -> const void* { return &(((propType*)obj)->_ValueTypeID()); },\
+		(std::function<void(void*, const void*)>)nullptr),\
+		(SPtr<IField>)ConstructShared<TField<propType::value_type>>("Value"sv,\
+		(std::function<const void* (const void*)>)[](const void* obj) -> const void* { static propType::value_type temp; temp = std::move(((propType*)obj)->GetValueCopy()); return &temp; },\
+		(std::function<void(void*, const void*)>)[](void* obj, const void* value) { ((propType*)obj)->SetValue(*((const propType::value_type*)value)); }),\
 	});\
 }
 

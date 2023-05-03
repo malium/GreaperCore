@@ -23,8 +23,8 @@ namespace greaper
 {
 	namespace Impl
 	{
-		void _LogBreak(const String& msg);
-		void _TriggerBreak(const String& str);
+		void _LogBreak(const String& msg)noexcept;
+		void _TriggerBreak(const String& str)noexcept;
 		
 		template<class T, class _Alloc_ = GenericAllocator>
 		INLINE void DefaultDeleter(T* ptr)
@@ -62,7 +62,7 @@ namespace greaper
 
 namespace greaper::Impl
 {
-	INLINE void _LogBreak(const String& str)
+	INLINE void _LogBreak(const String& str)noexcept
 	{
 		FILE* file = nullptr;
 #if PLT_WINDOWS
@@ -81,7 +81,7 @@ namespace greaper::Impl
 		}
 	}
 	
-	INLINE void _TriggerBreak(const String& str)
+	INLINE void _TriggerBreak(const String& str)noexcept
 	{
 #if GREAPER_DEBUG_BREAK
 		DialogChoice_t choice = DialogChoice_t::ABORT_RETRY_IGNORE;
