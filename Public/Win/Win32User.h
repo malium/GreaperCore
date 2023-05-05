@@ -511,6 +511,11 @@ GetMessageW(
 #define SW_FORCEMINIMIZE    11
 #define SW_MAX              11
 
+#define SW_PARENTCLOSING    1
+#define SW_OTHERZOOM        2
+#define SW_PARENTOPENING    3
+#define SW_OTHERUNZOOM      4
+
 typedef struct tagHELPINFO      /* Structure pointed to by lParam of WM_HELP */
 {
 	UINT    cbSize;             /* Size in bytes of this struct  */

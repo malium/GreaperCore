@@ -89,7 +89,7 @@ namespace greaper
 
 		void Disconnect(HandlerType& handler) noexcept;
 
-		void Trigger(Args&&... args) noexcept;
+		void Trigger(Args... args) noexcept;
 	};
 
 	template<class... Args>
@@ -154,7 +154,7 @@ namespace greaper
 	}
 
 	template<class... Args>
-	void Event<Args...>::Trigger(Args&&... args) noexcept
+	void Event<Args...>::Trigger(Args... args) noexcept
 	{
 		auto lck = Lock(m_Mutex);
 		for (EventHandlerID<Args...>& hnd : m_Handlers)
