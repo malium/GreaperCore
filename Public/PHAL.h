@@ -137,14 +137,26 @@
 /* Greaper Library suffix name */
 #define GREAPER_LIBRARY_SUFFIX_DBG "_Debug"
 #define GREAPER_LIBRARY_SUFFIX_RLS "_Release"
+#define GREAPER_LIBRARY_SUFFIX_RDI "_RelWithDebInfo"
+#define GREAPER_LIBRARY_SUFFIX_RMS "_MinSizeRel"
 
 #if GREAPER_FRELEASE
 #define GREAPER_LIBSUFFIX ""
-#else
+#else // compiled through cmake
+#if defined(Debug)
+#define GREAPER_LIBSUFFIX GREAPER_LIBRARY_SUFFIX_DBG
+#elif defined(Release)
+#define GREAPER_LIBSUFFIX GREAPER_LIBRARY_SUFFIX_RLS
+#elif defined(RelWithDebInfo)
+#define GREAPER_LIBSUFFIX GREAPER_LIBRARY_SUFFIX_RDI
+#elif defined(MinSizeRel)
+#define GREAPER_LIBSUFFIX GREAPER_LIBRARY_SUFFIX_RMS
+#else // not compiled from cmake
 #if GREAPER_DEBUG
 #define GREAPER_LIBSUFFIX GREAPER_LIBRARY_SUFFIX_DBG
 #else
 #define GREAPER_LIBSUFFIX GREAPER_LIBRARY_SUFFIX_RLS
+#endif
 #endif
 #endif
 

@@ -4386,4 +4386,12 @@ TrackMouseEvent(
 #define WM_COPYGLOBALDATA 0x0049
 #endif
 
+
+#ifndef GET_X_LPARAM
+#define GET_X_LPARAM(lp)                        ((int)(short)LOWORD(lp))
+#endif
+#ifndef GET_Y_LPARAM
+#define GET_Y_LPARAM(lp)                        ((int)(short)HIWORD(lp))
+#endif
+
 #endif /* CORE_WIN32_USER_H */
