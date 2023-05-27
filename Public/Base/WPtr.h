@@ -10,7 +10,7 @@ namespace greaper
 	template<class T>
 	class WeakPointer
 	{
-		mutable Impl::ISharedPointerControl* m_Control;
+		mutable Impl::ISharedPointerControl* m_Control = nullptr;
 
 		template<class _T_, class T2, typename std::enable_if<std::is_base_of_v<_T_, T2> || std::is_base_of_v<T2, _T_>, bool>::type>
 		friend bool operator==(const WeakPointer<_T_>& left, const WeakPointer<T2>& right)noexcept;
@@ -18,11 +18,7 @@ namespace greaper
 		template<class T2>
 		friend class WeakPointer;
 	public:
-		INLINE constexpr WeakPointer()noexcept
-			:m_Control(nullptr)
-		{
-
-		}
+		constexpr WeakPointer()noexcept = default;
 		template<class T2, typename std::enable_if<std::is_base_of_v<T, T2> || std::is_base_of_v<T2, T>, bool>::type = true>
 		INLINE explicit WeakPointer(const SharedPointer<T2>& shared) noexcept
 			:m_Control(shared.m_Control)
@@ -110,7 +106,7 @@ namespace greaper
 				m_Control->DecWeakReference();
 		}
 
-		inline NODISCARD SharedPointer<T> lock()const noexcept
+		NODISCARD inline SharedPointer<T> lock()const noexcept
 		{
 			SharedPointer<T> shared;
 
@@ -123,7 +119,7 @@ namespace greaper
 
 			return shared;
 		}
-		NODISCARD INLINE bool expired()const noexcept
+        NODISCARD INLINE bool expired()const noexcept
 		{
 			return m_Control == nullptr || m_Control->SharedRefCount() <= 0;
 		}
@@ -142,7 +138,7 @@ namespace greaper
 				m_Control = nullptr;
 			}
 		}
-		NODISCARD INLINE uint32 SharedRefCount()const noexcept
+        NODISCARD INLINE uint32 SharedRefCount()const noexcept
 		{
 			if (m_Control != nullptr)
 				return m_Control->SharedRefCount();

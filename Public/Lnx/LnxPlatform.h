@@ -15,6 +15,7 @@ namespace greaper
 {
 	class LnxOSPlatform
 	{
+	public:
 		static void Sleep(uint32 millis) noexcept;
 
 		static String GetStackTrace();

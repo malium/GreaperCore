@@ -13,10 +13,10 @@ namespace greaper
 		virtual ~IPoolAllocator() = default;
 		virtual void* Alloc() = 0;
 		virtual void Dealloc(void* elem) = 0;
-		virtual sizet GetElementSize()const = 0;
-		virtual sizet GetElementsPerBlock()const = 0;
-		virtual sizet GetAlignment()const = 0;
-		virtual bool IsLocked()const = 0;
+		NODISCARD virtual sizet GetElementSize()const = 0;
+		NODISCARD virtual sizet GetElementsPerBlock()const = 0;
+		NODISCARD virtual sizet GetAlignment()const = 0;
+		NODISCARD virtual bool IsLocked()const = 0;
 	};
 
 	namespace Impl

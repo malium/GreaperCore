@@ -35,7 +35,8 @@ namespace greaper
 
 	INLINE void THREAD_YIELD() noexcept
 	{
-		::pthread_yield();
+		//::pthread_yield();
+        ::sched_yield();
 	}
 
 	namespace Impl

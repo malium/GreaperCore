@@ -194,7 +194,7 @@ namespace greaper
 			return TReturn<T>{};
 		}
 		template<class T, class T2>
-		NODISCARD INLINE constexpr static TReturn<T> CopyFailure(const TReturn<T2>& other)noexcept
+		NODISCARD INLINE constexpr static TReturn<T> CopyFailure(UNUSED const TReturn<T2>& other)noexcept
 		{
 			return TReturn<T>{};
 		}

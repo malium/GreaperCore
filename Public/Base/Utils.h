@@ -37,8 +37,9 @@ NODISCARD INLINE constexpr uint32 BitsLog2(uint32 v)
 		return 5;
 	case 64:
 		return 6;
+	default:
+		return 3;
 	};
-	return 3;
 }
 /** Checks if a number is a power of two */
 template<typename T>
@@ -100,7 +101,7 @@ NODISCARD INLINE constexpr T Min(const T a, const T b)
 }
 /** Clamps the value between a minimum and a maximum */
 template<typename T>
-NODISCARD INLINE constexpr T Clamp(const T a, const T min, const T max)
+NODISCARD INLINE constexpr T Clamp(const T a, const T min, const T max)noexcept
 {
 	return Max(min, Min(max, a));
 }
@@ -159,34 +160,34 @@ NODISCARD INLINE constexpr Rtn LerpInverse(const T begin, const T end, const T v
 
 /** Computes the absolute value */
 template<class T> 
-NODISCARD INLINE constexpr T Abs(T a)
+NODISCARD INLINE constexpr T Abs(T a)noexcept
 {
 	return (a >= T(0)) ? a : -a;
 }
 
-NODISCARD INLINE constexpr bool IsNearlyEqual(float a, float b, float tolerance = 0.0001f)
+NODISCARD INLINE constexpr bool IsNearlyEqual(float a, float b, float tolerance = 0.0001f)noexcept
 {
 	return Abs(a - b) <= tolerance;
 }
-NODISCARD INLINE constexpr bool IsNearlyEqual(double a, double b, double tolerance = 0.0001)
+NODISCARD INLINE constexpr bool IsNearlyEqual(double a, double b, double tolerance = 0.0001)noexcept
 {
 	return Abs(a - b) <= tolerance;
 }
 /** Returns a * a */
 template<typename T>
-NODISCARD INLINE constexpr T Square(const T a)
+NODISCARD INLINE constexpr T Square(const T a)noexcept
 {
 	return a * a;
 }
 /** Returns a * a * a */
 template<typename T>
-NODISCARD INLINE constexpr T Cube(const T a)
+NODISCARD INLINE constexpr T Cube(const T a)noexcept
 {
 	return a * a * a;
 }
 /** Returns 1, 0 or -1 depending on relation of T to 0 */
 template<class T>
-NODISCARD INLINE constexpr T Sign(const T a)
+NODISCARD INLINE constexpr T Sign(const T a)noexcept
 {
 	return ((a > (T)0) ? (T)1 : ((a) < (T)0) ? (T)-1 : (T)0);
 }

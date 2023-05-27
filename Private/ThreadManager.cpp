@@ -52,7 +52,7 @@ void ThreadManager::OnActivation(const PInterface& oldDefault) noexcept
 	{
 		const auto& other = (const PThreadManager&)oldDefault;
 		// Copy threads
-		other->AccessThreads([this](CSpan<PThread> threads)
+		other->AccessThreads([this](const CSpan<PThread>& threads)
 			{
 				auto lck = Lock(m_ThreadMutex);
 				const auto count = threads.GetSizeFn();

@@ -25,7 +25,7 @@ namespace greaper
 		public:
 			constexpr Task()noexcept = default;
 
-			TaskState_t GetCurrentState()const noexcept;
+			NODISCARD TaskState_t GetCurrentState()const noexcept;
 
 			friend MPMCTaskScheduler;
 

@@ -30,7 +30,7 @@ namespace greaper
 
 		void Disconnect();
 
-		bool IsConnected()const noexcept;
+		NODISCARD bool IsConnected()const noexcept;
 
 		friend class Event<Args...>;
 	};
@@ -83,7 +83,7 @@ namespace greaper
 		Event(const Event&) = delete;
 		Event& operator=(const Event&) = delete;
 
-		const String& GetName()const noexcept { return m_Name; }
+		NODISCARD const String& GetName()const noexcept { return m_Name; }
 
 		void Connect(HandlerType& handler, HandlerFunction function) noexcept;
 

@@ -144,7 +144,7 @@ namespace std
 	{
 		NODISCARD INLINE size_t operator()(const greaper::TProperty<T>& p)const noexcept
 		{
-			return hash<greaper::IProperty>((const greaper::IProperty&)p);
+			return hash<greaper::IProperty>{}((const greaper::IProperty&)p);
 		}
 	};
 }

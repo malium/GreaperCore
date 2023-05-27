@@ -260,7 +260,7 @@
 #endif
 #ifndef FUNCTION_VARARGS_END
 #if COMPILER_GCC
-#define FUNCTION_VARARGS_END(fmtPlace, varArgsPlace) __attribute__((format(printf, fmtPlace, varArgsPlace)))
+#define FUNCTION_VARARGS_END(fmtPlace, varArgsPlace) /*__attribute__((format(printf, fmtPlace, varArgsPlace))) */
 #else
 #define FUNCTION_VARARGS_END(...)
 #endif

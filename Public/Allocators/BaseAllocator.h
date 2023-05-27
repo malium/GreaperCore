@@ -11,9 +11,9 @@ namespace greaper
 	class MemoryAllocator
 	{
 	public:
-		static NODISCARD void* Allocate(sizet byteSize);
+		NODISCARD static void* Allocate(sizet byteSize);
 
-		static NODISCARD void* AllocateAligned(sizet byteSize, sizet alignment);
+		NODISCARD static void* AllocateAligned(sizet byteSize, sizet alignment);
 
 		static void Deallocate(void* mem);
 

@@ -73,6 +73,7 @@ namespace greaper
 #elif PLT_LINUX
 #include "Lnx/LnxPlatform.h"
 #include <cpuid.h>
+#include <x86intrin.h>
 #define cpuid(out, x) __cpuid_count(x, 0, out[0], out[1], out[2], out[3])
 #endif
 

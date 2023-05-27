@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <limits>
 #include <vector>
 #include <list>
 #include <forward_list>

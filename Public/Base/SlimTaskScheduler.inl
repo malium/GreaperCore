@@ -203,7 +203,7 @@ namespace greaper
 		if (newInterface == nullptr || newInterface->GetInterfaceUUID() != IThreadManager::InterfaceUUID)
 			return;
 
-		m_ThreadManager = (WThreadManager)newInterface;
+		m_ThreadManager = (WThreadManager)(WInterface)newInterface;
 		m_OnManagerActivation.Disconnect(); // double check we are not connected
 		newInterface->GetActivationEvent().Connect(m_OnManagerActivation, [this](bool active, IInterface* oldInterface, const PInterface& newInterface) { OnManagerActivation(active, oldInterface, newInterface); });
 		m_OnNewManager.Disconnect();

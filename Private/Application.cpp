@@ -4,6 +4,7 @@
 ***********************************************************************************/
 
 #include "Application.h"
+#include "../Public/Library.h"
 #include "../Public/Platform.h"
 
 using namespace greaper;
@@ -256,7 +257,8 @@ void Application::DeinitProperties()noexcept
 
 TResult<PGreaperLib> greaper::core::Application::RegisterGreaperLibrary(const StringView& libPath) noexcept
 {
-	PLibrary lib{ Construct<Library>(libPath) };
+	//PLibrary lib{ Construct<Library>(libPath) };
+	auto lib = ConstructShared<Library>(libPath);
 	return RegisterGreaperLibrary(lib);
 }
 

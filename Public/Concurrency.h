@@ -373,7 +373,7 @@ namespace greaper
 		{
 			m_Lock.clear(std::memory_order_release);
 		}
-		INLINE bool IsEnabled()const noexcept { return true; }
+		NODISCARD INLINE bool IsEnabled()const noexcept { return true; }
 	};
 
 	template<>

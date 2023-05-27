@@ -33,15 +33,15 @@ namespace greaper
 
 		virtual ~IStream()noexcept = default;
 
-		const String& GetName()const noexcept { return m_Name; }
+		NODISCARD const String& GetName()const noexcept { return m_Name; }
 
-		uint16 GetAccessMode()const noexcept { return m_Access; }
-		
-		virtual bool IsReadable()const noexcept { return (m_Access & READ) != 0; }
+		NODISCARD uint16 GetAccessMode()const noexcept { return m_Access; }
 
-		virtual bool IsWritable()const noexcept { return (m_Access & WRITE) != 0; }
+		NODISCARD virtual bool IsReadable()const noexcept { return (m_Access & READ) != 0; }
 
-		virtual bool IsFile()const noexcept = 0;
+		NODISCARD virtual bool IsWritable()const noexcept { return (m_Access & WRITE) != 0; }
+
+		NODISCARD virtual bool IsFile()const noexcept = 0;
 
 		template<typename T>
 		const IStream& operator>>(T& val)const noexcept;
@@ -60,15 +60,15 @@ namespace greaper
 
 		virtual void Seek(ssizet pos)noexcept = 0;
 
-		virtual ssizet Tell()const noexcept = 0;
+		NODISCARD virtual ssizet Tell()const noexcept = 0;
 
 		virtual void Align(uint32 count = 1)noexcept;
 
-		virtual bool Eof()const noexcept = 0;
+		NODISCARD virtual bool Eof()const noexcept = 0;
 
-		ssizet Size()const noexcept { return m_Size; }
+		NODISCARD ssizet Size()const noexcept { return m_Size; }
 
-		virtual SPtr<IStream> Clone(bool copyData = true)const noexcept = 0;
+		NODISCARD virtual SPtr<IStream> Clone(bool copyData = true)const noexcept = 0;
 
 		virtual void Close()noexcept = 0;
 	};

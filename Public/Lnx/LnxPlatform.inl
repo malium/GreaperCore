@@ -6,6 +6,7 @@
 #pragma once
 
 #include <thread>
+//#include "LnxPlatform.h"
 
 INLINE void greaper::LnxOSPlatform::Sleep(uint32 millis) noexcept
 {
@@ -14,20 +15,25 @@ INLINE void greaper::LnxOSPlatform::Sleep(uint32 millis) noexcept
 
 INLINE greaper::String greaper::LnxOSPlatform::GetStackTrace()
 {
-
+	return {};
 }
 
-INLINE void greaper::LnxOSPlatform::PerThreadInit()
+INLINE uint64 greaper::LnxOSPlatform::GetPhysicalRAMAmountKB() noexcept {
+	return 0;
+}
+
+INLINE greaper::DialogButton_t greaper::LnxOSPlatform::CreateMessageBox(greaper::StringView title, greaper::StringView content,
+																 greaper::DialogChoice_t choice,
+																 greaper::DialogIcon_t icon) {
+	return greaper::DialogButton_t::RETRY;
+}
+
+INLINE void greaper::LnxOSPlatform::_PerThreadInit()
 {
 
 }
 
-INLINE void greaper::LnxOSPlatform::PerLibraryInit()
+INLINE void greaper::LnxOSPlatform::_PerLibraryInit()
 {
 
-}
-
-INLINE const CPUInfo& greaper::LnxOSPlatform::GetCPUInfo() noexcept
-{
-	return m_CPUInfo;
 }

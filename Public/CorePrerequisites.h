@@ -10,7 +10,6 @@
 
 #include "PHAL.h"
 #include "Memory.h"
-#include <chrono>
 #include "Base/TypeTraits.h"
 
 #ifdef GREAPER_CORE_VERSION

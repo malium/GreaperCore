@@ -162,7 +162,7 @@ void LogManager::OnActivation(const PInterface& oldDefault) noexcept
 	{
 		const auto& other = (const PLogManager&)oldDefault;
 		
-		other->AccessMessages([this](CSpan<LogData> messages)
+		other->AccessMessages([this](const CSpan<LogData>& messages)
 			{
 				auto lckMsg = Lock(m_MessagesMutex);
 				const auto msgCount = messages.GetSizeFn();

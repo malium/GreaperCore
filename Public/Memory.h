@@ -47,6 +47,15 @@ namespace greaper
 }
 
 #include "Base/Formatting.inl"
+#include <chrono>
+
+namespace greaper
+{
+	using Clock_t = std::chrono::high_resolution_clock;
+	using Timepoint_t = Clock_t::time_point;
+	using Duration_t = Clock_t::duration;
+}
+
 #include "Concurrency.h"
 
 #include "Allocators/PoolAllocator.h"
