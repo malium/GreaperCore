@@ -76,29 +76,49 @@ NODISCARD INLINE constexpr T RoundUpToPowerOf2(T val)
 	return val;
 }
 /** Returns the highest of 3 values */
+//template<typename T>
+//NODISCARD INLINE constexpr T Max3(const T a, const T b, const T c)
+//{
+//	return (a > b) ? ((a > c) ? a : c) : ((b > c) ? b : c);
+//}
 template<typename T>
-NODISCARD INLINE constexpr T Max3(const T a, const T b, const T c)
+NODISCARD INLINE constexpr T Max(T a, T b)
 {
-	return (a > b) ? ((a > c) ? a : c) : ((b > c) ? b : c);
+	return (a > b) ? a : b;
+}
+template<typename T, typename... RestOfArgs>
+NODISCARD INLINE constexpr T Max(T a, T b, RestOfArgs... args)
+{
+	return Max(Max(a,b), args...);
+}
+template<typename T>
+NODISCARD INLINE constexpr T Min(T a, T b)
+{
+	return (a < b) ? a : b;
+}
+template<typename T, typename... RestOfArgs>
+NODISCARD INLINE constexpr T Min(T a, T b, RestOfArgs... args)
+{
+	return Min(Min(a,b), args...);
 }
 /** Returns the lowest of 3 values */
-template<typename T>
-NODISCARD INLINE constexpr T Min3(const T a, const T b, const T c)
-{
-	return (a < b) ? ((a < c) ? a : c) : ((b < c) ? b : c);
-}
+//template<typename T>
+//NODISCARD INLINE constexpr T Min3(const T a, const T b, const T c)
+//{
+//	return (a < b) ? ((a < c) ? a : c) : ((b < c) ? b : c);
+//}
 /** Returns a higher value */
-template<class T>
-NODISCARD INLINE constexpr T Max(const T a, const T b)
-{
-	return (a >= b) ? a : b;
-}
+//template<class T>
+//NODISCARD INLINE constexpr T Max(const T a, const T b)
+//{
+//	return (a >= b) ? a : b;
+//}
 /** Returns the lower value */
-template<class T>
-NODISCARD INLINE constexpr T Min(const T a, const T b)
-{
-	return (a <= b) ? a : b;
-}
+//template<class T>
+//NODISCARD INLINE constexpr T Min(const T a, const T b)
+//{
+//	return (a <= b) ? a : b;
+//}
 /** Clamps the value between a minimum and a maximum */
 template<typename T>
 NODISCARD INLINE constexpr T Clamp(const T a, const T min, const T max)noexcept

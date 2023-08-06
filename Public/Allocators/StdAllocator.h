@@ -147,7 +147,7 @@ namespace greaper
 
 	template<typename T, typename A = StdAlloc<T>>
 	using Vector = std::vector<T, A>;
-	template<typename T, sizet Alignment, typename A = StdAlignedAlloc<T, Alignment>>
+	template<typename T, sizet Alignment = alignof(T), typename A = StdAlignedAlloc<T, Alignment>>
 	using VectorAligned = std::vector<T, A>;
 
 	using StringVec = Vector<String>;

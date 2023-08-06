@@ -45,6 +45,8 @@ set_target_properties(Core PROPERTIES
 						RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${PROJECT_SOURCE_DIR}/bin
 						RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${PROJECT_SOURCE_DIR}/bin
 						OUTPUT_NAME ${CORE_OUTPUT_NAME}
+						LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin
+						LIBRARY_OUTPUT_NAME ${CORE_OUTPUT_NAME}
 						CXX_STANDARD 17
 						C_STANDARD 11)
 
@@ -56,7 +58,8 @@ if(MSVC)
 		string(APPEND MSVC_COMPILE_OPTIONS ";/Oi;/Ot;/Gy;/fp:fast")
 	endif()
 	target_compile_options(Core PRIVATE ${MSVC_COMPILE_OPTIONS})
-else()
+elseif(CMAKE_COMPILER_IS_GNUCC)
 	target_compile_options(Core PRIVATE "-mxsave")
+	target_link_options(Core PRIVATE "-lstdc++")
 endif()
 

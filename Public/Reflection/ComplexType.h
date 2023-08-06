@@ -116,14 +116,14 @@ namespace greaper::refl
 			Break("[refl::ComplexType<T>]::SetArraySize Trying to use a PlainType for array operations!");
 		}
 
-		NODISCARD static const BaseType<T>::ArrayValueType& GetArrayValue(UNUSED const T& data, UNUSED sizet index)
+		NODISCARD static const typename BaseType<T>::ArrayValueType& GetArrayValue(UNUSED const T& data, UNUSED sizet index)
 		{
-			static constexpr BaseType<T>::ArrayValueType dummy = 0;
+			static constexpr typename BaseType<T>::ArrayValueType dummy = 0;
 			Break("[refl::ComplexType<T>]::GetArrayValue Trying to use a PlainType for array operations!");
 			return dummy;
 		}
 
-		static void SetArrayValue(UNUSED T& data, UNUSED const BaseType<T>::ArrayValueType& value, UNUSED sizet index)
+		static void SetArrayValue(UNUSED T& data, UNUSED const typename BaseType<T>::ArrayValueType& value, UNUSED sizet index)
 		{
 			Break("[refl::ComplexType<T>]::SetArrayValue Trying to use a PlainType for array operations!");
 		}

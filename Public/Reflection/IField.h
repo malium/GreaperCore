@@ -72,7 +72,7 @@ namespace greaper::refl
 		using tInfo = TypeInfo<Type>;
 		using ArrayValueType = typename tInfo::Type::ArrayValueType;
 
-		static_assert(!std::is_same_v<tInfo::Type, void>, "[refl::TField<T>] instantiated with an Unknown TypeID.");
+		static_assert(!std::is_same_v<typename tInfo::Type, void>, "[refl::TField<T>] instantiated with an Unknown TypeID.");
 
 		INLINE TField(StringView fieldName, std::function<const void*(const void*)> getValueFn, std::function<void(void*, const void*)> setValueFn)noexcept
 			:IField(std::move(fieldName), std::move(getValueFn), std::move(setValueFn))
@@ -80,7 +80,7 @@ namespace greaper::refl
 
 		}
 
-		INLINE bool IsArray()const noexcept override { return std::is_same_v<tInfo::Type, ContainerType<Type>>; }
+		INLINE bool IsArray()const noexcept override { return std::is_same_v<typename tInfo::Type, ContainerType<Type>>; }
 
 		INLINE ReflectedTypeID_t GetTypeID()const noexcept override { return tInfo::ID; }
 
