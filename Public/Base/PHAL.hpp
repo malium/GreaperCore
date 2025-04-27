@@ -235,9 +235,9 @@ static_assert(sizeof(ptruint) == 8 && sizeof(ptrint) == 8, "pointers should be 8
 static_assert(sizeof(sizet) == 8 && sizeof(ssizet) == 8, "size types should be 8 byte size");
 
 #if PLT_WINDOWS
-#include "Win/Prerequisites.hpp"
+#include "../Win/Prerequisites.hpp"
 #elif PLT_LINUX
-#include "Lnx/Prerequisites.hpp"
+#include "../Lnx/Prerequisites.hpp"
 #endif
 
 #ifndef PlatformAlloc
@@ -291,4 +291,4 @@ static_assert(sizeof(sizet) == 8 && sizeof(ssizet) == 8, "size types should be 8
 #define MATH_TOLERANCE 0.0001
 #endif
 
-#include "Base/Utils.hpp"
+#include "Utils.hpp"
