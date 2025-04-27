@@ -3,7 +3,9 @@
  *                                               All Rights Reserved                                                   *
  **********************************************************************************************************************/
 
- #pragma once
+#pragma once
+
+#include <cstring>
 
 /***********************************************************************************************************************
  *                                                 HELPER FUNCTIONS                                                    *
@@ -255,7 +257,7 @@ INLINE void DuplicateMemory(const T& source, T& dst) noexcept
 template<class T>
 INLINE bool CompareMemory(const T& left, const T& right)noexcept
 {
-	return memcmp(&left, &right, sizeof(T)) == 0;
+	return ::memcmp(&left, &right, sizeof(T)) == 0;
 }
 template<class T>
 NODISCARD INLINE bool IsMemoryCleared(const T& data) noexcept

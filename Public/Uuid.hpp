@@ -13,6 +13,7 @@
 #include <uuid/uuid.h>
 #endif
 #include <exception>
+#include "Reflection/BaseType.hpp"
 
 /***********************************************************************************************************************
  *                                                    DEFINITION                                                       *
@@ -349,6 +350,79 @@ namespace std
 		size_t operator()(const greaper::Uuid& val)const noexcept
 		{
 			return ComputeHash(val.m_Data[0], val.m_Data[1], val.m_Data[2], val.m_Data[3]);
+		}
+	};
+}
+
+namespace greaper::refl
+{
+	template<>
+	struct PlainType<Uuid> : public BaseType<Uuid>
+	{
+		static inline constexpr ReflectedTypeID_t ID = RTI_UUID;
+		static inline constexpr ReflectedSize_t StaticSize = sizeof(Uuid);
+		static inline constexpr TypeCategory_t Category = TypeCategory_t::Plain;
+		static std::expected<ReflectedSize_t, String> ToStream(const Uuid& data, IStream& stream)
+		{                      
+			const auto size = stream.Write(&data, sizeof(data));                                                        
+			if (size == sizeof(data))                                                                                   
+				return size;                                                                                            
+			return std::unexpected(std::format("[refl::PlainType<Uuid>::ToStream] "                                  
+				"Failure while writing to stream, not all data was written, expected:{} obtained:{}.",                  
+				sizeof(data), size));
+		}                                                                                  
+		static std::expected<ReflectedSize_t, String> FromStream(Uuid& data, IStream& stream)
+		{                          
+			const auto size = stream.Read(&data, sizeof(data));                                                         
+			if (size == sizeof(data))                                                                                   
+				return size;                                                                                            
+			return std::unexpected(std::format("[refl::PlainType<Uuid>::FromStream] "                                
+				"Failure while reading from stream, not all data was read, expected:{} obtained:{}.",                   
+				sizeof(data), size));
+		}                                                                                  
+		static std::expected<cJSON*, String> ToJSON(const Uuid& data, cJSON* json, StringView name)
+		{
+			return cJSON_AddStringToObject(json, name.data(), data.ToString().c_str());
+		}                                                                        
+		static std::expected<void, String> FromJSON(Uuid& data, cJSON* json, StringView name)
+		{                          
+			cJSON* item = cJSON_GetObjectItemCaseSensitive(json, name.data());             
+			if (item == nullptr)                                                                                        
+				return std::unexpected(std::format("[refl::PlainType<Uuid>::FromJSON] "                              
+				"Couldn't obtain the value from json, the item with name '{}' was not found.", name));                  
+			if (cJSON_IsString(item))
+			{          
+				data.FromString(cJSON_GetStringValue(item));
+				return {};
+			}                                                                                             
+			return std::unexpected(std::format("[refl::PlainType<Uuid>::FromJSON] "                                  
+				"Couldn't obtain the value from json, the item with name '{}' was not cJSON_IsString.", name));
+		}           
+		static std::expected<String, String> ToString(const Uuid& data)
+		{
+			return data.ToString();
+		}                                                                            
+		static std::expected<ReflectedSize_t, String> GetDynamicSize(UNUSED const Uuid& data)
+		{                          
+			return 0ll;
+		}                                                                                                
+		static std::expected<ReflectedSize_t, String> GetArraySize(UNUSED const Uuid& data)
+		{                            
+			return std::unexpected("Function 'PlainType<Uuid>::GetArraySize' Trying to use a PlainType as array!");
+		} 
+		static std::expected<void, String> SetArraySize(UNUSED Uuid& data, UNUSED ReflectedSize_t size)
+		{                
+			return std::unexpected("Function 'PlainType<Uuid>::SetArraySize' Trying to use a PlainType as array!");
+		} 
+		static std::expected<const ArrayValueType&, String> GetArrayValue(UNUSED const Uuid& data,                      
+			UNUSED ReflectedSize_t index)
+		{                                                                              
+			return std::unexpected("Function 'PlainType<Uuid>::GetArrayValue' Trying to use a PlainType as array!");
+		}
+		static std::expected<void, String> SetArrayValue(UNUSED Uuid& data, UNUSED const ArrayValueType& value,         
+			UNUSED ReflectedSize_t index)
+		{                                                                              
+			return std::unexpected("Function 'PlainType<Uuid>::SetArrayValue' Trying to use a PlainType as array!");
 		}
 	};
 }

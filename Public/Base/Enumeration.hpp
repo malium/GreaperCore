@@ -262,6 +262,48 @@ _ENUMDEF_MIDDLE(name)						                                                     
 #val10##sv, #val11##sv, #val12##sv, #val13##sv, #val14##sv, #val15##sv										           \
 _ENUMDEF_ENDING(name)
 
+#define ENUMERATION_17(name, val0, val1, val2, val3, val4, val5, val6, val7, val8, val9, val10, val11, val12, val13,   \
+	val14, val15, val16)			                                                                                   \
+_ENUMDEF_START(name)						                                                                           \
+val0, val1, val2, val3,	val4, val5, val6, val7, val8, val9, val10, val11, val12, val13, val14, val15, val16			   \
+COUNT										                                                                           \
+_ENUMDEF_MIDDLE(name)						                                                                           \
+#val0##sv, #val1##sv, #val2##sv, #val3##sv, #val4##sv, #val5##sv, #val6##sv, #val7##sv, #val8##sv, #val9##sv,          \
+#val10##sv, #val11##sv, #val12##sv, #val13##sv, #val14##sv, #val15##sv, #val16##sv									   \
+_ENUMDEF_ENDING(name)
+
+#define ENUMERATION_18(name, val0, val1, val2, val3, val4, val5, val6, val7, val8, val9, val10, val11, val12, val13,   \
+	val14, val15, val16, val17)			                                                                               \
+_ENUMDEF_START(name)						                                                                           \
+val0, val1, val2, val3,	val4, val5, val6, val7, val8, val9, val10, val11, val12, val13, val14, val15, val16, val17	   \
+COUNT										                                                                           \
+_ENUMDEF_MIDDLE(name)						                                                                           \
+#val0##sv, #val1##sv, #val2##sv, #val3##sv, #val4##sv, #val5##sv, #val6##sv, #val7##sv, #val8##sv, #val9##sv,          \
+#val10##sv, #val11##sv, #val12##sv, #val13##sv, #val14##sv, #val15##sv, #val16##sv, #val17##sv						   \
+_ENUMDEF_ENDING(name)
+
+#define ENUMERATION_19(name, val0, val1, val2, val3, val4, val5, val6, val7, val8, val9, val10, val11, val12, val13,   \
+	val14, val15, val16, val17, val18)			                                                                       \
+_ENUMDEF_START(name)						                                                                           \
+val0, val1, val2, val3,	val4, val5, val6, val7, val8, val9, val10, val11, val12, val13, val14, val15, val16, val17,    \
+val18                                                                                                                  \
+COUNT										                                                                           \
+_ENUMDEF_MIDDLE(name)						                                                                           \
+#val0##sv, #val1##sv, #val2##sv, #val3##sv, #val4##sv, #val5##sv, #val6##sv, #val7##sv, #val8##sv, #val9##sv,          \
+#val10##sv, #val11##sv, #val12##sv, #val13##sv, #val14##sv, #val15##sv, #val16##sv, #val17##sv, #val18##sv			   \
+_ENUMDEF_ENDING(name)
+
+#define ENUMERATION_20(name, val0, val1, val2, val3, val4, val5, val6, val7, val8, val9, val10, val11, val12, val13,   \
+	val14, val15, val16, val17, val18, val19)			                                                               \
+_ENUMDEF_START(name)						                                                                           \
+val0, val1, val2, val3,	val4, val5, val6, val7, val8, val9, val10, val11, val12, val13, val14, val15, val16, val17,    \
+val18, val19                                                                                                           \
+COUNT										                                                                           \
+_ENUMDEF_MIDDLE(name)						                                                                           \
+#val0##sv, #val1##sv, #val2##sv, #val3##sv, #val4##sv, #val5##sv, #val6##sv, #val7##sv, #val8##sv, #val9##sv,          \
+#val10##sv, #val11##sv, #val12##sv, #val13##sv, #val14##sv, #val15##sv, #val16##sv, #val17##sv, #val18##sv, #val19##sv \
+_ENUMDEF_ENDING(name)
+
 #define ENUM_CONCAT(A, B) _ENUM_CONCAT(A, B)
 #define _ENUM_CONCAT(A, B) A##_##B
 

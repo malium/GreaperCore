@@ -47,8 +47,8 @@ set_target_properties(Core PROPERTIES
 						OUTPUT_NAME ${CORE_OUTPUT_NAME}
 						LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin
 						LIBRARY_OUTPUT_NAME ${CORE_OUTPUT_NAME}
-						CXX_STANDARD 17
-						C_STANDARD 11)
+						CXX_STANDARD 23
+						C_STANDARD 17)
 
 target_compile_definitions(Core PRIVATE $<CONFIG>)
 

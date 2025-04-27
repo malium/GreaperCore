@@ -28,6 +28,8 @@ using namespace std::string_view_literals;
 
 namespace greaper
 {
+	class IStream;
+
 	template<typename T>
 	using BasicString = std::basic_string<T, std::char_traits<T>>;
 	template<typename T>
@@ -100,6 +102,8 @@ namespace greaper
 	using ReflectedTypeID_t = uint32;
 	using ReflectedSize_t = int64;
 
+
+
 	namespace refl
 	{
 		enum CoreReflectedTypeID : ReflectedTypeID_t
@@ -141,6 +145,7 @@ namespace greaper
 			RTI_UnorderedMultiSet,
 		};
 
+		template<class T> struct BaseType;
 		template<class T> struct PlainType {  };
 		template<class T> struct ContainerType {  };
 		template<class T> struct ComplexType;
@@ -205,5 +210,7 @@ namespace greaper::refl
 
 #undef CREATE_TYPEINFO
 #undef CREATE_TYPEINFO_CNAME
+
+#include "Base/Verify.hpp"
 
 #endif /* CORE_PREREQUISITES_HPP */

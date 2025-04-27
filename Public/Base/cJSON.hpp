@@ -3,10 +3,14 @@
  *                                               All Rights Reserved                                                   *
  **********************************************************************************************************************/
 
-#include "../Public/CorePrerequisites.hpp"
-#include <iostream>
+ #pragma once
 
-int main()
-{
-    std::cout << std::format("Hi Greaper Core {} ", IsWithin(3,1,5));
-}
+ #ifndef CORE_CJSON_HPP
+ #define CORE_CJSON_HPP 1
+ 
+ #define CJSON_IMPORT_SYMBOLS
+ #define CJSON_API_VISIBILITY
+ 
+ #include "../../../cJSON/cJSON.h"
+ 
+ #endif /* CORE_CJSON_HPP */

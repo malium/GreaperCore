@@ -29,11 +29,11 @@
 #error Greaper needs C++.
 #endif
 
-// We use at least C++17.
+// We use at least C++23.
 #if __cplusplus < 202302L
 #if defined(_MSC_VER)
 #if _MSC_VER < 1900
-#error "Unsopported C++ version!"
+#error "Unsopported C++ version! Requires C++23!"
 #endif
 #else
 #error "Unsopported C++ version! Requires C++23!"
