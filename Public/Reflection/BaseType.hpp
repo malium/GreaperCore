@@ -48,7 +48,7 @@ namespace greaper::refl
 			auto res = FromStream(elem, stream);
 			if (res.has_value())
 				return std::make_pair(elem, res.value());
-			return res.error();
+			return std::unexpected(res.error());
 		}
 
 		static std::expected<cJSON*, String> ToJSON(UNUSED const T& data, UNUSED cJSON* json, UNUSED StringView name)
@@ -76,7 +76,7 @@ namespace greaper::refl
 			auto res = FromJSON(elem, json, name);
 			if (res.has_value())
 				return elem;
-			return res.error();
+			return std::unexpected(res.error());
 		}
 
 		static std::expected<String, String> ToString(UNUSED const T& data)
