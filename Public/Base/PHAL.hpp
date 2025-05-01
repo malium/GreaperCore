@@ -82,6 +82,7 @@
 #ifndef PLATFORM_WINDOWS
 #if (defined(_WIN32) || defined(_WIN64) || defined(__WIN32__) || defined(__TOS_WIN__) || defined(__WINDOWS__))
 #define PLT_WINDOWS 1
+#define PLT_NAME "Win"
 #else
 #define PLT_WINDOWS 0
 #endif
@@ -90,6 +91,7 @@
 #ifndef PLT_LINUX
 #if (defined(linux) || defined(__linux__) || defined(__linux))
 #define PLT_LINUX 1
+#define PLT_NAME "Lnx"
 #else
 #define PLT_LINUX 0
 #endif
@@ -182,7 +184,6 @@ struct __GREAPER_BASIC_TYPES
 	typedef int64_t				ptrint_t;
 	typedef ptruint_t			sizetype;
 	typedef ptrint_t			ssizetype;
-	typedef int16_t				half_t;				
 };
 
 #if PLT_WINDOWS
@@ -225,7 +226,6 @@ using ptruint = __GREAPER_PLATFORM_TYPES::ptruint_t;
 using ptrint = __GREAPER_PLATFORM_TYPES::ptrint_t;
 using sizet = __GREAPER_PLATFORM_TYPES::sizetype;
 using ssizet = __GREAPER_PLATFORM_TYPES::ssizetype;
-using half = __GREAPER_PLATFORM_TYPES::half_t;
 
 static_assert(sizeof(uint8) == 1 && sizeof(int8) == 1, "u/int8 should be 1 byte size");
 static_assert(sizeof(uint16) == 2 && sizeof(int16) == 2, "u/int16 should be 2 byte size");

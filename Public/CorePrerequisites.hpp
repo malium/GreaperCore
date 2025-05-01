@@ -102,8 +102,6 @@ namespace greaper
 	using ReflectedTypeID_t = uint32;
 	using ReflectedSize_t = int64;
 
-
-
 	namespace refl
 	{
 		enum CoreReflectedTypeID : ReflectedTypeID_t
@@ -208,8 +206,8 @@ namespace greaper::refl
 	template<typename T, typename H, typename C> struct TypeInfo<UnorderedMultiSet<T, H, C>> { static constexpr ReflectedTypeID_t ID = RTI_UnorderedMultiSet; using Type = ContainerType<UnorderedMultiSet<T, H, C>>; static constexpr StringView Name = "unordered_multiset"sv; };
 }
 
-#undef CREATE_TYPEINFO
-#undef CREATE_TYPEINFO_CNAME
+//#undef CREATE_TYPEINFO
+//#undef CREATE_TYPEINFO_CNAME
 
 #include "Base/Verify.hpp"
 
