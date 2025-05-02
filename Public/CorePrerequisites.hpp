@@ -18,6 +18,7 @@
 #include <map>
 #include <unordered_map>
 #include <deque>
+#include <queue>
 #include <forward_list>
 #include <list>
 #include <set>

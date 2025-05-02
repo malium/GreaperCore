@@ -23,6 +23,8 @@ namespace greaper::refl
 
 		static inline constexpr TypeCategory_t Category = TypeCategory_t::Container;
 
+		REFL_CREATE_METHODS(String);
+
 		static std::expected<ReflectedSize_t, String> ToStream(const String& data, IStream& stream)
 		{
 			ReflectedSize_t size = 0;
@@ -106,7 +108,7 @@ namespace greaper::refl
 			return {};
 		}
 
-		static std::expected<const ArrayValueType&, String> GetArrayValue(const String& data,
+		static std::expected<const ArrayValueType*, String> GetArrayValue(const String& data,
 			ReflectedSize_t index)
 		{
 			auto res_arraySize = GetArraySize(data);
@@ -114,7 +116,7 @@ namespace greaper::refl
 				return std::unexpected(res_arraySize.error());
 			auto arraySize = res_arraySize.value();
 			if (index < arraySize)
-				return data[index];
+				return &data[index];
 			return std::unexpected(std::format("[refl::ContainerType<String>::GetArrayValue] "
 				"Index '{}' out of bounds [0,{}]", index, arraySize));
 		}
@@ -143,6 +145,8 @@ namespace greaper::refl
 		static inline constexpr ReflectedSize_t StaticSize = sizeof(sizet);
 
 		static inline constexpr TypeCategory_t Category = TypeCategory_t::Container;
+
+		REFL_CREATE_METHODS(WString);
 
 		static std::expected<ReflectedSize_t, String> ToStream(const WString& data, IStream& stream)
 		{
@@ -227,7 +231,7 @@ namespace greaper::refl
 			return {};
 		}
 
-		static std::expected<const ArrayValueType&, String> GetArrayValue(const WString& data,
+		static std::expected<const ArrayValueType*, String> GetArrayValue(const WString& data,
 			ReflectedSize_t index)
 		{
 			auto res_arraySize = GetArraySize(data);
@@ -235,7 +239,7 @@ namespace greaper::refl
 				return std::unexpected(res_arraySize.error());
 			auto arraySize = res_arraySize.value();
 			if (index < arraySize)
-				return data[index];
+				return &data[index];
 			return std::unexpected(std::format("[refl::ContainerType<WString>::GetArrayValue] "
 				"Index '{}' out of bounds [0,{}]", index, arraySize));
 		}
@@ -268,6 +272,8 @@ namespace greaper::refl
 		static inline constexpr ReflectedSize_t StaticSize = ValueCat::StaticSize * N;
 
 		static inline constexpr TypeCategory_t Category = TypeCategory_t::Container;
+
+		REFL_CREATE_METHODS(Type);
 
 		static std::expected<ReflectedSize_t, String> ToStream(const Type& data, IStream& stream)
 		{
@@ -441,7 +447,7 @@ namespace greaper::refl
 				"Trying to change the size of an array, different than its initial size.");
 		}
 
-		static std::expected<const ArrayValueType&, String> GetArrayValue(const Type& data,
+		static std::expected<const ArrayValueType*, String> GetArrayValue(const Type& data,
 			ReflectedSize_t index)
 		{
 			auto res_arraySize = GetArraySize(data);
@@ -449,7 +455,7 @@ namespace greaper::refl
 				return std::unexpected(res_arraySize.error());
 			auto arraySize = res_arraySize.value();
 			if (index < arraySize)
-				return data[index];
+				return &data[index];
 			return std::unexpected(std::format("[refl::ContainerType<array>::GetArrayValue] "
 				"Index '{}' out of bounds [0,{}]", index, arraySize));
 		}
@@ -482,6 +488,8 @@ namespace greaper::refl
 		static inline constexpr ReflectedSize_t StaticSize = sizeof(sizet);
 
 		static inline constexpr TypeCategory_t Category = TypeCategory_t::Container;
+
+		REFL_CREATE_METHODS(Type);
 
 		static std::expected<ReflectedSize_t, String> ToStream(const Type& data, IStream& stream)
 		{
@@ -630,7 +638,7 @@ namespace greaper::refl
 			return {};
 		}
 
-		static std::expected<const ArrayValueType&, String> GetArrayValue(const Type& data,
+		static std::expected<const ArrayValueType*, String> GetArrayValue(const Type& data,
 			ReflectedSize_t index)
 		{
 			auto res_arraySize = GetArraySize(data);
@@ -638,7 +646,7 @@ namespace greaper::refl
 				return std::unexpected(res_arraySize.error());
 			auto arraySize = res_arraySize.value();
 			if (index < arraySize)
-				return data[index];
+				return &data[index];
 			return std::unexpected(std::format("[refl::ContainerType<list>::GetArrayValue] "
 				"Index '{}' out of bounds [0,{}]", index, arraySize));
 		}
@@ -671,6 +679,8 @@ namespace greaper::refl
 		static inline constexpr ReflectedSize_t StaticSize = sizeof(sizet);
 
 		static inline constexpr TypeCategory_t Category = TypeCategory_t::Container;
+
+		REFL_CREATE_METHODS(Type);
 
 		static std::expected<ReflectedSize_t, String> ToStream(const Type& data, IStream& stream)
 		{
@@ -819,7 +829,7 @@ namespace greaper::refl
 			return {};
 		}
 
-		static std::expected<const ArrayValueType&, String> GetArrayValue(const Type& data,
+		static std::expected<const ArrayValueType*, String> GetArrayValue(const Type& data,
 			ReflectedSize_t index)
 		{
 			auto res_arraySize = GetArraySize(data);
@@ -827,7 +837,7 @@ namespace greaper::refl
 				return std::unexpected(res_arraySize.error());
 			auto arraySize = res_arraySize.value();
 			if (index < arraySize)
-				return data[index];
+				return &data[index];
 			return std::unexpected(std::format("[refl::ContainerType<deque>::GetArrayValue] "
 				"Index '{}' out of bounds [0,{}]", index, arraySize));
 		}
@@ -860,6 +870,8 @@ namespace greaper::refl
 		static inline constexpr ReflectedSize_t StaticSize = sizeof(sizet);
 
 		static inline constexpr TypeCategory_t Category = TypeCategory_t::Container;
+
+		REFL_CREATE_METHODS(Type);
 
 		static std::expected<ReflectedSize_t, String> ToStream(const Type& data, IStream& stream)
 		{
@@ -1008,7 +1020,7 @@ namespace greaper::refl
 			return {};
 		}
 
-		static std::expected<const ArrayValueType&, String> GetArrayValue(const Type& data,
+		static std::expected<const ArrayValueType*, String> GetArrayValue(const Type& data,
 			ReflectedSize_t index)
 		{
 			auto res_arraySize = GetArraySize(data);
@@ -1016,7 +1028,7 @@ namespace greaper::refl
 				return std::unexpected(res_arraySize.error());
 			auto arraySize = res_arraySize.value();
 			if (index < arraySize)
-				return data[index];
+				return &data[index];
 			return std::unexpected(std::format("[refl::ContainerType<set>::GetArrayValue] "
 				"Index '{}' out of bounds [0,{}]", index, arraySize));
 		}
@@ -1049,6 +1061,8 @@ namespace greaper::refl
 		static inline constexpr ReflectedSize_t StaticSize = sizeof(sizet);
 
 		static inline constexpr TypeCategory_t Category = TypeCategory_t::Container;
+
+		REFL_CREATE_METHODS(Type);
 
 		static std::expected<ReflectedSize_t, String> ToStream(const Type& data, IStream& stream)
 		{
@@ -1197,7 +1211,7 @@ namespace greaper::refl
 			return {};
 		}
 
-		static std::expected<const ArrayValueType&, String> GetArrayValue(const Type& data,
+		static std::expected<const ArrayValueType*, String> GetArrayValue(const Type& data,
 			ReflectedSize_t index)
 		{
 			auto res_arraySize = GetArraySize(data);
@@ -1205,7 +1219,7 @@ namespace greaper::refl
 				return std::unexpected(res_arraySize.error());
 			auto arraySize = res_arraySize.value();
 			if (index < arraySize)
-				return data[index];
+				return &data[index];
 			return std::unexpected(std::format("[refl::ContainerType<multiset>::GetArrayValue] "
 				"Index '{}' out of bounds [0,{}]", index, arraySize));
 		}
@@ -1238,6 +1252,8 @@ namespace greaper::refl
 		static inline constexpr ReflectedSize_t StaticSize = sizeof(sizet);
 
 		static inline constexpr TypeCategory_t Category = TypeCategory_t::Container;
+
+		REFL_CREATE_METHODS(Type);
 
 		static std::expected<ReflectedSize_t, String> ToStream(const Type& data, IStream& stream)
 		{
@@ -1386,7 +1402,7 @@ namespace greaper::refl
 			return {};
 		}
 
-		static std::expected<const ArrayValueType&, String> GetArrayValue(const Type& data,
+		static std::expected<const ArrayValueType*, String> GetArrayValue(const Type& data,
 			ReflectedSize_t index)
 		{
 			auto res_arraySize = GetArraySize(data);
@@ -1394,7 +1410,7 @@ namespace greaper::refl
 				return std::unexpected(res_arraySize.error());
 			auto arraySize = res_arraySize.value();
 			if (index < arraySize)
-				return data[index];
+				return &data[index];
 			return std::unexpected(std::format("[refl::ContainerType<unordered_set>::GetArrayValue] "
 				"Index '{}' out of bounds [0,{}]", index, arraySize));
 		}
@@ -1427,6 +1443,8 @@ namespace greaper::refl
 		static inline constexpr ReflectedSize_t StaticSize = sizeof(sizet);
 
 		static inline constexpr TypeCategory_t Category = TypeCategory_t::Container;
+
+		REFL_CREATE_METHODS(Type);
 
 		static std::expected<ReflectedSize_t, String> ToStream(const Type& data, IStream& stream)
 		{
@@ -1575,7 +1593,7 @@ namespace greaper::refl
 			return {};
 		}
 
-		static std::expected<const ArrayValueType&, String> GetArrayValue(const Type& data,
+		static std::expected<const ArrayValueType*, String> GetArrayValue(const Type& data,
 			ReflectedSize_t index)
 		{
 			auto res_arraySize = GetArraySize(data);
@@ -1583,7 +1601,7 @@ namespace greaper::refl
 				return std::unexpected(res_arraySize.error());
 			auto arraySize = res_arraySize.value();
 			if (index < arraySize)
-				return data[index];
+				return &data[index];
 			return std::unexpected(std::format("[refl::ContainerType<unordered_multiset>::GetArrayValue] "
 				"Index '{}' out of bounds [0,{}]", index, arraySize));
 		}
@@ -1619,6 +1637,8 @@ namespace greaper::refl
 		static inline constexpr ReflectedSize_t StaticSize = sizeof(sizet);
 
 		static inline constexpr TypeCategory_t Category = TypeCategory_t::Container;
+
+		REFL_CREATE_METHODS(Type);
 
 		static std::expected<ReflectedSize_t, String> ToStream(const Type& data, IStream& stream)
 		{
@@ -1798,7 +1818,7 @@ namespace greaper::refl
 			return {};
 		}
 
-		static std::expected<const ArrayValueType&, String> GetArrayValue(const Type& data,
+		static std::expected<const ArrayValueType*, String> GetArrayValue(const Type& data,
 			ReflectedSize_t index)
 		{
 			auto res_arraySize = GetArraySize(data);
@@ -1811,7 +1831,7 @@ namespace greaper::refl
 				for (const auto& keyvalue : data)
 				{
 					if (i == index)
-						return keyvalue;
+						return &keyvalue;
 					++i;
 				}
 			}
@@ -1858,6 +1878,8 @@ namespace greaper::refl
 		static inline constexpr ReflectedSize_t StaticSize = sizeof(sizet);
 
 		static inline constexpr TypeCategory_t Category = TypeCategory_t::Container;
+
+		REFL_CREATE_METHODS(Type);
 
 		static std::expected<ReflectedSize_t, String> ToStream(const Type& data, IStream& stream)
 		{
@@ -2037,7 +2059,7 @@ namespace greaper::refl
 			return {};
 		}
 
-		static std::expected<const ArrayValueType&, String> GetArrayValue(const Type& data,
+		static std::expected<const ArrayValueType*, String> GetArrayValue(const Type& data,
 			ReflectedSize_t index)
 		{
 			auto res_arraySize = GetArraySize(data);
@@ -2050,7 +2072,7 @@ namespace greaper::refl
 				for (const auto& keyvalue : data)
 				{
 					if (i == index)
-						return keyvalue;
+						return &keyvalue;
 					++i;
 				}
 			}
@@ -2097,6 +2119,8 @@ namespace greaper::refl
 		static inline constexpr ReflectedSize_t StaticSize = sizeof(sizet);
 
 		static inline constexpr TypeCategory_t Category = TypeCategory_t::Container;
+
+		REFL_CREATE_METHODS(Type);
 
 		static std::expected<ReflectedSize_t, String> ToStream(const Type& data, IStream& stream)
 		{
@@ -2276,7 +2300,7 @@ namespace greaper::refl
 			return {};
 		}
 
-		static std::expected<const ArrayValueType&, String> GetArrayValue(const Type& data,
+		static std::expected<const ArrayValueType*, String> GetArrayValue(const Type& data,
 			ReflectedSize_t index)
 		{
 			auto res_arraySize = GetArraySize(data);
@@ -2289,7 +2313,7 @@ namespace greaper::refl
 				for (const auto& keyvalue : data)
 				{
 					if (i == index)
-						return keyvalue;
+						return &keyvalue;
 					++i;
 				}
 			}
@@ -2336,6 +2360,8 @@ namespace greaper::refl
 		static inline constexpr ReflectedSize_t StaticSize = sizeof(sizet);
 
 		static inline constexpr TypeCategory_t Category = TypeCategory_t::Container;
+
+		REFL_CREATE_METHODS(Type);
 
 		static std::expected<ReflectedSize_t, String> ToStream(const Type& data, IStream& stream)
 		{
@@ -2515,7 +2541,7 @@ namespace greaper::refl
 			return {};
 		}
 
-		static std::expected<const ArrayValueType&, String> GetArrayValue(const Type& data,
+		static std::expected<const ArrayValueType*, String> GetArrayValue(const Type& data,
 			ReflectedSize_t index)
 		{
 			auto res_arraySize = GetArraySize(data);
@@ -2528,7 +2554,7 @@ namespace greaper::refl
 				for (const auto& keyvalue : data)
 				{
 					if (i == index)
-						return keyvalue;
+						return &keyvalue;
 					++i;
 				}
 			}

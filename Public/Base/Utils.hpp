@@ -6,6 +6,7 @@
 #pragma once
 
 #include <cstring>
+#include <type_traits>
 
 /***********************************************************************************************************************
  *                                                 HELPER FUNCTIONS                                                    *
@@ -159,22 +160,27 @@ NODISCARD INLINE constexpr int16 ClampShort(const int32 i)
 	return static_cast<int16>(Clamp(i, -32768, 32767));
 }
 /** Retruns true if value is NaN */
-NODISCARD INLINE bool IsNaN(const float f) noexcept
+NODISCARD INLINE constexpr bool IsNaN(const float f) noexcept
 {
-	return (*reinterpret_cast<const uint32*>(&f) & 0x7FFFFFFF) > 0x7F800000;
+	union { float f32; uint32 u32; }a;
+	a.f32 = f;
+	return (a.u32 & 0x7FFFFFFF) > 0x7F800000;
 }
 /** Returns true if a value is finite */
-NODISCARD INLINE bool IsFinite(const float f)
+NODISCARD INLINE constexpr bool IsFinite(const float f)
 {
-	return (*reinterpret_cast<const uint32*>(&f) & 0x7F800000) != 0x7F800000;
+	union { float f32; uint32 u32; }a;
+	a.f32 = f;
+	return (a.u32 & 0x7F800000) != 0x7F800000;
+	//return (*reinterpret_cast<const uint32*>(&f) & 0x7F800000) != 0x7F800000;
 }
 /** Returns true if a value is infinite */
-NODISCARD INLINE bool IsInfinite(const float f)
+NODISCARD INLINE constexpr bool IsInfinite(const float f)
 {
 	return !IsFinite(f);
 }
 /** Get the boolean value from a flag */
-NODISCARD INLINE bool GetBitValue(const uint8* ptr, const uint32 index)noexcept
+NODISCARD INLINE bool GetBitValue(const uint8*const ptr, const uint32 index)noexcept
 {
 	const auto* const bytePtr = ptr + index / 8;
 	const auto mask = static_cast<uint8>(1u << (index & 0x7u));

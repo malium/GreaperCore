@@ -14,6 +14,7 @@
 #define CREATE_BASIC_PLAINTYPE(type, jsonAddFn, jsonIsFn, jsonGetFn)                                                   \
 template<>struct PlainType<type> : public BaseType<type> {                                                             \
 	static inline constexpr TypeCategory_t Category = TypeCategory_t::Plain;                                           \
+	REFL_CREATE_METHODS(type);                                                                                         \
 	static std::expected<ReflectedSize_t, String> ToStream(const type& data, IStream& stream){                         \
 		const auto size = stream.Write(&data, sizeof(data));                                                           \
 		if (size == sizeof(data))                                                                                      \

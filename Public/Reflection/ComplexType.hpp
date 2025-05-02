@@ -21,6 +21,8 @@ namespace greaper::refl
 
 		static inline constexpr ssizet StaticSize = 0;
 
+		REFL_CREATE_METHODS(T);
+		
 		static std::expected<ReflectedSize_t, String> ToStream(const T& data, IStream& stream)
 		{
 			ReflectedSize_t totalSize = 0;
@@ -120,7 +122,7 @@ namespace greaper::refl
 			return std::unexpected("Function 'ComplexType<T>::SetArraySize' Trying to use a ComplexType as array!");
 		}
 
-		static std::expected<const ArrayValueType&, String> GetArrayValue(UNUSED const T& data,
+		static std::expected<const ArrayValueType*, String> GetArrayValue(UNUSED const T& data,
 			UNUSED ReflectedSize_t index)
 		{
 			return std::unexpected("Function 'ComplexType<T>::GetArrayValue' Trying to use a ComplexType as array!");

@@ -56,7 +56,7 @@ namespace greaper
 		 * 
 		 * @return Uuid The new random Uuid 
 		 */
-		NODISCARD static Uuid GenerateRandom() noexcept;
+		NODISCARD static Uuid GenerateRandom();
 
 		constexpr bool IsEmpty()const noexcept;
 		constexpr const uint32* GetData()const noexcept;
@@ -108,7 +108,8 @@ namespace greaper
 
 		INLINE constexpr void ViewToUUID(const StringView& view, uint32 data[4]) noexcept
 		{
-			if (view.size() < 36)
+			std::cout << view.size() << std::endl;
+			if (view.size() < (8 * 4 + 3))
 				return;
 
 			uint32 idx = 0;
@@ -122,7 +123,7 @@ namespace greaper
 
 			++idx;
 
-			for (int32 i = 7; i >= 4; --i)
+			for (int32 i = 7; i >= 0; --i)
 			{
 				const auto charVal = view[idx++];
 				const auto hexVal = (uint32)LITERAL_TO_HEX[static_cast<sizet>(charVal)];
@@ -131,16 +132,7 @@ namespace greaper
 
 			++idx;
 
-			for (int32 i = 3; i >= 0; --i)
-			{
-				const auto charVal = view[idx++];
-				const auto hexVal = (uint32)LITERAL_TO_HEX[static_cast<sizet>(charVal)];
-				data[1] |= hexVal << (i * 4);
-			}
-
-			++idx;
-
-			for (int32 i = 7; i >= 4; --i)
+			for (int32 i = 7; i >= 0; --i)
 			{
 				const auto charVal = view[idx++];
 				const auto hexVal = (uint32)LITERAL_TO_HEX[static_cast<sizet>(charVal)];
@@ -148,13 +140,6 @@ namespace greaper
 			}
 
 			++idx;
-
-			for (int32 i = 3; i >= 0; --i)
-			{
-				const auto charVal = view[idx++];
-				const auto hexVal = (uint32)LITERAL_TO_HEX[static_cast<sizet>(charVal)];
-				data[2] |= hexVal << (i * 4);
-			}
 
 
 			for (int32 i = 7; i >= 0; --i)
@@ -178,7 +163,7 @@ namespace greaper
 
 			output[idx++] = '-';
 
-			for (int32 i = 7; i >= 4; --i)
+			for (int32 i = 7; i >= 0; --i)
 			{
 				const auto hexVal = (data[1] >> (i * 4)) & 0xF;
 				output[idx++] = HEX_TO_LITERAL[hexVal];
@@ -186,27 +171,13 @@ namespace greaper
 
 			output[idx++] = '-';
 
-			for (int32 i = 3; i >= 0; --i)
-			{
-				const auto hexVal = (data[1] >> (i * 4)) & 0xF;
-				output[idx++] = HEX_TO_LITERAL[hexVal];
-			}
-
-			output[idx++] = '-';
-
-			for (int32 i = 7; i >= 4; --i)
+			for (int32 i = 7; i >= 0; --i)
 			{
 				const auto hexVal = (data[2] >> (i * 4)) & 0xF;
 				output[idx++] = HEX_TO_LITERAL[hexVal];
 			}
 
 			output[idx++] = '-';
-
-			for (int32 i = 3; i >= 0; --i)
-			{
-				const auto hexVal = (data[2] >> (i * 4)) & 0xF;
-				output[idx++] = HEX_TO_LITERAL[hexVal];
-			}
 
 			for (int32 i = 7; i >= 0; --i)
 			{
@@ -252,7 +223,7 @@ namespace greaper
 		Impl::ViewToUUID(StringView{str.data(), str.size()}, m_Data);
 	}
 
-	INLINE Uuid Uuid::GenerateRandom() noexcept
+	INLINE Uuid Uuid::GenerateRandom()
 	{
 #if PLT_WINDOWS
 		UUID uuid;
@@ -362,6 +333,7 @@ namespace greaper::refl
 		static inline constexpr ReflectedTypeID_t ID = RTI_UUID;
 		static inline constexpr ReflectedSize_t StaticSize = sizeof(Uuid);
 		static inline constexpr TypeCategory_t Category = TypeCategory_t::Plain;
+		REFL_CREATE_METHODS(Uuid);
 		static std::expected<ReflectedSize_t, String> ToStream(const Uuid& data, IStream& stream)
 		{                      
 			const auto size = stream.Write(&data, sizeof(data));                                                        
@@ -414,7 +386,7 @@ namespace greaper::refl
 		{                
 			return std::unexpected("Function 'PlainType<Uuid>::SetArraySize' Trying to use a PlainType as array!");
 		} 
-		static std::expected<const ArrayValueType&, String> GetArrayValue(UNUSED const Uuid& data,                      
+		static std::expected<const ArrayValueType*, String> GetArrayValue(UNUSED const Uuid& data,                      
 			UNUSED ReflectedSize_t index)
 		{                                                                              
 			return std::unexpected("Function 'PlainType<Uuid>::GetArrayValue' Trying to use a PlainType as array!");
