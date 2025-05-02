@@ -140,7 +140,7 @@ namespace greaper::refl
 		if (!res.has_value())
 			return std::unexpected(res.error());
 		
-		return tInfo::Type::ToStream(*res.value(), stream);
+		return tInfo::Type::ToStream(*(const T*)res.value(), stream);
 	}
 
 	template <class T>
@@ -162,7 +162,7 @@ namespace greaper::refl
 		auto gres = GetValue(complexPtr);
 		if (!gres.has_value())
 			return std::unexpected(gres.error());
-		return tInfo::Type::ToJSON(*gres.value(), json, m_FieldName);
+		return tInfo::Type::ToJSON(*(const T*)gres.value(), json, m_FieldName);
 	}
 
 	template <class T>
@@ -184,7 +184,7 @@ namespace greaper::refl
 		auto gres = GetValue(complexPtr);
 		if (!gres.has_value())
 			return std::unexpected(gres.error());
-		return tInfo::Type::ToString(*gres.value());
+		return tInfo::Type::ToString(*(const T*)gres.value());
 	}
 
 	template <class T>
@@ -193,7 +193,7 @@ namespace greaper::refl
 		auto gres = GetValue(complexPtr);
 		if (!gres.has_value())
 			return std::unexpected(gres.error());
-		return tInfo::Type::GetDynamicSize(*gres.value());
+		return tInfo::Type::GetDynamicSize(*(const T*)gres.value());
 	}
 
 	template <class T>
@@ -208,7 +208,7 @@ namespace greaper::refl
 		auto gres = GetValue(complexPtr);
 		if (!gres.has_value())
 			return std::unexpected(gres.error());
-		return tInfo::Type::GetArraySize(*gres.value());
+		return tInfo::Type::GetArraySize(*(const T*)gres.value());
 	}
 
 	template <class T>
@@ -217,7 +217,7 @@ namespace greaper::refl
 		auto gres = GetValue(complexPtr);
 		if (!gres.has_value())
 			return std::unexpected(gres.error());
-		return tInfo::Type::SetArraySize(*gres.value(), size);
+		return tInfo::Type::SetArraySize(*(T*)gres.value(), size);
 	}
 
 	template <class T>
@@ -226,7 +226,7 @@ namespace greaper::refl
 		auto gres = GetValue(complexPtr);
 		if (!gres.has_value())
 			return std::unexpected(gres.error());
-		return tInfo::Type::GetArrayValue(*gres.value(), index);
+		return tInfo::Type::GetArrayValue(*(const T*)gres.value(), index);
 	}
 	
 	template <class T>
@@ -235,7 +235,7 @@ namespace greaper::refl
 		auto gres = GetValue(complexPtr);
 		if (!gres.has_value())
 			return std::unexpected(gres.error());
-		return tInfo::Type::SetArrayValue(*gres.value(), *((const ArrayValueType*)value), index);
+		return tInfo::Type::SetArrayValue(*(T*)gres.value(), *((const ArrayValueType*)value), index);
 	}
 
 	template <class T>

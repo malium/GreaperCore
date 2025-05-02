@@ -21,6 +21,8 @@ namespace greaper::refl
 
 		static inline constexpr ssizet StaticSize = 0;
 
+		using ArrayValueType = int32;
+
 		REFL_CREATE_METHODS(T);
 		
 		static std::expected<ReflectedSize_t, String> ToStream(const T& data, IStream& stream)
@@ -83,12 +85,16 @@ namespace greaper::refl
 		{
 			String output {};
 			output += "(";
+			sizet i = 0;
 			for (const auto& field : Fields)
 			{
 				auto res = field->ToString(&data);
 				if (!res.has_value())
 					return res;
-				output += res.value() + ", ";
+				output += res.value();
+				if (i < (Fields.size() - 1))
+					output += ", ";
+				++i;
 			}
 			output += ")";
 			return output;
@@ -99,7 +105,7 @@ namespace greaper::refl
 			ReflectedSize_t totalSize = 0;
 			for (const auto& field : Fields)
 			{
-				auto sres = field->GetStaticSize(&data);
+				auto sres = field->GetStaticSize();
 				if (!sres.has_value())
 					return sres;
 

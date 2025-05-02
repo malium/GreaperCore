@@ -30,7 +30,7 @@ template<>struct PlainType<type> : public BaseType<type> {                      
 			"Failure while reading from stream, not all data was read, expected:{} obtained:{}.",                      \
 			sizeof(data), size));}                                                                                     \
 	static std::expected<cJSON*, String> ToJSON(const type& data, cJSON* json, StringView name){                       \
-		jsonAddFn(json, name.data(), data);}                                                                           \
+		jsonAddFn(json, name.data(), data); return {};}                                                                \
 	static std::expected<void, String> FromJSON(type& data, cJSON* json, StringView name){                             \
 		cJSON* item = cJSON_GetObjectItemCaseSensitive(json, name.data());                                             \
 		if (item == nullptr)                                                                                           \
@@ -49,7 +49,7 @@ template<>struct PlainType<type> : public BaseType<type> {                      
 		return std::unexpected("Function 'PlainType<"#type">::GetArraySize' Trying to use a PlainType as array!");}    \
 	static std::expected<void, String> SetArraySize(UNUSED type& data, UNUSED ReflectedSize_t size){                   \
 		return std::unexpected("Function 'PlainType<"#type">::SetArraySize' Trying to use a PlainType as array!");}    \
-	static std::expected<const ArrayValueType&, String> GetArrayValue(UNUSED const type& data,                         \
+	static std::expected<const ArrayValueType*, String> GetArrayValue(UNUSED const type& data,                         \
 		UNUSED ReflectedSize_t index){                                                                                 \
 		return std::unexpected("Function 'PlainType<"#type">::GetArrayValue' Trying to use a PlainType as array!");}   \
 	static std::expected<void, String> SetArrayValue(UNUSED type& data, UNUSED const ArrayValueType& value,            \
@@ -84,6 +84,7 @@ namespace greaper::refl
 		static inline constexpr ReflectedTypeID_t ID = RTI_Enum;
 		static inline constexpr ReflectedSize_t StaticSize = sizeof(std::underlying_type_t<T>);
 		static inline constexpr TypeCategory_t Category = TypeCategory_t::Plain;
+		using ArrayValueType = int32;
 		static std::expected<ReflectedSize_t, String> ToStream(const T& data, IStream& stream)
 		{                      
 			const auto size = stream.Write(&data, sizeof(data));                                                        
@@ -137,7 +138,7 @@ namespace greaper::refl
 		{                
 			return std::unexpected("Function 'PlainType<TEnum>::SetArraySize' Trying to use a PlainType as array!");
 		} 
-		static std::expected<const ArrayValueType&, String> GetArrayValue(UNUSED const T& data,                      
+		static std::expected<const ArrayValueType*, String> GetArrayValue(UNUSED const T& data,                      
 			UNUSED ReflectedSize_t index)
 		{                                                                              
 			return std::unexpected("Function 'PlainType<TEnum>::GetArrayValue' Trying to use a PlainType as array!");
