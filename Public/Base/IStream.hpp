@@ -51,11 +51,11 @@ namespace greaper
 
 		virtual ssizet Read(void* buff, ssizet count)const noexcept = 0;
 		
-		virtual ssizet Write(const void* buff, ssizet count)noexcept = 0;
+		virtual ssizet Write(const void* buff, ssizet count) = 0;
 		
-		virtual void Skip(ssizet count)noexcept = 0;
+		virtual void Skip(ssizet count) = 0;
 
-		virtual void Seek(ssizet pos)noexcept = 0;
+		virtual void Seek(ssizet pos) = 0;
 
 		NODISCARD virtual ssizet Tell()const noexcept = 0;
 
@@ -65,7 +65,7 @@ namespace greaper
 
 		NODISCARD ssizet Size()const noexcept { return m_Size; }
 
-		NODISCARD virtual IStream Clone(bool copyData = true)const noexcept = 0;
+		NODISCARD virtual std::shared_ptr<IStream> Clone(bool copyData = true)const noexcept = 0;
 
 		virtual void Close()noexcept = 0;
 	};
