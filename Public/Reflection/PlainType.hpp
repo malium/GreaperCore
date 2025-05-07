@@ -84,23 +84,23 @@ namespace greaper::refl
 		static inline constexpr TypeCategory_t Category = TypeCategory_t::Plain;
 		using ArrayValueType = int32;
 		static std::expected<ReflectedSize_t, String> ToStream(const T& data, IStream& stream)
-		{                      
-			const auto size = stream.Write(&data, sizeof(data));                                                        
-			if (size == sizeof(data))                                                                                   
-				return size;                                                                                            
-			return std::unexpected(std::format("[refl::PlainType<TEnum>::ToStream] "                                  
-				"Failure while writing to stream, not all data was written, expected:{} obtained:{}.",                  
+		{
+			const auto size = stream.Write(&data, sizeof(data));
+			if (size == sizeof(data))
+				return size;
+			return std::unexpected(std::format("[refl::PlainType<TEnum>::ToStream] "
+				"Failure while writing to stream, not all data was written, expected:{} obtained:{}.",
 				sizeof(data), size));
-		}          
+		}
 		static std::expected<ReflectedSize_t, String> FromStream(T& data, IStream& stream)
-		{                          
-			const auto size = stream.Read(&data, sizeof(data));                                                         
-			if (size == sizeof(data))                                                                                   
-				return size;                                                                                            
-			return std::unexpected(std::format("[refl::PlainType<TEnum>::FromStream] "                                
-				"Failure while reading from stream, not all data was read, expected:{} obtained:{}.",                   
+		{
+			const auto size = stream.Read(&data, sizeof(data));
+			if (size == sizeof(data))
+				return size;
+			return std::unexpected(std::format("[refl::PlainType<TEnum>::FromStream] "
+				"Failure while reading from stream, not all data was read, expected:{} obtained:{}.",
 				sizeof(data), size));
-		}          
+		}
 		static std::expected<cJSON*, String> ToJSON_Item(const T& data)
 		{
 			auto str = TEnum<T>::ToString(data);
@@ -119,27 +119,101 @@ namespace greaper::refl
 		static std::expected<String, String> ToString(const T& data)
 		{
 			return TEnum<T>::ToString(data);
-		}    
+		}
 		static std::expected<ReflectedSize_t, String> GetDynamicSize(UNUSED const T& data)
-		{                          
+		{
 			return 0ll;
-		}                        
+		}
 		static std::expected<ReflectedSize_t, String> GetArraySize(UNUSED const T& data)
-		{                            
+		{
 			return std::unexpected("Function 'PlainType<TEnum>::GetArraySize' Trying to use a PlainType as array!");
-		} 
+		}
 		static std::expected<void, String> SetArraySize(UNUSED T& data, UNUSED ReflectedSize_t size)
-		{                
+		{
 			return std::unexpected("Function 'PlainType<TEnum>::SetArraySize' Trying to use a PlainType as array!");
-		} 
-		static std::expected<const ArrayValueType*, String> GetArrayValue(UNUSED const T& data,                      
+		}
+		static std::expected<const ArrayValueType*, String> GetArrayValue(UNUSED const T& data,
 			UNUSED ReflectedSize_t index)
-		{                                                                              
+		{
 			return std::unexpected("Function 'PlainType<TEnum>::GetArrayValue' Trying to use a PlainType as array!");
 		}
 		static std::expected<void, String> SetArrayValue(UNUSED T& data, UNUSED const ArrayValueType& value,         
 			UNUSED ReflectedSize_t index)
-		{                                                                              
+		{
+			return std::unexpected("Function 'PlainType<TEnum>::SetArrayValue' Trying to use a PlainType as array!");
+		}
+	};
+
+	template<class First, class Second>>
+	struct PlainType<std::pair<First, Second>> : BaseType<std::pair<First, Second>>
+	{
+		using FirstCat = typename TypeInfo_t<First>::Type;
+		using SecondCat = typename TypeInfo_t<Second>::Type;
+
+		static_assert(!std::is_same_v<FirstCat, void> && !std::is_same_v<SecondCat, void>,
+			"[refl::PlainType<std::pair>] Trying to use a Container with not refl value_type!");
+
+		static inline constexpr ReflectedTypeID_t ID = RTI_Pair;
+		static inline constexpr ReflectedSize_t StaticSize = FirstCat::StaticSize + SecondCat::StaticSize;
+		static inline constexpr TypeCategory_t Category = TypeCategory_t::Plain;
+		using ArrayValueType = void*;
+		static std::expected<ReflectedSize_t, String> ToStream(const T& data, IStream& stream)
+		{
+			const auto size = stream.Write(&data, sizeof(data));
+			if (size == sizeof(data))
+				return size;
+			return std::unexpected(std::format("[refl::PlainType<TEnum>::ToStream] "
+				"Failure while writing to stream, not all data was written, expected:{} obtained:{}.",
+				sizeof(data), size));
+		}
+		static std::expected<ReflectedSize_t, String> FromStream(T& data, IStream& stream)
+		{
+			const auto size = stream.Read(&data, sizeof(data));
+			if (size == sizeof(data))
+				return size;
+			return std::unexpected(std::format("[refl::PlainType<TEnum>::FromStream] "
+				"Failure while reading from stream, not all data was read, expected:{} obtained:{}.",
+				sizeof(data), size));
+		}
+		static std::expected<cJSON*, String> ToJSON_Item(const T& data)
+		{
+			auto str = TEnum<T>::ToString(data);
+			return cJSON_CreateString(str.data());
+		}
+		static std::expected<void, String> FromJSON_Item(T& data, cJSON* jsonItem)
+		{
+			if (cJSON_IsString(jsonItem))
+			{
+				data = TEnum<T>::FromString(cJSON_GetStringValue(jsonItem));
+				return {};
+			}
+			return std::unexpected("[refl::PlainType<TEnum>::FromJSON] "
+				"Couldn't obtain the value from json, the item was not ENUM.");
+		}
+		static std::expected<String, String> ToString(const T& data)
+		{
+			return TEnum<T>::ToString(data);
+		}
+		static std::expected<ReflectedSize_t, String> GetDynamicSize(UNUSED const T& data)
+		{
+			return 0ll;
+		}
+		static std::expected<ReflectedSize_t, String> GetArraySize(UNUSED const T& data)
+		{
+			return std::unexpected("Function 'PlainType<TEnum>::GetArraySize' Trying to use a PlainType as array!");
+		}
+		static std::expected<void, String> SetArraySize(UNUSED T& data, UNUSED ReflectedSize_t size)
+		{
+			return std::unexpected("Function 'PlainType<TEnum>::SetArraySize' Trying to use a PlainType as array!");
+		}
+		static std::expected<const ArrayValueType*, String> GetArrayValue(UNUSED const T& data,
+			UNUSED ReflectedSize_t index)
+		{
+			return std::unexpected("Function 'PlainType<TEnum>::GetArrayValue' Trying to use a PlainType as array!");
+		}
+		static std::expected<void, String> SetArrayValue(UNUSED T& data, UNUSED const ArrayValueType& value,         
+			UNUSED ReflectedSize_t index)
+		{
 			return std::unexpected("Function 'PlainType<TEnum>::SetArrayValue' Trying to use a PlainType as array!");
 		}
 	};
