@@ -28,12 +28,36 @@ static std::expected<std::shared_ptr<cJSON>, String> CreateJSON(const Type& data
 	if (res.has_value())                                                                                               \
 		return std::shared_ptr<cJSON>(obj, cJSON_Delete);                                                              \
 	return std::unexpected(res.error());}                                                                              \
-static std::expected<Type, String> CreateFromJSON(cJSON* json, StringView name){                                       \
+static std::expected<Type, String> CreateFromJSON(cJSON* json, StringView name, bool caseSensitive = false){           \
 	Type elem;                                                                                                         \
-	auto res = FromJSON(elem, json, name);                                                                             \
+	auto res = FromJSON(elem, json, name, caseSensitive);                                                              \
 	if (res.has_value())                                                                                               \
 		return elem;                                                                                                   \
-	return std::unexpected(res.error());}
+	return std::unexpected(res.error());}                                                                              \
+static std::expected<void, String> FromJSON(T& data, cJSON* json, StringView name, bool caseSensitive = false){        \
+	cJSON* item = nullptr;                                                                                             \
+	if (!caseSensitive)                                                                                                \
+		item = cJSON_GetObjectItemCaseSensitive(json, name.data());                                                    \
+	else                                                                                                               \
+		item = cJSON_GetObjectItem(json, name.data());                                                                 \
+	if (item == nullptr)                                                                                               \
+		return std::unexpected(std::format("["#Type"::FromJSON] "                                                      \
+			"Couldn't obtain the value from json, the item with name '{}' was not found.", name));                     \
+	auto res = FromJSON_Item(data, item);                                                                              \
+	if (res.has_value())                                                                                               \
+		return {};                                                                                                     \
+	return std::unexpected(std::format("{}, item name '{}'", res.error(), name));}                                     \
+static std::expected<cJSON*, String> ToJSON(UNUSED const T& data, UNUSED cJSON* json, StringView name){                \
+	auto item_res = ToJSON_Item(data);                                                                                 \
+	if (!item_res.has_value())                                                                                         \
+		return std::unexpected(std::format("{}, item name '{}'", item_res.error(), name));                             \
+	if (item_res.value() == nullptr)                                                                                   \
+		return std::unexpected(std::format("["#Type"::ToJSON] Couldn't create the json item, with name '{}'.", name)); \
+	auto ok = cJSON_AddItemToObject(json, name.data(), item_res.value());                                              \
+	if (ok == 0)                                                                                                       \
+		return std::unexpected(std::format("["#Type"::ToJSON] "                                                        \
+			"Couldn't attach item, with name '{}', to the json object.", name));                                       \
+	return item_res.value();}
 
 namespace greaper::refl
 {
@@ -46,7 +70,7 @@ namespace greaper::refl
 			
 		using ArrayValueType = void*;
 
-		static inline constexpr ReflectedTypeID_t ID = TypeInfo<T>::ID;
+		static inline constexpr ReflectedTypeID_t ID = TypeInfo_t<T>::ID;
 
 		static inline constexpr ReflectedSize_t StaticSize = sizeof(T);
 
@@ -63,14 +87,14 @@ namespace greaper::refl
 			return std::unexpected("Function 'BaseType<T>::FromStream' not overriden!");
 		}
 
-		static std::expected<cJSON*, String> ToJSON(UNUSED const T& data, UNUSED cJSON* json, UNUSED StringView name)
+		static std::expected<cJSON*, String> ToJSON_Item(UNUSED const T& data)
 		{
-			return std::unexpected("Function 'BaseType<T>::ToJSON' not overriden!"); 
+			return std::unexpected("Function 'BaseType<T>::ToJSON_Item' not overriden!");
 		}
 
-		static std::expected<void, String> FromJSON(UNUSED T& data, UNUSED cJSON* json, UNUSED StringView name)
+		static std::expected<void, String> FromJSON_Item(UNUSED T& data, UNUSED cJSON* item)
 		{
-			return std::unexpected("Function 'BaseType<T>::FromJSON' not overriden!");
+			return std::unexpected("Function 'BaseType<T>::FromJSON_Item' not overriden!");
 		}
 
 		static std::expected<String, String> ToString(UNUSED const T& data)

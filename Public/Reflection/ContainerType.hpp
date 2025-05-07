@@ -20,7 +20,7 @@ namespace greaper::refl
 		using ArrayValueType = typename Type::value_type;
 
 		static inline constexpr ReflectedSize_t StaticSize = sizeof(sizet);
-
+		static inline constexpr ReflectedTypeID_t ID = RTI_String;
 		static inline constexpr TypeCategory_t Category = TypeCategory_t::Container;
 
 		REFL_CREATE_METHODS(String);
@@ -63,28 +63,24 @@ namespace greaper::refl
 				expectedSize, size));
 		}
 
-		static std::expected<cJSON*, String> ToJSON(const String& data, cJSON* json, StringView name)
+		static std::expected<cJSON*, String> ToJSON_Item(const String& data)
 		{
-			cJSON* res = cJSON_AddStringToObject(json, name.data(), data.c_str());
+			cJSON* res = cJSON_CreateString(data.c_str());
 			if (res != nullptr)
 				return res;
-			return std::unexpected(std::format("[refl::ContainerType<String>::ToJSON] "
-				"Couldn't add a string with name '{}' to the object", name));
+			return std::unexpected("[refl::ContainerType<String>::ToJSON_Item] "
+				"Couldn't add a string to the object");
 		}
 
-		static std::expected<void, String> FromJSON(String& data, cJSON* json, StringView name)
+		static std::expected<void, String> FromJSON_Item(String& data, cJSON* item)
 		{
-			cJSON* item = cJSON_GetObjectItemCaseSensitive(json, name.data());
-			if (item == nullptr)
-				return std::unexpected(std::format("[refl::ContainerType<String>::FromJSON] "                                 
-				"Couldn't obtain the value from json, the item with name '{}' was not found.", name));
 			if (cJSON_IsString(item))
 			{
 				data.assign(cJSON_GetStringValue(item));
 				return {};	
 			}
-			return std::unexpected(std::format("[refl::ContainerType<String>::FromJSON] "
-				"Couldn't obtain the value from json, the item with name '{}' was not String.", name));
+			return std::unexpected("[refl::ContainerType<String>::FromJSON_Item] "
+				"Couldn't obtain the value from json, the item was not String.");
 		}
 
 		static std::expected<String, String> ToString(const String& data)
@@ -145,7 +141,7 @@ namespace greaper::refl
 		using ArrayValueType = typename Type::value_type;
 
 		static inline constexpr ReflectedSize_t StaticSize = sizeof(sizet);
-
+		static inline constexpr ReflectedTypeID_t ID = RTI_WString;
 		static inline constexpr TypeCategory_t Category = TypeCategory_t::Container;
 
 		REFL_CREATE_METHODS(WString);
@@ -188,28 +184,24 @@ namespace greaper::refl
 				expectedSize, size));
 		}
 
-		static std::expected<cJSON*, String> ToJSON(const WString& data, cJSON* json, StringView name)
+		static std::expected<cJSON*, String> ToJSON_Item(const WString& data)
 		{
-			cJSON* res = cJSON_AddStringToObject(json, name.data(), StringUtils::FromWIDE(data).c_str());
+			cJSON* res = cJSON_CreateString(StringUtils::FromWIDE(data).c_str());
 			if (res != nullptr)
 				return res;
-			return std::unexpected(std::format("[refl::ContainerType<String>::ToJSON] "
-				"Couldn't add a string with name '{}' to the object", name));
+			return std::unexpected("[refl::ContainerType<WString>::ToJSON_Item] "
+				"Couldn't add a string to the object");
 		}
 
-		static std::expected<void, String> FromJSON(WString& data, cJSON* json, StringView name)
+		static std::expected<void, String> FromJSON_Item(WString& data, cJSON* item)
 		{
-			cJSON* item = cJSON_GetObjectItemCaseSensitive(json, name.data());
-			if (item == nullptr)
-				return std::unexpected(std::format("[refl::ContainerType<WString>::FromJSON] "                                 
-				"Couldn't obtain the value from json, the item with name '{}' was not found.", name));
 			if (cJSON_IsString(item))
 			{
 				data = StringUtils::ToWIDE(cJSON_GetStringValue(item));
 				return {};	
 			}
-			return std::unexpected(std::format("[refl::ContainerType<WString>::FromJSON] "
-				"Couldn't obtain the value from json, the item with name '{}' was not String.", name));
+			return std::unexpected("[refl::ContainerType<WString>::FromJSON_Item] "
+				"Couldn't obtain the value from json, the item was not String.");
 		}
 
 		static std::expected<String, String> ToString(const WString& data)
@@ -268,13 +260,13 @@ namespace greaper::refl
 	{
 		using Type = std::array<T, N>;
 		using ArrayValueType = typename Type::value_type;
-		using ValueCat = typename TypeInfo<ArrayValueType>::Type;
+		using ValueCat = typename TypeInfo_t<ArrayValueType>::Type;
 
 		static_assert(!std::is_same_v<ValueCat, void>,
 			"[refl::ContainerType<array>] Trying to use a Container with not refl value_type!");
 
 		static inline constexpr ReflectedSize_t StaticSize = ValueCat::StaticSize * N;
-
+		static inline constexpr ReflectedTypeID_t ID = RTI_Array;
 		static inline constexpr TypeCategory_t Category = TypeCategory_t::Container;
 
 		REFL_CREATE_METHODS(Type);
@@ -346,54 +338,46 @@ namespace greaper::refl
 				expectedSize, size));
 		}
 
-		static std::expected<cJSON*, String> ToJSON(const Type& data, cJSON* json, StringView name)
+		static std::expected<cJSON*, String> ToJSON_Item(const Type& data)
 		{
-			cJSON* arrayObject = cJSON_AddArrayToObject(json, name.data());
-			achar buffer[32];
+			cJSON* arrayObject = cJSON_CreateArray();
+			
 			sizet i = 0;
 			for (const ArrayValueType& elem : data)
 			{
-				const std::format_to_n_result fres = std::format_to_n(buffer, ARRAY_SIZE(buffer), "Elem_{}", i++);
-				*fres.out = '\0';
-				cJSON* obj = cJSON_CreateObject();
-				auto res = ValueCat::ToJSON(elem, obj, StringView(buffer, fres.out));
+				auto res = ValueCat::ToJSON_Item(elem);
 				if (!res.has_value())
 					return std::unexpected(res.error());
-				cJSON_bool ok = cJSON_AddItemToArray(arrayObject, obj);
+				cJSON_bool ok = cJSON_AddItemToArray(arrayObject, res.value());
 				if (ok == 0)
-					return std::unexpected(std::format("[refl::ContainerType<array>::ToJSON] "
-						"Error while adding an item to the array, name {}, idx {}.", name, i-1));
+					return std::unexpected(std::format("[refl::ContainerType<array>::ToJSON_Item] "
+						"Error while adding an item to the array, idx {}.", i));
+				++i;
 			}
 			return arrayObject;
 		}
 
-		static std::expected<void, String> FromJSON(Type& data, cJSON* json, StringView name)
+		static std::expected<void, String> FromJSON_Item(Type& data, cJSON* arrayObject)
 		{
-			cJSON* arrayObject = cJSON_GetObjectItemCaseSensitive(json, name.data());
-			if (arrayObject == nullptr)
-				return std::unexpected(std::format("[refl::ContainerType<array>::FromJSON] "                                
-				"Couldn't obtain the value from json, the array with name '{}' was not found.", name));
 			if (!cJSON_IsArray(arrayObject))
-			return std::unexpected(std::format("[refl::ContainerType<array>::FromJSON] "                               
-				"Couldn't obtain the value from json, the array with name '{}' was not an array.", name));
+				return std::unexpected("[refl::ContainerType<array>::FromJSON_Item] "                               
+					"Couldn't obtain the value from json, the item was not an array.");
 
 			sizet arraySize = cJSON_GetArraySize(arrayObject);
 			if (arraySize != N)
-				return std::unexpected(std::format("[refl::ContainerType<array>::FromJSON] "                             
-					"Couldn't obtain the value from json, the array with name '{}' "
-					"have an expected size {} but obtained {}.", name, N, arraySize));
+				return std::unexpected(std::format("[refl::ContainerType<array>::FromJSON_Item] "                             
+					"Couldn't obtain the value from json, the array "
+					"have an expected size {} but obtained {}.", N, arraySize));
 
-			achar buffer[32];
 			for (sizet i = 0; i < N; ++i)
 			{
 				cJSON* item = cJSON_GetArrayItem(arrayObject, i);
 				if (item == nullptr)
-					return std::unexpected(std::format("[refl::ContainerType<array>::FromJSON] "
-						"Couldn't obtain the value from json, the array with name '{}' "
-						"returned a null child at index {}.", name, i));
-				const std::format_to_n_result fres = std::format_to_n(buffer, ARRAY_SIZE(buffer), "Elem_{}", i++);
-				*fres.out = '\0';
-				auto res = ValueCat::FromJSON(data[i], item, StringView(buffer, fres.out));
+					return std::unexpected(std::format("[refl::ContainerType<array>::FromJSON_Item] "
+						"Couldn't obtain the value from json, the array "
+						"returned a null child at index {}.", i));
+
+				auto res = ValueCat::FromJSON_Item(data[i], item);
 				if (!res.has_value())
 					return std::unexpected(res.error());
 			}
@@ -490,13 +474,13 @@ namespace greaper::refl
 	{
 		using Type = std::list<T>;
 		using ArrayValueType = typename Type::value_type;
-		using ValueCat = typename TypeInfo<ArrayValueType>::Type;
+		using ValueCat = typename TypeInfo_t<ArrayValueType>::Type;
 
 		static_assert(!std::is_same_v<ValueCat, void>,
 			"[refl::ContainerType<list>] Trying to use a Container with not refl value_type!");
 
 		static inline constexpr ReflectedSize_t StaticSize = sizeof(sizet);
-
+		static inline constexpr ReflectedTypeID_t ID = RTI_List;
 		static inline constexpr TypeCategory_t Category = TypeCategory_t::Container;
 
 		REFL_CREATE_METHODS(Type);
@@ -556,54 +540,44 @@ namespace greaper::refl
 				expectedSize, size));
 		}
 
-		static std::expected<cJSON*, String> ToJSON(const Type& data, cJSON* json, StringView name)
+		static std::expected<cJSON*, String> ToJSON_Item(const Type& data)
 		{
-			cJSON* arrayObject = cJSON_AddArrayToObject(json, name.data());
-			achar buffer[32];
+			cJSON* arrayObject = cJSON_CreateArray();
+			
 			sizet i = 0;
 			for (const ArrayValueType& elem : data)
 			{
-				const std::format_to_n_result fres = std::format_to_n(buffer, ARRAY_SIZE(buffer), "Elem_{}", i++);
-				*fres.out = '\0';
-				cJSON* obj = cJSON_CreateObject();
-				auto res = ValueCat::ToJSON(elem, obj, StringView(buffer, fres.out));
+				auto res = ValueCat::ToJSON_Item(elem);
 				if (!res.has_value())
 					return std::unexpected(res.error());
-				cJSON_bool ok = cJSON_AddItemToArray(arrayObject, obj);
+				cJSON_bool ok = cJSON_AddItemToArray(arrayObject, res.value());
 				if (ok == 0)
-					return std::unexpected(std::format("[refl::ContainerType<list>::ToJSON] "
-						"Error while adding an item to the list, name {}, idx {}.", name, i-1));
+					return std::unexpected(std::format("[refl::ContainerType<list>::ToJSON_Item] "
+						"Error while adding an item to the list, idx {}.", i));
+				++i;
 			}
 			return arrayObject;
 		}
 
-		static std::expected<void, String> FromJSON(Type& data, cJSON* json, StringView name)
+		static std::expected<void, String> FromJSON_Item(Type& data, cJSON* arrayObject)
 		{
-			cJSON* arrayObject = cJSON_GetObjectItemCaseSensitive(json, name.data());
-			if (arrayObject == nullptr)
-				return std::unexpected(std::format("[refl::ContainerType<list>::FromJSON] "                                
-				"Couldn't obtain the value from json, the list with name '{}' was not found.", name));
 			if (!cJSON_IsArray(arrayObject))
-			return std::unexpected(std::format("[refl::ContainerType<list>::FromJSON] "                               
-				"Couldn't obtain the value from json, the list with name '{}' was not an array.", name));
+				return std::unexpected("[refl::ContainerType<list>::FromJSON_Item] "                               
+					"Couldn't obtain the value from json, the item was not an array.");
 
 			sizet arraySize = cJSON_GetArraySize(arrayObject);
 			
 			data.clear();
-			data.resize(arraySize);
-
-			achar buffer[32];
-			sizet i = 0;
-			for (ArrayValueType& elem : data)
+			
+			for (sizet i = 0; i < arraySize; ++i)
 			{
 				cJSON* item = cJSON_GetArrayItem(arrayObject, i);
 				if (item == nullptr)
-					return std::unexpected(std::format("[refl::ContainerType<list>::FromJSON] "
-						"Couldn't obtain the value from json, the list with name '{}' "
-						"returned a null child at index {}.", name, i));
-				const std::format_to_n_result fres = std::format_to_n(buffer, ARRAY_SIZE(buffer), "Elem_{}", i++);
-				*fres.out = '\0';
-				auto res = ValueCat::FromJSON(elem, item, StringView(buffer, fres.out));
+					return std::unexpected(std::format("[refl::ContainerType<list>::FromJSON_Item] "
+						"Couldn't obtain the value from json, the list "
+						"returned a null child at index {}.", i));
+				ArrayValueType elem;
+				auto res = ValueCat::FromJSON_Item(elem, item);
 				if (!res.has_value())
 					return std::unexpected(res.error());
 			}
@@ -688,13 +662,13 @@ namespace greaper::refl
 	{
 		using Type = std::vector<T>;
 		using ArrayValueType = typename Type::value_type;
-		using ValueCat = typename TypeInfo<ArrayValueType>::Type;
+		using ValueCat = typename TypeInfo_t<ArrayValueType>::Type;
 
 		static_assert(!std::is_same_v<ValueCat, void>,
-			"[refl::ContainerType<list>] Trying to use a Container with not refl value_type!");
+			"[refl::ContainerType<vector>] Trying to use a Container with not refl value_type!");
 
 		static inline constexpr ReflectedSize_t StaticSize = sizeof(sizet);
-
+		static inline constexpr ReflectedTypeID_t ID = RTI_Vector;
 		static inline constexpr TypeCategory_t Category = TypeCategory_t::Container;
 
 		REFL_CREATE_METHODS(Type);
@@ -720,7 +694,7 @@ namespace greaper::refl
 			auto expectedSize = dynamicSize + StaticSize;
 			if (size == expectedSize)
 				return size;
-			return std::unexpected(std::format("[refl::ContainerType<list>::ToStream] "
+			return std::unexpected(std::format("[refl::ContainerType<vector>::ToStream] "
 				"Failure while writing to stream, not all data was written, expected:{} obtained:{}.",
 				expectedSize, size));
 		}
@@ -749,59 +723,49 @@ namespace greaper::refl
 			auto expectedSize = dynamicSize + StaticSize;
 			if (size == expectedSize)
 				return size;
-			return std::unexpected(std::format("[refl::ContainerType<list>::FromStream] "
+			return std::unexpected(std::format("[refl::ContainerType<vector>::FromStream] "
 				"Failure while reading from stream, not all data was read, expected:{} obtained:{}.",
 				expectedSize, size));
 		}
 
-		static std::expected<cJSON*, String> ToJSON(const Type& data, cJSON* json, StringView name)
+		static std::expected<cJSON*, String> ToJSON_Item(const Type& data)
 		{
-			cJSON* arrayObject = cJSON_AddArrayToObject(json, name.data());
-			achar buffer[32];
+			cJSON* arrayObject = cJSON_CreateArray();
+			
 			sizet i = 0;
 			for (const ArrayValueType& elem : data)
 			{
-				const std::format_to_n_result fres = std::format_to_n(buffer, ARRAY_SIZE(buffer), "Elem_{}", i++);
-				*fres.out = '\0';
-				cJSON* obj = cJSON_CreateObject();
-				auto res = ValueCat::ToJSON(elem, obj, StringView(buffer, fres.out));
+				auto res = ValueCat::ToJSON_Item(elem);
 				if (!res.has_value())
 					return std::unexpected(res.error());
-				cJSON_bool ok = cJSON_AddItemToArray(arrayObject, obj);
+				cJSON_bool ok = cJSON_AddItemToArray(arrayObject, res.value());
 				if (ok == 0)
-					return std::unexpected(std::format("[refl::ContainerType<list>::ToJSON] "
-						"Error while adding an item to the list, name {}, idx {}.", name, i-1));
+					return std::unexpected(std::format("[refl::ContainerType<vector>::ToJSON_Item] "
+						"Error while adding an item to the vector, idx {}.", i));
+				++i;
 			}
 			return arrayObject;
 		}
 
-		static std::expected<void, String> FromJSON(Type& data, cJSON* json, StringView name)
+		static std::expected<void, String> FromJSON_Item(Type& data, cJSON* arrayObject)
 		{
-			cJSON* arrayObject = cJSON_GetObjectItemCaseSensitive(json, name.data());
-			if (arrayObject == nullptr)
-				return std::unexpected(std::format("[refl::ContainerType<list>::FromJSON] "                                
-				"Couldn't obtain the value from json, the list with name '{}' was not found.", name));
 			if (!cJSON_IsArray(arrayObject))
-			return std::unexpected(std::format("[refl::ContainerType<list>::FromJSON] "                               
-				"Couldn't obtain the value from json, the list with name '{}' was not an array.", name));
+				return std::unexpected("[refl::ContainerType<vector>::FromJSON_Item] "                               
+					"Couldn't obtain the value from json, the vector was not an array.");
 
 			sizet arraySize = cJSON_GetArraySize(arrayObject);
 			
 			data.clear();
-			data.resize(arraySize);
-
-			achar buffer[32];
-			sizet i = 0;
-			for (ArrayValueType& elem : data)
+			
+			for (sizet i = 0; i < arraySize; ++i)
 			{
 				cJSON* item = cJSON_GetArrayItem(arrayObject, i);
 				if (item == nullptr)
-					return std::unexpected(std::format("[refl::ContainerType<list>::FromJSON] "
-						"Couldn't obtain the value from json, the list with name '{}' "
-						"returned a null child at index {}.", name, i));
-				const std::format_to_n_result fres = std::format_to_n(buffer, ARRAY_SIZE(buffer), "Elem_{}", i++);
-				*fres.out = '\0';
-				auto res = ValueCat::FromJSON(elem, item, StringView(buffer, fres.out));
+					return std::unexpected(std::format("[refl::ContainerType<vector>::FromJSON_Item] "
+						"Couldn't obtain the value from json, the vector "
+						"returned a null child at index {}.", i));
+				ArrayValueType elem;
+				auto res = ValueCat::FromJSON_Item(elem, item);
 				if (!res.has_value())
 					return std::unexpected(res.error());
 			}
@@ -860,7 +824,7 @@ namespace greaper::refl
 			auto arraySize = res_arraySize.value();
 			if (index < arraySize)
 				return &data[index];
-			return std::unexpected(std::format("[refl::ContainerType<list>::GetArrayValue] "
+			return std::unexpected(std::format("[refl::ContainerType<vector>::GetArrayValue] "
 				"Index '{}' out of bounds [0,{}]", index, arraySize));
 		}
 
@@ -876,7 +840,7 @@ namespace greaper::refl
 				data[index] = value;
 				return {};
 			}
-			return std::unexpected(std::format("[refl::ContainerType<list>::SetArrayValue] "
+			return std::unexpected(std::format("[refl::ContainerType<vector>::SetArrayValue] "
 				"Index '{}' out of bounds [0,{}]", index, arraySize)); 
 		}
 	};
@@ -886,13 +850,13 @@ namespace greaper::refl
 	{
 		using Type = std::deque<T>;
 		using ArrayValueType = typename Type::value_type;
-		using ValueCat = typename TypeInfo<ArrayValueType>::Type;
+		using ValueCat = typename TypeInfo_t<ArrayValueType>::Type;
 
 		static_assert(!std::is_same_v<ValueCat, void>,
 			"[refl::ContainerType<deque>] Trying to use a Container with not refl value_type!");
 
 		static inline constexpr ReflectedSize_t StaticSize = sizeof(sizet);
-
+		static inline constexpr ReflectedTypeID_t ID = RTI_Deque;
 		static inline constexpr TypeCategory_t Category = TypeCategory_t::Container;
 
 		REFL_CREATE_METHODS(Type);
@@ -952,54 +916,43 @@ namespace greaper::refl
 				expectedSize, size));
 		}
 
-		static std::expected<cJSON*, String> ToJSON(const Type& data, cJSON* json, StringView name)
+		static std::expected<cJSON*, String> ToJSON_Item(const Type& data)
 		{
-			cJSON* arrayObject = cJSON_AddArrayToObject(json, name.data());
-			achar buffer[32];
+			cJSON* arrayObject = cJSON_CreateArray();
+
 			sizet i = 0;
 			for (const ArrayValueType& elem : data)
 			{
-				const std::format_to_n_result fres = std::format_to_n(buffer, ARRAY_SIZE(buffer), "Elem_{}", i++);
-				*fres.out = '\0';
-				cJSON* obj = cJSON_CreateObject();
-				auto res = ValueCat::ToJSON(elem, obj, StringView(buffer, fres.out));
+				auto res = ValueCat::ToJSON_Item(elem);
 				if (!res.has_value())
 					return std::unexpected(res.error());
-				cJSON_bool ok = cJSON_AddItemToArray(arrayObject, obj);
+				cJSON_bool ok = cJSON_AddItemToArray(arrayObject, res.value());
 				if (ok == 0)
-					return std::unexpected(std::format("[refl::ContainerType<deque>::ToJSON] "
-						"Error while adding an item to the deque, name {}, idx {}.", name, i-1));
+					return std::unexpected(std::format("[refl::ContainerType<deque>::ToJSON_Item] "
+						"Error while adding an item to the deque, idx {}.", i));
 			}
 			return arrayObject;
 		}
 
-		static std::expected<void, String> FromJSON(Type& data, cJSON* json, StringView name)
+		static std::expected<void, String> FromJSON_Item(Type& data, cJSON* arrayObject)
 		{
-			cJSON* arrayObject = cJSON_GetObjectItemCaseSensitive(json, name.data());
-			if (arrayObject == nullptr)
-				return std::unexpected(std::format("[refl::ContainerType<deque>::FromJSON] "                                
-				"Couldn't obtain the value from json, the deque with name '{}' was not found.", name));
 			if (!cJSON_IsArray(arrayObject))
-			return std::unexpected(std::format("[refl::ContainerType<deque>::FromJSON] "                               
-				"Couldn't obtain the value from json, the deque with name '{}' was not an array.", name));
+				return std::unexpected("[refl::ContainerType<deque>::FromJSON_Item] "                               
+					"Couldn't obtain the value from json, the deque was not an array.");
 
 			sizet arraySize = cJSON_GetArraySize(arrayObject);
 			
 			data.clear();
-			data.resize(arraySize);
-
-			achar buffer[32];
-			sizet i = 0;
-			for (ArrayValueType& elem : data)
+			
+			for (sizet i = 0; i < arraySize; ++i)
 			{
 				cJSON* item = cJSON_GetArrayItem(arrayObject, i);
 				if (item == nullptr)
-					return std::unexpected(std::format("[refl::ContainerType<deque>::FromJSON] "
-						"Couldn't obtain the value from json, the deque with name '{}' "
-						"returned a null child at index {}.", name, i));
-				const std::format_to_n_result fres = std::format_to_n(buffer, ARRAY_SIZE(buffer), "Elem_{}", i++);
-				*fres.out = '\0';
-				auto res = ValueCat::FromJSON(elem, item, StringView(buffer, fres.out));
+					return std::unexpected(std::format("[refl::ContainerType<deque>::FromJSON_Item] "
+						"Couldn't obtain the value from json, the deque "
+						"returned a null child at index {}.", i));
+				ArrayValueType elem;
+				auto res = ValueCat::FromJSON_Item(elem, item);
 				if (!res.has_value())
 					return std::unexpected(res.error());
 			}
@@ -1084,13 +1037,13 @@ namespace greaper::refl
 	{
 		using Type = std::set<T>;
 		using ArrayValueType = typename Type::value_type;
-		using ValueCat = typename TypeInfo<ArrayValueType>::Type;
+		using ValueCat = typename TypeInfo_t<ArrayValueType>::Type;
 
 		static_assert(!std::is_same_v<ValueCat, void>,
 			"[refl::ContainerType<set>] Trying to use a Container with not refl value_type!");
 
 		static inline constexpr ReflectedSize_t StaticSize = sizeof(sizet);
-
+		static inline constexpr ReflectedTypeID_t ID = RTI_Set;
 		static inline constexpr TypeCategory_t Category = TypeCategory_t::Container;
 
 		REFL_CREATE_METHODS(Type);
@@ -1150,54 +1103,43 @@ namespace greaper::refl
 				expectedSize, size));
 		}
 
-		static std::expected<cJSON*, String> ToJSON(const Type& data, cJSON* json, StringView name)
+		static std::expected<cJSON*, String> ToJSON_Item(const Type& data)
 		{
-			cJSON* arrayObject = cJSON_AddArrayToObject(json, name.data());
-			achar buffer[32];
+			cJSON* arrayObject = cJSON_CreateArray();
+
 			sizet i = 0;
 			for (const ArrayValueType& elem : data)
 			{
-				const std::format_to_n_result fres = std::format_to_n(buffer, ARRAY_SIZE(buffer), "Elem_{}", i++);
-				*fres.out = '\0';
-				cJSON* obj = cJSON_CreateObject();
-				auto res = ValueCat::ToJSON(elem, obj, StringView(buffer, fres.out));
+				auto res = ValueCat::ToJSON_Item(elem);
 				if (!res.has_value())
 					return std::unexpected(res.error());
-				cJSON_bool ok = cJSON_AddItemToArray(arrayObject, obj);
+				cJSON_bool ok = cJSON_AddItemToArray(arrayObject, res.value());
 				if (ok == 0)
-					return std::unexpected(std::format("[refl::ContainerType<set>::ToJSON] "
-						"Error while adding an item to the set, name {}, idx {}.", name, i-1));
+					return std::unexpected(std::format("[refl::ContainerType<set>::ToJSON_Item] "
+						"Error while adding an item to the set, idx {}.", i));
 			}
 			return arrayObject;
 		}
 
-		static std::expected<void, String> FromJSON(Type& data, cJSON* json, StringView name)
+		static std::expected<void, String> FromJSON_Item(Type& data, cJSON* arrayObject)
 		{
-			cJSON* arrayObject = cJSON_GetObjectItemCaseSensitive(json, name.data());
-			if (arrayObject == nullptr)
-				return std::unexpected(std::format("[refl::ContainerType<set>::FromJSON] "                                
-				"Couldn't obtain the value from json, the set with name '{}' was not found.", name));
 			if (!cJSON_IsArray(arrayObject))
-			return std::unexpected(std::format("[refl::ContainerType<set>::FromJSON] "                               
-				"Couldn't obtain the value from json, the set with name '{}' was not an array.", name));
+				return std::unexpected("[refl::ContainerType<set>::FromJSON_Item] "                               
+					"Couldn't obtain the value from json, the set was not an array.");
 
 			sizet arraySize = cJSON_GetArraySize(arrayObject);
 			
 			data.clear();
-			data.resize(arraySize);
-
-			achar buffer[32];
-			sizet i = 0;
-			for (ArrayValueType& elem : data)
+			
+			for (sizet i = 0; i < arraySize; ++i)
 			{
 				cJSON* item = cJSON_GetArrayItem(arrayObject, i);
 				if (item == nullptr)
-					return std::unexpected(std::format("[refl::ContainerType<set>::FromJSON] "
-						"Couldn't obtain the value from json, the set with name '{}' "
-						"returned a null child at index {}.", name, i));
-				const std::format_to_n_result fres = std::format_to_n(buffer, ARRAY_SIZE(buffer), "Elem_{}", i++);
-				*fres.out = '\0';
-				auto res = ValueCat::FromJSON(elem, item, StringView(buffer, fres.out));
+					return std::unexpected(std::format("[refl::ContainerType<deque>::FromJSON_Item] "
+						"Couldn't obtain the value from json, the deque "
+						"returned a null child at index {}.", i));
+				ArrayValueType elem;
+				auto res = ValueCat::FromJSON_Item(elem, item);
 				if (!res.has_value())
 					return std::unexpected(res.error());
 			}
@@ -1282,13 +1224,13 @@ namespace greaper::refl
 	{
 		using Type = std::multiset<T, C>;
 		using ArrayValueType = typename Type::value_type;
-		using ValueCat = typename TypeInfo<ArrayValueType>::Type;
+		using ValueCat = typename TypeInfo_t<ArrayValueType>::Type;
 
 		static_assert(!std::is_same_v<ValueCat, void>,
 			"[refl::ContainerType<multiset>] Trying to use a Container with not refl value_type!");
 
 		static inline constexpr ReflectedSize_t StaticSize = sizeof(sizet);
-
+		static inline constexpr ReflectedTypeID_t ID = RTI_MultiSet;
 		static inline constexpr TypeCategory_t Category = TypeCategory_t::Container;
 
 		REFL_CREATE_METHODS(Type);
@@ -1348,54 +1290,43 @@ namespace greaper::refl
 				expectedSize, size));
 		}
 
-		static std::expected<cJSON*, String> ToJSON(const Type& data, cJSON* json, StringView name)
+		static std::expected<cJSON*, String> ToJSON_Item(const Type& data)
 		{
-			cJSON* arrayObject = cJSON_AddArrayToObject(json, name.data());
-			achar buffer[32];
+			cJSON* arrayObject = cJSON_CreateArray();
+
 			sizet i = 0;
 			for (const ArrayValueType& elem : data)
 			{
-				const std::format_to_n_result fres = std::format_to_n(buffer, ARRAY_SIZE(buffer), "Elem_{}", i++);
-				*fres.out = '\0';
-				cJSON* obj = cJSON_CreateObject();
-				auto res = ValueCat::ToJSON(elem, obj, StringView(buffer, fres.out));
+				auto res = ValueCat::ToJSON_Item(elem);
 				if (!res.has_value())
 					return std::unexpected(res.error());
-				cJSON_bool ok = cJSON_AddItemToArray(arrayObject, obj);
+				cJSON_bool ok = cJSON_AddItemToArray(arrayObject, res.value());
 				if (ok == 0)
-					return std::unexpected(std::format("[refl::ContainerType<multiset>::ToJSON] "
-						"Error while adding an item to the multiset, name {}, idx {}.", name, i-1));
+					return std::unexpected(std::format("[refl::ContainerType<multiset>::ToJSON_Item] "
+						"Error while adding an item to the multiset, idx {}.", i));
 			}
 			return arrayObject;
 		}
 
-		static std::expected<void, String> FromJSON(Type& data, cJSON* json, StringView name)
+		static std::expected<void, String> FromJSON_Item(Type& data, cJSON* arrayObject)
 		{
-			cJSON* arrayObject = cJSON_GetObjectItemCaseSensitive(json, name.data());
-			if (arrayObject == nullptr)
-				return std::unexpected(std::format("[refl::ContainerType<multiset>::FromJSON] "                                
-				"Couldn't obtain the value from json, the multiset with name '{}' was not found.", name));
 			if (!cJSON_IsArray(arrayObject))
-			return std::unexpected(std::format("[refl::ContainerType<multiset>::FromJSON] "                               
-				"Couldn't obtain the value from json, the multiset with name '{}' was not an array.", name));
+				return std::unexpected("[refl::ContainerType<multiset>::FromJSON_Item] "                               
+					"Couldn't obtain the value from json, the multiset was not an array.");
 
 			sizet arraySize = cJSON_GetArraySize(arrayObject);
 			
 			data.clear();
-			data.resize(arraySize);
-
-			achar buffer[32];
-			sizet i = 0;
-			for (ArrayValueType& elem : data)
+			
+			for (sizet i = 0; i < arraySize; ++i)
 			{
 				cJSON* item = cJSON_GetArrayItem(arrayObject, i);
 				if (item == nullptr)
-					return std::unexpected(std::format("[refl::ContainerType<multiset>::FromJSON] "
-						"Couldn't obtain the value from json, the multiset with name '{}' "
-						"returned a null child at index {}.", name, i));
-				const std::format_to_n_result fres = std::format_to_n(buffer, ARRAY_SIZE(buffer), "Elem_{}", i++);
-				*fres.out = '\0';
-				auto res = ValueCat::FromJSON(elem, item, StringView(buffer, fres.out));
+					return std::unexpected(std::format("[refl::ContainerType<deque>::FromJSON_Item] "
+						"Couldn't obtain the value from json, the deque "
+						"returned a null child at index {}.", i));
+				ArrayValueType elem;
+				auto res = ValueCat::FromJSON_Item(elem, item);
 				if (!res.has_value())
 					return std::unexpected(res.error());
 			}
@@ -1480,13 +1411,13 @@ namespace greaper::refl
 	{
 		using Type = std::unordered_set<T, H, C>;
 		using ArrayValueType = typename Type::value_type;
-		using ValueCat = typename TypeInfo<ArrayValueType>::Type;
+		using ValueCat = typename TypeInfo_t<ArrayValueType>::Type;
 
 		static_assert(!std::is_same_v<ValueCat, void>,
 			"[refl::ContainerType<unordered_set>] Trying to use a Container with not refl value_type!");
 
 		static inline constexpr ReflectedSize_t StaticSize = sizeof(sizet);
-
+		static inline constexpr ReflectedTypeID_t ID = RTI_UnorderedSet;
 		static inline constexpr TypeCategory_t Category = TypeCategory_t::Container;
 
 		REFL_CREATE_METHODS(Type);
@@ -1546,54 +1477,43 @@ namespace greaper::refl
 				expectedSize, size));
 		}
 
-		static std::expected<cJSON*, String> ToJSON(const Type& data, cJSON* json, StringView name)
+		static std::expected<cJSON*, String> ToJSON_Item(const Type& data)
 		{
-			cJSON* arrayObject = cJSON_AddArrayToObject(json, name.data());
-			achar buffer[32];
+			cJSON* arrayObject = cJSON_CreateArray();
+
 			sizet i = 0;
 			for (const ArrayValueType& elem : data)
 			{
-				const std::format_to_n_result fres = std::format_to_n(buffer, ARRAY_SIZE(buffer), "Elem_{}", i++);
-				*fres.out = '\0';
-				cJSON* obj = cJSON_CreateObject();
-				auto res = ValueCat::ToJSON(elem, obj, StringView(buffer, fres.out));
+				auto res = ValueCat::ToJSON_Item(elem);
 				if (!res.has_value())
 					return std::unexpected(res.error());
-				cJSON_bool ok = cJSON_AddItemToArray(arrayObject, obj);
+				cJSON_bool ok = cJSON_AddItemToArray(arrayObject, res.value());
 				if (ok == 0)
-					return std::unexpected(std::format("[refl::ContainerType<unordered_set>::ToJSON] "
-						"Error while adding an item to the unordered_set, name {}, idx {}.", name, i-1));
+					return std::unexpected(std::format("[refl::ContainerType<unordered_set>::ToJSON_Item] "
+						"Error while adding an item to the unordered_set, idx {}.", i));
 			}
 			return arrayObject;
 		}
 
-		static std::expected<void, String> FromJSON(Type& data, cJSON* json, StringView name)
+		static std::expected<void, String> FromJSON_Item(Type& data, cJSON* arrayObject)
 		{
-			cJSON* arrayObject = cJSON_GetObjectItemCaseSensitive(json, name.data());
-			if (arrayObject == nullptr)
-				return std::unexpected(std::format("[refl::ContainerType<unordered_set>::FromJSON] "                                
-				"Couldn't obtain the value from json, the unordered_set with name '{}' was not found.", name));
 			if (!cJSON_IsArray(arrayObject))
-			return std::unexpected(std::format("[refl::ContainerType<unordered_set>::FromJSON] "                               
-				"Couldn't obtain the value from json, the unordered_set with name '{}' was not an array.", name));
+				return std::unexpected("[refl::ContainerType<unordered_set>::FromJSON_Item] "                               
+					"Couldn't obtain the value from json, the unordered_set was not an array.");
 
 			sizet arraySize = cJSON_GetArraySize(arrayObject);
 			
 			data.clear();
-			data.resize(arraySize);
-
-			achar buffer[32];
-			sizet i = 0;
-			for (ArrayValueType& elem : data)
+			
+			for (sizet i = 0; i < arraySize; ++i)
 			{
 				cJSON* item = cJSON_GetArrayItem(arrayObject, i);
 				if (item == nullptr)
-					return std::unexpected(std::format("[refl::ContainerType<unordered_set>::FromJSON] "
-						"Couldn't obtain the value from json, the unordered_set with name '{}' "
-						"returned a null child at index {}.", name, i));
-				const std::format_to_n_result fres = std::format_to_n(buffer, ARRAY_SIZE(buffer), "Elem_{}", i++);
-				*fres.out = '\0';
-				auto res = ValueCat::FromJSON(elem, item, StringView(buffer, fres.out));
+					return std::unexpected(std::format("[refl::ContainerType<deque>::FromJSON_Item] "
+						"Couldn't obtain the value from json, the deque "
+						"returned a null child at index {}.", i));
+				ArrayValueType elem;
+				auto res = ValueCat::FromJSON_Item(elem, item);
 				if (!res.has_value())
 					return std::unexpected(res.error());
 			}
@@ -1678,13 +1598,13 @@ namespace greaper::refl
 	{
 		using Type = std::unordered_multiset<T, H, C>;
 		using ArrayValueType = typename Type::value_type;
-		using ValueCat = typename TypeInfo<ArrayValueType>::Type;
+		using ValueCat = typename TypeInfo_t<ArrayValueType>::Type;
 
 		static_assert(!std::is_same_v<ValueCat, void>,
 			"[refl::ContainerType<unordered_multiset>] Trying to use a Container with not refl value_type!");
 
 		static inline constexpr ReflectedSize_t StaticSize = sizeof(sizet);
-
+		static inline constexpr ReflectedTypeID_t ID = RTI_UnorderedMultiSet;
 		static inline constexpr TypeCategory_t Category = TypeCategory_t::Container;
 
 		REFL_CREATE_METHODS(Type);
@@ -1744,54 +1664,43 @@ namespace greaper::refl
 				expectedSize, size));
 		}
 
-		static std::expected<cJSON*, String> ToJSON(const Type& data, cJSON* json, StringView name)
+		static std::expected<cJSON*, String> ToJSON_Item(const Type& data)
 		{
-			cJSON* arrayObject = cJSON_AddArrayToObject(json, name.data());
-			achar buffer[32];
+			cJSON* arrayObject = cJSON_CreateArray();
+
 			sizet i = 0;
 			for (const ArrayValueType& elem : data)
 			{
-				const std::format_to_n_result fres = std::format_to_n(buffer, ARRAY_SIZE(buffer), "Elem_{}", i++);
-				*fres.out = '\0';
-				cJSON* obj = cJSON_CreateObject();
-				auto res = ValueCat::ToJSON(elem, obj, StringView(buffer, fres.out));
+				auto res = ValueCat::ToJSON_Item(elem);
 				if (!res.has_value())
 					return std::unexpected(res.error());
-				cJSON_bool ok = cJSON_AddItemToArray(arrayObject, obj);
+				cJSON_bool ok = cJSON_AddItemToArray(arrayObject, res.value());
 				if (ok == 0)
-					return std::unexpected(std::format("[refl::ContainerType<unordered_multiset>::ToJSON] "
-						"Error while adding an item to the unordered_multiset, name {}, idx {}.", name, i-1));
+					return std::unexpected(std::format("[refl::ContainerType<unordered_multiset>::ToJSON_Item] "
+						"Error while adding an item to the unordered_multiset, idx {}.", i));
 			}
 			return arrayObject;
 		}
 
-		static std::expected<void, String> FromJSON(Type& data, cJSON* json, StringView name)
+		static std::expected<void, String> FromJSON_Item(Type& data, cJSON* arrayObject)
 		{
-			cJSON* arrayObject = cJSON_GetObjectItemCaseSensitive(json, name.data());
-			if (arrayObject == nullptr)
-				return std::unexpected(std::format("[refl::ContainerType<unordered_multiset>::FromJSON] "                                
-				"Couldn't obtain the value from json, the unordered_multiset with name '{}' was not found.", name));
 			if (!cJSON_IsArray(arrayObject))
-			return std::unexpected(std::format("[refl::ContainerType<unordered_multiset>::FromJSON] "                               
-				"Couldn't obtain the value from json, the unordered_multiset with name '{}' was not an array.", name));
+				return std::unexpected("[refl::ContainerType<unordered_multiset>::FromJSON_Item] "                               
+					"Couldn't obtain the value from json, the unordered_multiset was not an array.");
 
 			sizet arraySize = cJSON_GetArraySize(arrayObject);
 			
 			data.clear();
-			data.resize(arraySize);
-
-			achar buffer[32];
-			sizet i = 0;
-			for (ArrayValueType& elem : data)
+			
+			for (sizet i = 0; i < arraySize; ++i)
 			{
 				cJSON* item = cJSON_GetArrayItem(arrayObject, i);
 				if (item == nullptr)
-					return std::unexpected(std::format("[refl::ContainerType<unordered_multiset>::FromJSON] "
-						"Couldn't obtain the value from json, the unordered_multiset with name '{}' "
-						"returned a null child at index {}.", name, i));
-				const std::format_to_n_result fres = std::format_to_n(buffer, ARRAY_SIZE(buffer), "Elem_{}", i++);
-				*fres.out = '\0';
-				auto res = ValueCat::FromJSON(elem, item, StringView(buffer, fres.out));
+					return std::unexpected(std::format("[refl::ContainerType<deque>::FromJSON_Item] "
+						"Couldn't obtain the value from json, the deque "
+						"returned a null child at index {}.", i));
+				ArrayValueType elem;
+				auto res = ValueCat::FromJSON_Item(elem, item);
 				if (!res.has_value())
 					return std::unexpected(res.error());
 			}
@@ -1876,8 +1785,8 @@ namespace greaper::refl
 	{
 		using Type = std::map<K, V, P>;
 		using ArrayValueType = typename Type::value_type;
-		using KeyCat = typename TypeInfo<K>::Type;
-		using ValueCat = typename TypeInfo<V>::Type;
+		using KeyCat = typename TypeInfo_t<K>::Type;
+		using ValueCat = typename TypeInfo_t<V>::Type;
 
 		static_assert(!std::is_same_v<KeyCat, void>,
 			"[refl::ContainerType<map>] Trying to use a Container with not refl key_value!");
@@ -1885,7 +1794,7 @@ namespace greaper::refl
 			"[refl::ContainerType<map>] Trying to use a Container with not refl value_type!");
 
 		static inline constexpr ReflectedSize_t StaticSize = sizeof(sizet);
-
+		static inline constexpr ReflectedTypeID_t ID = RTI_Map;
 		static inline constexpr TypeCategory_t Category = TypeCategory_t::Container;
 
 		REFL_CREATE_METHODS(Type);
@@ -1965,9 +1874,9 @@ namespace greaper::refl
 				expectedSize, size));
 		}
 
-		static std::expected<cJSON*, String> ToJSON(const Type& data, cJSON* json, StringView name)
+		static std::expected<cJSON*, String> ToJSON_Item(const Type& data)
 		{
-			cJSON* arrayObject = cJSON_AddArrayToObject(json, name.data());
+			cJSON* arrayObject = cJSON_CreateArray();
 			for (const ArrayValueType& elem : data)
 			{
 				cJSON* obj = cJSON_CreateObject();
@@ -1980,21 +1889,17 @@ namespace greaper::refl
 
 				cJSON_bool ok = cJSON_AddItemToArray(arrayObject, obj);
 				if (ok == 0)
-					return std::unexpected(std::format("[refl::ContainerType<map>::ToJSON] "
-						"Error while adding a key-value item to the map, name {}.", name));
+					return std::unexpected("[refl::ContainerType<map>::ToJSON_Item] "
+						"Error while adding a key-value item to the map.");
 			}
 			return arrayObject;
 		}
 
-		static std::expected<void, String> FromJSON(Type& data, cJSON* json, StringView name)
+		static std::expected<void, String> FromJSON_Item(Type& data, cJSON* arrayObject)
 		{
-			cJSON* arrayObject = cJSON_GetObjectItemCaseSensitive(json, name.data());
-			if (arrayObject == nullptr)
-				return std::unexpected(std::format("[refl::ContainerType<map>::FromJSON] "                                
-				"Couldn't obtain the value from json, the map with name '{}' was not found.", name));
 			if (!cJSON_IsArray(arrayObject))
-				return std::unexpected(std::format("[refl::ContainerType<map>::FromJSON] "                               
-				"Couldn't obtain the value from json, the map with name '{}' was not an array.", name));
+				return std::unexpected(std::format("[refl::ContainerType<map>::FromJSON_Item] "                               
+				"Couldn't obtain the value from json, the map was not an array."));
 
 			sizet arraySize = cJSON_GetArraySize(arrayObject);
 			
@@ -2004,9 +1909,9 @@ namespace greaper::refl
 			{
 				cJSON* item = cJSON_GetArrayItem(arrayObject, i);
 				if (item == nullptr)
-					return std::unexpected(std::format("[refl::ContainerType<map>::FromJSON] "
-						"Couldn't obtain the value from json, the map with name '{}' "
-						"returned a null child at index {}.", name, i));
+					return std::unexpected(std::format("[refl::ContainerType<map>::FromJSON_Item] "
+						"Couldn't obtain the value from json, the map "
+						"returned a null child at index {}.", i));
 				
 				K key;
 				auto kres = KeyCat::FromJSON(key, item, "key"sv);
@@ -2124,8 +2029,8 @@ namespace greaper::refl
 	{
 		using Type = std::multimap<K, V, P>;
 		using ArrayValueType = typename Type::value_type;
-		using KeyCat = typename TypeInfo<K>::Type;
-		using ValueCat = typename TypeInfo<V>::Type;
+		using KeyCat = typename TypeInfo_t<K>::Type;
+		using ValueCat = typename TypeInfo_t<V>::Type;
 
 		static_assert(!std::is_same_v<KeyCat, void>,
 			"[refl::ContainerType<multimap>] Trying to use a Container with not refl key_value!");
@@ -2133,7 +2038,7 @@ namespace greaper::refl
 			"[refl::ContainerType<multimap>] Trying to use a Container with not refl value_type!");
 
 		static inline constexpr ReflectedSize_t StaticSize = sizeof(sizet);
-
+		static inline constexpr ReflectedTypeID_t ID = RTI_MultiMap;
 		static inline constexpr TypeCategory_t Category = TypeCategory_t::Container;
 
 		REFL_CREATE_METHODS(Type);
@@ -2213,9 +2118,9 @@ namespace greaper::refl
 				expectedSize, size));
 		}
 
-		static std::expected<cJSON*, String> ToJSON(const Type& data, cJSON* json, StringView name)
+		static std::expected<cJSON*, String> ToJSON_Item(const Type& data)
 		{
-			cJSON* arrayObject = cJSON_AddArrayToObject(json, name.data());
+			cJSON* arrayObject = cJSON_CreateArray();
 			for (const ArrayValueType& elem : data)
 			{
 				cJSON* obj = cJSON_CreateObject();
@@ -2228,21 +2133,17 @@ namespace greaper::refl
 
 				cJSON_bool ok = cJSON_AddItemToArray(arrayObject, obj);
 				if (ok == 0)
-					return std::unexpected(std::format("[refl::ContainerType<multimap>::ToJSON] "
-						"Error while adding a key-value item to the multimap, name {}.", name));
+					return std::unexpected("[refl::ContainerType<map>::ToJSON_Item] "
+						"Error while adding a key-value item to the map.");
 			}
 			return arrayObject;
 		}
 
-		static std::expected<void, String> FromJSON(Type& data, cJSON* json, StringView name)
+		static std::expected<void, String> FromJSON_Item(Type& data, cJSON* arrayObject)
 		{
-			cJSON* arrayObject = cJSON_GetObjectItemCaseSensitive(json, name.data());
-			if (arrayObject == nullptr)
-				return std::unexpected(std::format("[refl::ContainerType<multimap>::FromJSON] "                                
-				"Couldn't obtain the value from json, the multimap with name '{}' was not found.", name));
 			if (!cJSON_IsArray(arrayObject))
-				return std::unexpected(std::format("[refl::ContainerType<multimap>::FromJSON] "                               
-				"Couldn't obtain the value from json, the multimap with name '{}' was not an array.", name));
+				return std::unexpected(std::format("[refl::ContainerType<map>::FromJSON_Item] "                               
+				"Couldn't obtain the value from json, the map was not an array."));
 
 			sizet arraySize = cJSON_GetArraySize(arrayObject);
 			
@@ -2252,9 +2153,9 @@ namespace greaper::refl
 			{
 				cJSON* item = cJSON_GetArrayItem(arrayObject, i);
 				if (item == nullptr)
-					return std::unexpected(std::format("[refl::ContainerType<multimap>::FromJSON] "
-						"Couldn't obtain the value from json, the multimap with name '{}' "
-						"returned a null child at index {}.", name, i));
+					return std::unexpected(std::format("[refl::ContainerType<map>::FromJSON_Item] "
+						"Couldn't obtain the value from json, the map "
+						"returned a null child at index {}.", i));
 				
 				K key;
 				auto kres = KeyCat::FromJSON(key, item, "key"sv);
@@ -2372,8 +2273,8 @@ namespace greaper::refl
 	{
 		using Type = std::unordered_map<K, V, H, C>;
 		using ArrayValueType = typename Type::value_type;
-		using KeyCat = typename TypeInfo<K>::Type;
-		using ValueCat = typename TypeInfo<V>::Type;
+		using KeyCat = typename TypeInfo_t<K>::Type;
+		using ValueCat = typename TypeInfo_t<V>::Type;
 
 		static_assert(!std::is_same_v<KeyCat, void>,
 			"[refl::ContainerType<unordered_map>] Trying to use a Container with not refl key_value!");
@@ -2381,7 +2282,7 @@ namespace greaper::refl
 			"[refl::ContainerType<unordered_map>] Trying to use a Container with not refl value_type!");
 
 		static inline constexpr ReflectedSize_t StaticSize = sizeof(sizet);
-
+		static inline constexpr ReflectedTypeID_t ID = RTI_UnorderedMap;
 		static inline constexpr TypeCategory_t Category = TypeCategory_t::Container;
 
 		REFL_CREATE_METHODS(Type);
@@ -2461,9 +2362,9 @@ namespace greaper::refl
 				expectedSize, size));
 		}
 
-		static std::expected<cJSON*, String> ToJSON(const Type& data, cJSON* json, StringView name)
+		static std::expected<cJSON*, String> ToJSON_Item(const Type& data)
 		{
-			cJSON* arrayObject = cJSON_AddArrayToObject(json, name.data());
+			cJSON* arrayObject = cJSON_CreateArray();
 			for (const ArrayValueType& elem : data)
 			{
 				cJSON* obj = cJSON_CreateObject();
@@ -2476,21 +2377,17 @@ namespace greaper::refl
 
 				cJSON_bool ok = cJSON_AddItemToArray(arrayObject, obj);
 				if (ok == 0)
-					return std::unexpected(std::format("[refl::ContainerType<unordered_map>::ToJSON] "
-						"Error while adding a key-value item to the unordered_map, name {}.", name));
+					return std::unexpected("[refl::ContainerType<unordered_map>::ToJSON_Item] "
+						"Error while adding a key-value item to the map.");
 			}
 			return arrayObject;
 		}
 
-		static std::expected<void, String> FromJSON(Type& data, cJSON* json, StringView name)
+		static std::expected<void, String> FromJSON_Item(Type& data, cJSON* arrayObject)
 		{
-			cJSON* arrayObject = cJSON_GetObjectItemCaseSensitive(json, name.data());
-			if (arrayObject == nullptr)
-				return std::unexpected(std::format("[refl::ContainerType<unordered_map>::FromJSON] "                                
-				"Couldn't obtain the value from json, the unordered_map with name '{}' was not found.", name));
 			if (!cJSON_IsArray(arrayObject))
-				return std::unexpected(std::format("[refl::ContainerType<unordered_map>::FromJSON] "                               
-				"Couldn't obtain the value from json, the unordered_map with name '{}' was not an array.", name));
+				return std::unexpected(std::format("[refl::ContainerType<map>::FromJSON_Item] "                               
+				"Couldn't obtain the value from json, the map was not an array."));
 
 			sizet arraySize = cJSON_GetArraySize(arrayObject);
 			
@@ -2500,9 +2397,9 @@ namespace greaper::refl
 			{
 				cJSON* item = cJSON_GetArrayItem(arrayObject, i);
 				if (item == nullptr)
-					return std::unexpected(std::format("[refl::ContainerType<unordered_map>::FromJSON] "
-						"Couldn't obtain the value from json, the unordered_map with name '{}' "
-						"returned a null child at index {}.", name, i));
+					return std::unexpected(std::format("[refl::ContainerType<map>::FromJSON_Item] "
+						"Couldn't obtain the value from json, the map "
+						"returned a null child at index {}.", i));
 				
 				K key;
 				auto kres = KeyCat::FromJSON(key, item, "key"sv);
@@ -2620,8 +2517,8 @@ namespace greaper::refl
 	{
 		using Type = std::unordered_multimap<K, V, H, C>;
 		using ArrayValueType = typename Type::value_type;
-		using KeyCat = typename TypeInfo<K>::Type;
-		using ValueCat = typename TypeInfo<V>::Type;
+		using KeyCat = typename TypeInfo_t<K>::Type;
+		using ValueCat = typename TypeInfo_t<V>::Type;
 
 		static_assert(!std::is_same_v<KeyCat, void>,
 			"[refl::ContainerType<unordered_multimap>] Trying to use a Container with not refl key_value!");
@@ -2629,7 +2526,7 @@ namespace greaper::refl
 			"[refl::ContainerType<unordered_multimap>] Trying to use a Container with not refl value_type!");
 
 		static inline constexpr ReflectedSize_t StaticSize = sizeof(sizet);
-
+		static inline constexpr ReflectedTypeID_t ID = RTI_UnorderedMultiMap;
 		static inline constexpr TypeCategory_t Category = TypeCategory_t::Container;
 
 		REFL_CREATE_METHODS(Type);
@@ -2709,9 +2606,9 @@ namespace greaper::refl
 				expectedSize, size));
 		}
 
-		static std::expected<cJSON*, String> ToJSON(const Type& data, cJSON* json, StringView name)
+		static std::expected<cJSON*, String> ToJSON_Item(const Type& data)
 		{
-			cJSON* arrayObject = cJSON_AddArrayToObject(json, name.data());
+			cJSON* arrayObject = cJSON_CreateArray();
 			for (const ArrayValueType& elem : data)
 			{
 				cJSON* obj = cJSON_CreateObject();
@@ -2724,21 +2621,17 @@ namespace greaper::refl
 
 				cJSON_bool ok = cJSON_AddItemToArray(arrayObject, obj);
 				if (ok == 0)
-					return std::unexpected(std::format("[refl::ContainerType<unordered_multimap>::ToJSON] "
-						"Error while adding a key-value item to the unordered_multimap, name {}.", name));
+					return std::unexpected("[refl::ContainerType<unordered_multimap>::ToJSON_Item] "
+						"Error while adding a key-value item to the map.");
 			}
 			return arrayObject;
 		}
 
-		static std::expected<void, String> FromJSON(Type& data, cJSON* json, StringView name)
+		static std::expected<void, String> FromJSON_Item(Type& data, cJSON* arrayObject)
 		{
-			cJSON* arrayObject = cJSON_GetObjectItemCaseSensitive(json, name.data());
-			if (arrayObject == nullptr)
-				return std::unexpected(std::format("[refl::ContainerType<unordered_multimap>::FromJSON] "                                
-				"Couldn't obtain the value from json, the unordered_multimap with name '{}' was not found.", name));
 			if (!cJSON_IsArray(arrayObject))
-				return std::unexpected(std::format("[refl::ContainerType<unordered_multimap>::FromJSON] "                               
-				"Couldn't obtain the value from json, the unordered_multimap with name '{}' was not an array.", name));
+				return std::unexpected(std::format("[refl::ContainerType<unordered_multimap>::FromJSON_Item] "                               
+				"Couldn't obtain the value from json, the unordered_multimap was not an array."));
 
 			sizet arraySize = cJSON_GetArraySize(arrayObject);
 			
@@ -2748,9 +2641,9 @@ namespace greaper::refl
 			{
 				cJSON* item = cJSON_GetArrayItem(arrayObject, i);
 				if (item == nullptr)
-					return std::unexpected(std::format("[refl::ContainerType<unordered_multimap>::FromJSON] "
-						"Couldn't obtain the value from json, the unordered_multimap with name '{}' "
-						"returned a null child at index {}.", name, i));
+					return std::unexpected(std::format("[refl::ContainerType<unordered_multimap>::FromJSON_Item] "
+						"Couldn't obtain the value from json, the unordered_multimap "
+						"returned a null child at index {}.", i));
 				
 				K key;
 				auto kres = KeyCat::FromJSON(key, item, "key"sv);

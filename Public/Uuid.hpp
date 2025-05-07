@@ -352,23 +352,19 @@ namespace greaper::refl
 				"Failure while reading from stream, not all data was read, expected:{} obtained:{}.",                   
 				sizeof(data), size));
 		}                                                                                  
-		static std::expected<cJSON*, String> ToJSON(const Uuid& data, cJSON* json, StringView name)
+		static std::expected<cJSON*, String> ToJSON_Item(const Uuid& data)
 		{
-			return cJSON_AddStringToObject(json, name.data(), data.ToString().c_str());
+			return cJSON_CreateString(data.ToString().c_str());
 		}                                                                        
-		static std::expected<void, String> FromJSON(Uuid& data, cJSON* json, StringView name)
+		static std::expected<void, String> FromJSON_Item(Uuid& data, cJSON* json)
 		{                          
-			cJSON* item = cJSON_GetObjectItemCaseSensitive(json, name.data());             
-			if (item == nullptr)                                                                                        
-				return std::unexpected(std::format("[refl::PlainType<Uuid>::FromJSON] "                              
-				"Couldn't obtain the value from json, the item with name '{}' was not found.", name));                  
 			if (cJSON_IsString(item))
 			{          
 				data.FromString(cJSON_GetStringValue(item));
 				return {};
 			}                                                                                             
-			return std::unexpected(std::format("[refl::PlainType<Uuid>::FromJSON] "                                  
-				"Couldn't obtain the value from json, the item with name '{}' was not cJSON_IsString.", name));
+			return std::unexpected("[refl::PlainType<Uuid>::FromJSON] "                                  
+				"Couldn't obtain the value from json, the item was not cJSON_IsString.");
 		}           
 		static std::expected<String, String> ToString(const Uuid& data)
 		{

@@ -5,8 +5,8 @@
 
 #pragma once
 
-#ifndef CORE_REFLECTION_COMPLEX_FIELD_HPP
-#define CORE_REFLECTION_COMPLEX_FIELD_HPP 1
+#ifndef CORE_REFLECTION_COMPLEX_TYPE_HPP
+#define CORE_REFLECTION_COMPLEX_TYPE_HPP 1
 
 #include "IField.hpp"
 
@@ -18,7 +18,7 @@ namespace greaper::refl
 		static const Vector<std::shared_ptr<IField>> Fields;
 
 		static inline constexpr TypeCategory_t Category = TypeCategory_t::Complex;
-
+		static inline constexpr ReflectedTypeID_t ID = TypeInfo_t<T>::ID;
 		static inline constexpr ssizet StaticSize = 0;
 
 		using ArrayValueType = int32;
@@ -53,9 +53,9 @@ namespace greaper::refl
 			return totalSize;
 		}
 
-		static std::expected<cJSON*, String> ToJSON(const T& data, cJSON* json, StringView name)
+		static std::expected<cJSON*, String> ToJSON_Item(const T& data)
 		{
-			cJSON* obj = cJSON_AddObjectToObject(json, name.data());
+			cJSON* obj = cJSON_CreateObject();
 			for (const auto& field : Fields)
 			{
 				auto res = field->ToJSON(&data, obj);
@@ -65,13 +65,8 @@ namespace greaper::refl
 			return obj;
 		}
 
-		static std::expected<void, String> FromJSON(T& data, cJSON* json, StringView name)
+		static std::expected<void, String> FromJSON_Item(T& data, cJSON* item)
 		{
-			cJSON* item = cJSON_GetObjectItemCaseSensitive(json, name.data());
-			if (item == nullptr)
-				return std::unexpected(std::format("[refl::ComplexType<T>::FromJSON] "
-					"Couldn't obtain the value from json, the item with name '{}' was not found.", name));
-			
 			for (const auto& field : Fields)
 			{
 				auto res = field->FromJSON(&data, item);
@@ -142,4 +137,4 @@ namespace greaper::refl
 	};
 }
 
-#endif /* CORE_REFLECTION_COMPLEX_FIELD_HPP */
+#endif /* CORE_REFLECTION_COMPLEX_TYPE_HPP */

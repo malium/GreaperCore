@@ -11,8 +11,10 @@
 #include "BaseType.hpp"
 #include "../Base/IStream.hpp"
 
-#define CREATE_BASIC_PLAINTYPE(type, jsonAddFn, jsonIsFn, jsonGetFn)                                                   \
+#define CREATE_BASIC_PLAINTYPE(type, jsonCreateFn, jsonIsFn, jsonGetFn)                                                \
 template<>struct PlainType<type> : public BaseType<type> {                                                             \
+	static inline constexpr ReflectedTypeID_t ID = TypeInfo_t<type>::ID;                                               \
+	static inline constexpr ReflectedSize_t StaticSize = sizeof(type);                                                 \
 	static inline constexpr TypeCategory_t Category = TypeCategory_t::Plain;                                           \
 	REFL_CREATE_METHODS(type);                                                                                         \
 	static std::expected<ReflectedSize_t, String> ToStream(const type& data, IStream& stream){                         \
@@ -29,18 +31,14 @@ template<>struct PlainType<type> : public BaseType<type> {                      
 		return std::unexpected(std::format("[refl::PlainType<"#type">::FromStream] "                                   \
 			"Failure while reading from stream, not all data was read, expected:{} obtained:{}.",                      \
 			sizeof(data), size));}                                                                                     \
-	static std::expected<cJSON*, String> ToJSON(const type& data, cJSON* json, StringView name){                       \
-		jsonAddFn(json, name.data(), data); return {};}                                                                \
-	static std::expected<void, String> FromJSON(type& data, cJSON* json, StringView name){                             \
-		cJSON* item = cJSON_GetObjectItemCaseSensitive(json, name.data());                                             \
-		if (item == nullptr)                                                                                           \
-			return std::unexpected(std::format("[refl::PlainType<"#type">::FromJSON] "                                 \
-			"Couldn't obtain the value from json, the item with name '{}' was not found.", name));                     \
-		if (jsonIsFn(item)){                                                                                           \
-			data = static_cast<type>(jsonGetFn(item));                                                                 \
+	static std::expected<cJSON*, String> ToJSON_Item(const type& data){                                                \
+		return jsonCreateFn(data);}                                                                                    \
+	static std::expected<void, String> FromJSON_Item(T& data, cJSON* jsonItem){                                        \
+		if (jsonIsFn(jsonItem)){                                                                                       \
+			data = static_cast<type>(jsonGetFn(jsonItem));                                                             \
 			return {};}                                                                                                \
-		return std::unexpected(std::format("[refl::PlainType<"#type">::FromJSON] "                                     \
-			"Couldn't obtain the value from json, the item with name '{}' was not "#jsonIsFn".", name));}              \
+		return std::unexpected("[refl::PlainType<"#type">::FromJSON] "                                                 \
+			"Couldn't obtain the value from json, the item was not "#jsonIsFn".");}                                    \
 	static std::expected<String, String> ToString(const type& data){                                                   \
 		return std::format("{}", data);}                                                                               \
 	static std::expected<ReflectedSize_t, String> GetDynamicSize(UNUSED const type& data){                             \
@@ -93,7 +91,7 @@ namespace greaper::refl
 			return std::unexpected(std::format("[refl::PlainType<TEnum>::ToStream] "                                  
 				"Failure while writing to stream, not all data was written, expected:{} obtained:{}.",                  
 				sizeof(data), size));
-		}                                                                                  
+		}          
 		static std::expected<ReflectedSize_t, String> FromStream(T& data, IStream& stream)
 		{                          
 			const auto size = stream.Read(&data, sizeof(data));                                                         
@@ -102,34 +100,30 @@ namespace greaper::refl
 			return std::unexpected(std::format("[refl::PlainType<TEnum>::FromStream] "                                
 				"Failure while reading from stream, not all data was read, expected:{} obtained:{}.",                   
 				sizeof(data), size));
-		}                                                                                  
-		static std::expected<cJSON*, String> ToJSON(const T& data, cJSON* json, StringView name)
+		}          
+		static std::expected<cJSON*, String> ToJSON_Item(const T& data)
 		{
 			auto str = TEnum<T>::ToString(data);
-			return cJSON_AddStringToObject(json, name.data(), str.data());
-		}                                                                        
-		static std::expected<void, String> FromJSON(T& data, cJSON* json, StringView name)
-		{                          
-			cJSON* item = cJSON_GetObjectItemCaseSensitive(json, name.data());             
-			if (item == nullptr)                                                                                        
-				return std::unexpected(std::format("[refl::PlainType<TEnum>::FromJSON] "                              
-				"Couldn't obtain the value from json, the item with name '{}' was not found.", name));                  
-			if (cJSON_IsString(item))
-			{          
-				data = TEnum<T>::FromString(cJSON_GetStringValue(item));               
+			return cJSON_CreateString(str.data());
+		}
+		static std::expected<void, String> FromJSON_Item(T& data, cJSON* jsonItem)
+		{
+			if (cJSON_IsString(jsonItem))
+			{
+				data = TEnum<T>::FromString(cJSON_GetStringValue(jsonItem));
 				return {};
-			}                                                                                             
-			return std::unexpected(std::format("[refl::PlainType<TEnum>::FromJSON] "                                  
-				"Couldn't obtain the value from json, the item with name '{}' was not ENUM.", name));
-		}           
+			}
+			return std::unexpected("[refl::PlainType<TEnum>::FromJSON] "
+				"Couldn't obtain the value from json, the item was not ENUM.");
+		}
 		static std::expected<String, String> ToString(const T& data)
 		{
 			return TEnum<T>::ToString(data);
-		}                                                                            
+		}    
 		static std::expected<ReflectedSize_t, String> GetDynamicSize(UNUSED const T& data)
 		{                          
 			return 0ll;
-		}                                                                                                
+		}                        
 		static std::expected<ReflectedSize_t, String> GetArraySize(UNUSED const T& data)
 		{                            
 			return std::unexpected("Function 'PlainType<TEnum>::GetArraySize' Trying to use a PlainType as array!");

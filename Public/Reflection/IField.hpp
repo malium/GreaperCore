@@ -26,8 +26,10 @@ namespace greaper::refl
 		virtual std::expected<ReflectedSize_t, String> FromStream(void* complexPtr, IStream& stream)const = 0;
 
 		std::expected<std::shared_ptr<cJSON>, String> CreateJSON(const void* complexPtr)const;
-		virtual std::expected<cJSON*, String>  ToJSON(const void* complexPtr, cJSON* json)const = 0;
-		virtual std::expected<void, String> FromJSON(void* complexPtr, cJSON* json)const = 0;
+		std::expected<cJSON*, String>  ToJSON(const void* complexPtr, cJSON* json)const;
+		virtual std::expected<cJSON*, String>  ToJSON_Item(const void* complexPtr)const = 0;
+		std::expected<void, String> FromJSON(void* complexPtr, cJSON* json, bool caseSensitive = false)const;
+		virtual std::expected<void, String> FromJSON_Item(void* complexPtr, cJSON* json)const = 0;
 
 		virtual std::expected<String, String> ToString(const void* complexPtr)const = 0;
 
@@ -70,8 +72,8 @@ namespace greaper::refl
 		std::expected<ReflectedSize_t, String> ToStream(const void* complexPtr, IStream& stream)const override;
 		std::expected<ReflectedSize_t, String> FromStream(void* complexPtr, IStream& stream)const override;
 		
-		std::expected<cJSON*, String>  ToJSON(const void* complexPtr, cJSON* json)const override;
-		std::expected<void, String> FromJSON(void* complexPtr, cJSON* json)const override;
+		std::expected<cJSON*, String> ToJSON_Item(const void* complexPtr)const override;
+		std::expected<void, String> FromJSON_Item(void* complexPtr, cJSON* json)const override;
 		
 		std::expected<String, String> ToString(const void* complexPtr)const override;
 		
@@ -103,6 +105,35 @@ namespace greaper::refl
 		if (res.has_value())
 			return std::shared_ptr<cJSON>(json, cJSON_Delete);
 		return std::unexpected(res.error());
+	}
+
+	INLINE std::expected<cJSON*, String> IField::ToJSON(const void* complexPtr, cJSON* json) const
+	{
+		auto item_res = ToJSON_Item(complexPtr);
+		if (!item_res.has_value())
+			return std::unexpected(std::format("{}, item name '{}'", item_res.error(), name));
+		if (item_res.value() == nullptr)
+			return std::unexpected(std::format("Couldn't convert to JSON the complex field '{}'.", m_FieldName));
+		auto ok = cJSON_AddItemToObject(json, m_FieldName.data(), item_res.value());
+		if (ok == 0)
+			return std::unexpected(std::format("Couldn't attach item to JSON object, item name '{}'.", m_FieldName));
+		return item_res.value();
+	}
+
+	INLINE std::expected<void, String> IField::FromJSON(void* complexPtr, cJSON* json, bool caseSensitive) const
+	{
+		cJSON* item = nullptr;
+		if (!caseSensitive)
+			item = cJSON_GetObjectItemCaseSensitive(json, m_FieldName.data());
+		else
+			item = cJSON_GetObjectItem(json, m_FieldName.data());
+		if (item == nullptr)
+			return std::unexpected(std::format("Couldn't obtain the value from json, the item with name '{}' "
+				"was not found.", m_FieldName));
+		auto res = FromJSON_Item(complexPtr, item);
+		if (res.has_value())
+			return {};
+		return std::unexpected(std::format("{}, item name '{}'", m_FieldName));
 	}
 
 	INLINE std::expected<const void*, String> IField::GetValue(const void *complexPtr) const noexcept
@@ -157,19 +188,19 @@ namespace greaper::refl
 	}
 
 	template <class T>
-	std::expected<cJSON*, String> TField<T>::ToJSON(const void *complexPtr, cJSON *json) const
+	std::expected<cJSON*, String> TField<T>::ToJSON_Item(const void *complexPtr) const
 	{
 		auto gres = GetValue(complexPtr);
 		if (!gres.has_value())
 			return std::unexpected(gres.error());
-		return tInfo::Type::ToJSON(*(const T*)gres.value(), json, m_FieldName);
+		return tInfo::Type::ToJSON_Item(*(const T*)gres.value());
 	}
 
 	template <class T>
-	std::expected<void, String> TField<T>::FromJSON(void *complexPtr, cJSON *json) const
+	std::expected<void, String> TField<T>::FromJSON_Item(void *complexPtr, cJSON *json) const
 	{
 		Type temp;
-		auto res = tInfo::Type::FromJSON(temp, json, m_FieldName);
+		auto res = tInfo::Type::FromJSON_Item(temp, json);
 		if (!res.has_value())
 			return std::unexpected(res.error());
 		auto sres = SetValue(complexPtr, &temp);
