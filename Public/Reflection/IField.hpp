@@ -88,7 +88,7 @@ namespace greaper::refl
 		ReflectedTypeID_t GetTypeID()const noexcept override;
 	};
 	
-	IField::IField(StringView fieldName, IField::GetValueFn getValueFn, IField::SetValueFn setValueFn) noexcept
+	INLINE IField::IField(StringView fieldName, IField::GetValueFn getValueFn, IField::SetValueFn setValueFn) noexcept
 		:m_FieldName(std::move(fieldName))
 		,m_GetValueFn(std::move(getValueFn))
 		,m_SetValueFn(std::move(setValueFn))
@@ -96,7 +96,7 @@ namespace greaper::refl
 
 	}
 
-	std::expected<std::shared_ptr<cJSON>, String> IField::CreateJSON(const void* complexPtr)const
+	INLINE std::expected<std::shared_ptr<cJSON>, String> IField::CreateJSON(const void* complexPtr)const
 	{
 		cJSON* json = cJSON_CreateObject();
 		auto res = ToJSON(complexPtr, json);
@@ -105,7 +105,7 @@ namespace greaper::refl
 		return std::unexpected(res.error());
 	}
 
-	std::expected<const void*, String> IField::GetValue(const void *complexPtr) const noexcept
+	INLINE std::expected<const void*, String> IField::GetValue(const void *complexPtr) const noexcept
 	{
 		if (m_GetValueFn != nullptr)
 		{
@@ -115,7 +115,7 @@ namespace greaper::refl
 			"null get value function.", m_FieldName));
 	}
 
-	std::expected<void, String> IField::SetValue(void *complexPtr, const void *value) const noexcept
+	INLINE std::expected<void, String> IField::SetValue(void *complexPtr, const void *value) const noexcept
 	{
 		if (m_SetValueFn != nullptr)
 		{

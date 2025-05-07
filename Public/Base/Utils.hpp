@@ -135,11 +135,11 @@ NODISCARD INLINE constexpr T Abs(T a)noexcept
 {
 	return (a >= T(0)) ? a : -a;
 }
-NODISCARD INLINE constexpr bool IsNearlyEqual(float a, float b, float tolerance = MATH_TOLERANCE)noexcept
+NODISCARD INLINE constexpr bool IsNearlyEqual(float a, float b, float tolerance = MATH_TOLERANCE_VAL)noexcept
 {
 	return Abs(a - b) <= tolerance;
 }
-NODISCARD INLINE constexpr bool IsNearlyEqual(double a, double b, double tolerance = MATH_TOLERANCE)noexcept
+NODISCARD INLINE constexpr bool IsNearlyEqual(double a, double b, double tolerance = MATH_TOLERANCE_VAL)noexcept
 {
 	return Abs(a - b) <= tolerance;
 }

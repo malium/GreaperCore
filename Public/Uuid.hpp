@@ -65,7 +65,7 @@ namespace greaper
 
 		friend constexpr bool operator==(const Uuid& left, const Uuid& right)noexcept;
 		friend constexpr bool operator<(const Uuid& left, const Uuid& right)noexcept;
-		
+
 		friend struct std::hash<greaper::Uuid>;
 	};
 }

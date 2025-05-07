@@ -287,8 +287,8 @@ static_assert(sizeof(sizet) == 8 && sizeof(ssizet) == 8, "size types should be 8
 #ifndef NODISCARD
 #define NODISCARD [[nodiscard]]
 #endif
-#ifndef MATH_TOLERANCE
-#define MATH_TOLERANCE 0.0001
+#ifndef MATH_TOLERANCE_VAL
+#define MATH_TOLERANCE_VAL 0.0001
 #endif
 
 #include "Utils.hpp"
