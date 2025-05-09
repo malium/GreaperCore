@@ -111,7 +111,7 @@ namespace greaper::refl
 	{
 		auto item_res = ToJSON_Item(complexPtr);
 		if (!item_res.has_value())
-			return std::unexpected(std::format("{}, item name '{}'", item_res.error(), name));
+			return std::unexpected(std::format("{}, item name '{}'", item_res.error(), m_FieldName));
 		if (item_res.value() == nullptr)
 			return std::unexpected(std::format("Couldn't convert to JSON the complex field '{}'.", m_FieldName));
 		auto ok = cJSON_AddItemToObject(json, m_FieldName.data(), item_res.value());
@@ -133,7 +133,7 @@ namespace greaper::refl
 		auto res = FromJSON_Item(complexPtr, item);
 		if (res.has_value())
 			return {};
-		return std::unexpected(std::format("{}, item name '{}'", m_FieldName));
+		return std::unexpected(std::format("{}, item name '{}'", res.error(), m_FieldName));
 	}
 
 	INLINE std::expected<const void*, String> IField::GetValue(const void *complexPtr) const noexcept

@@ -34,7 +34,7 @@ static std::expected<Type, String> CreateFromJSON(cJSON* json, StringView name, 
 	if (res.has_value())                                                                                               \
 		return elem;                                                                                                   \
 	return std::unexpected(res.error());}                                                                              \
-static std::expected<void, String> FromJSON(T& data, cJSON* json, StringView name, bool caseSensitive = false){        \
+static std::expected<void, String> FromJSON(Type& data, cJSON* json, StringView name, bool caseSensitive = false){     \
 	cJSON* item = nullptr;                                                                                             \
 	if (!caseSensitive)                                                                                                \
 		item = cJSON_GetObjectItemCaseSensitive(json, name.data());                                                    \
@@ -47,7 +47,7 @@ static std::expected<void, String> FromJSON(T& data, cJSON* json, StringView nam
 	if (res.has_value())                                                                                               \
 		return {};                                                                                                     \
 	return std::unexpected(std::format("{}, item name '{}'", res.error(), name));}                                     \
-static std::expected<cJSON*, String> ToJSON(UNUSED const T& data, UNUSED cJSON* json, StringView name){                \
+static std::expected<cJSON*, String> ToJSON(const Type& data, cJSON* json, StringView name){                           \
 	auto item_res = ToJSON_Item(data);                                                                                 \
 	if (!item_res.has_value())                                                                                         \
 		return std::unexpected(std::format("{}, item name '{}'", item_res.error(), name));                             \

@@ -358,9 +358,9 @@ namespace greaper::refl
 		}                                                                        
 		static std::expected<void, String> FromJSON_Item(Uuid& data, cJSON* json)
 		{                          
-			if (cJSON_IsString(item))
+			if (cJSON_IsString(json))
 			{          
-				data.FromString(cJSON_GetStringValue(item));
+				data.FromString(cJSON_GetStringValue(json));
 				return {};
 			}                                                                                             
 			return std::unexpected("[refl::PlainType<Uuid>::FromJSON] "                                  

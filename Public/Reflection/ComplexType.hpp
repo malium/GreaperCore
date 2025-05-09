@@ -60,7 +60,10 @@ namespace greaper::refl
 			{
 				auto res = field->ToJSON(&data, obj);
 				if (!res.has_value())
+				{
+					cJSON_Delete(obj);
 					return res;
+				}
 			}
 			return obj;
 		}

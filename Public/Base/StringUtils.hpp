@@ -234,21 +234,21 @@ namespace greaper::StringUtils
 	 * @param str The WIDE string
 	 * @return String The converted ANSI string
 	 */
-	String FromWIDE(const WString& str) noexcept
-	{
-		String output;
-		output.reserve(str.size());
-
-		auto backInserter = std::back_inserter(output);
-
-		for (auto it = str.begin(); it != str.end();)
-		{
-			u32char c32 = 0;
-			it = Impl::WIDEToUTF32(it, str.end(), c32);
-			Impl::UTF32To8(c32, backInserter, 4);
-		}
-		return output;
-	}
+//	String FromWIDE(const WString& str) noexcept
+//	{
+//		String output;
+//		output.reserve(str.size());
+//
+//		auto backInserter = std::back_inserter(output);
+//
+//		for (auto it = str.begin(); it != str.end();)
+//		{
+//			u32char c32 = 0;
+//			it = Impl::WIDEToUTF32(it, str.end(), c32);
+//			Impl::UTF32To8(c32, backInserter, 4);
+//		}
+//		return output;
+//	}
 
 	/**
 	 * @brief Converts a WIDE string into an ANSI string
@@ -256,7 +256,7 @@ namespace greaper::StringUtils
 	 * @param str The WIDE string
 	 * @return String The converted ANSI string
 	 */
-	String FromWIDE(WStringView str) noexcept
+	INLINE String FromWIDE(WStringView str) noexcept
 	{
 		String output;
 		output.reserve(str.size());
@@ -278,10 +278,10 @@ namespace greaper::StringUtils
 	 * @param str The WIDE string
 	 * @return String The converted ANSI string
 	 */
-	String FromWIDE(const wchar* str) noexcept
-	{
-		return FromWIDE(WStringView(str));
-	}
+//	String FromWIDE(const wchar* str) noexcept
+//	{
+//		return FromWIDE(WStringView(str));
+//	}
 
 	/**
 	 * @brief Converts an ANSI string into a WIDE string
@@ -289,7 +289,30 @@ namespace greaper::StringUtils
 	 * @param str The ANSI string
 	 * @return WString The Converted WIDE string
 	 */
-	WString ToWIDE(const String& str) noexcept
+//	WString ToWIDE(const String& str) noexcept
+//	{
+//		WString output;
+//		output.reserve(str.size());
+//
+//		auto backInserter = std::back_inserter(output);
+//
+//		for (auto it = str.begin(); it != str.end(); )
+//		{
+//			u32char c32 = 0;
+//			it = Impl::UTF8To32(it, str.end(), c32);
+//			Impl::UTF32ToWIDE(c32, backInserter, 2);
+//		}
+//
+//		return output;
+//	}
+
+	/**
+	 * @brief Converts an ANSI string into a WIDE string
+	 *
+	 * @param str The ANSI string
+	 * @return WString The Converted WIDE string
+	 */
+	INLINE WString ToWIDE(StringView str) noexcept
 	{
 		WString output;
 		output.reserve(str.size());
@@ -308,37 +331,14 @@ namespace greaper::StringUtils
 
 	/**
 	 * @brief Converts an ANSI string into a WIDE string
-	 *
-	 * @param str The ANSI string
-	 * @return WString The Converted WIDE string
-	 */
-	WString ToWIDE(StringView str) noexcept
-	{
-		WString output;
-		output.reserve(str.size());
-
-		auto backInserter = std::back_inserter(output);
-
-		for (auto it = str.begin(); it != str.end(); )
-		{
-			u32char c32 = 0;
-			it = Impl::UTF8To32(it, str.end(), c32);
-			Impl::UTF32ToWIDE(c32, backInserter, 2);
-		}
-
-		return output;
-	}
-
-	/**
-	 * @brief Converts an ANSI string into a WIDE string
 	 * 
 	 * @param str The ANSI string
 	 * @return WString The Converted WIDE string
 	 */
-	WString ToWIDE(const achar* str) noexcept
-	{
-		return ToWIDE(StringView(str));
-	}
+//	WString ToWIDE(const achar* str) noexcept
+//	{
+//		return ToWIDE(StringView(str));
+//	}
 
 	/**
 	 * @brief Counts how many characters 'token' are inside the given string

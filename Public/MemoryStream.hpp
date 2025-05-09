@@ -72,7 +72,7 @@ namespace greaper
 
 namespace greaper
 {
-	MemoryStream::MemoryStream() noexcept
+	INLINE MemoryStream::MemoryStream() noexcept
 		:IStream(READ | WRITE)
 		,m_Data(nullptr)
 		,m_Cursor(nullptr)

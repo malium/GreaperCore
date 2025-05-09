@@ -52,12 +52,16 @@ namespace greaper::refl
 			data.resize(elemCount);
 			auto resDynamicSize = GetDynamicSize(data);
 			if (!resDynamicSize.has_value())
+			{
+				data.clear();
 				return std::unexpected(resDynamicSize.error());
+			}
 			auto dynamicSize = resDynamicSize.value();
 			size += stream.Read(data.data(), dynamicSize);
 			auto expectedSize = dynamicSize + StaticSize;
 			if (size == expectedSize)
 				return size;
+			data.clear();
 			return std::unexpected(std::format("[refl::ContainerType<String>::FromStream] "
 				"Failure while reading from stream, not all data was read, expected:{} obtained:{}.",
 				expectedSize, size));
@@ -173,12 +177,16 @@ namespace greaper::refl
 			data.resize(elemCount);
 			auto resDynamicSize = GetDynamicSize(data);
 			if (!resDynamicSize.has_value())
+			{
+				data.clear();
 				return std::unexpected(resDynamicSize.error());
+			}
 			auto dynamicSize = resDynamicSize.value();
 			size += stream.Read(data.data(), dynamicSize);
 			auto expectedSize = dynamicSize + StaticSize;
 			if (size == expectedSize)
 				return size;
+			data.clear();
 			return std::unexpected(std::format("[refl::ContainerType<WString>::FromStream] "
 				"Failure while reading from stream, not all data was read, expected:{} obtained:{}.",
 				expectedSize, size));
@@ -186,11 +194,12 @@ namespace greaper::refl
 
 		static std::expected<cJSON*, String> ToJSON_Item(const WString& data)
 		{
-			cJSON* res = cJSON_CreateString(StringUtils::FromWIDE(data).c_str());
+			auto ansi = StringUtils::FromWIDE(data);
+			cJSON* res = cJSON_CreateString(ansi.c_str());
 			if (res != nullptr)
 				return res;
 			return std::unexpected("[refl::ContainerType<WString>::ToJSON_Item] "
-				"Couldn't add a string to the object");
+				"Couldn't create a JSON String item");
 		}
 
 		static std::expected<void, String> FromJSON_Item(WString& data, cJSON* item)
@@ -347,11 +356,17 @@ namespace greaper::refl
 			{
 				auto res = ValueCat::ToJSON_Item(elem);
 				if (!res.has_value())
+				{
+					cJSON_Delete(arrayObject);
 					return std::unexpected(res.error());
+				}
 				cJSON_bool ok = cJSON_AddItemToArray(arrayObject, res.value());
 				if (ok == 0)
+				{
+					cJSON_Delete(arrayObject);
 					return std::unexpected(std::format("[refl::ContainerType<array>::ToJSON_Item] "
 						"Error while adding an item to the array, idx {}.", i));
+				}	
 				++i;
 			}
 			return arrayObject;
@@ -435,21 +450,17 @@ namespace greaper::refl
 		{
 			if (size == N)
 				return {};
-			return std::unexpected("[refl::ContainerType<array>::GetArrayValue] "
+			return std::unexpected("[refl::ContainerType<array>::SetArraySize] "
 				"Trying to change the size of an array, different than its initial size.");
 		}
 
 		static std::expected<const ArrayValueType*, String> GetArrayValue(const Type& data,
 			ReflectedSize_t index)
 		{
-			auto res_arraySize = GetArraySize(data);
-			if (!res_arraySize.has_value())
-				return std::unexpected(res_arraySize.error());
-			auto arraySize = res_arraySize.value();
-			if (index < arraySize)
+			if (index < N)
 				return &data[index];
 			return std::unexpected(std::format("[refl::ContainerType<array>::GetArrayValue] "
-				"Index '{}' out of bounds [0,{}]", index, arraySize));
+				"Index '{}' out of bounds [0,{}]", index, N));
 		}
 
 		static std::expected<void, String> SetArrayValue(Type& data, const ArrayValueType& value,
@@ -524,17 +535,24 @@ namespace greaper::refl
 			{
 				auto res = ValueCat::FromStream(elem, stream);
 				if (!res.has_value())
+				{
+					data.clear();
 					return std::unexpected(res.error());
+				}
 				
 				auto resDynamicSize = ValueCat::GetDynamicSize(elem);
 				if (!resDynamicSize.has_value())
+				{
+					data.clear();
 					return std::unexpected(resDynamicSize.error());
+				}
 				dynamicSize += ValueCat::StaticSize + resDynamicSize.value();
 				size += res.value();
 			}
 			auto expectedSize = dynamicSize + StaticSize;
 			if (size == expectedSize)
 				return size;
+			data.clear();
 			return std::unexpected(std::format("[refl::ContainerType<list>::FromStream] "
 				"Failure while reading from stream, not all data was read, expected:{} obtained:{}.",
 				expectedSize, size));
@@ -549,11 +567,17 @@ namespace greaper::refl
 			{
 				auto res = ValueCat::ToJSON_Item(elem);
 				if (!res.has_value())
+				{
+					cJSON_Delete(arrayObject);
 					return std::unexpected(res.error());
+				}
 				cJSON_bool ok = cJSON_AddItemToArray(arrayObject, res.value());
 				if (ok == 0)
+				{
+					cJSON_Delete(arrayObject);
 					return std::unexpected(std::format("[refl::ContainerType<list>::ToJSON_Item] "
 						"Error while adding an item to the list, idx {}.", i));
+				}
 				++i;
 			}
 			return arrayObject;
@@ -573,13 +597,20 @@ namespace greaper::refl
 			{
 				cJSON* item = cJSON_GetArrayItem(arrayObject, i);
 				if (item == nullptr)
+				{
+					data.clear();
 					return std::unexpected(std::format("[refl::ContainerType<list>::FromJSON_Item] "
 						"Couldn't obtain the value from json, the list "
 						"returned a null child at index {}.", i));
+				}
 				ArrayValueType elem;
 				auto res = ValueCat::FromJSON_Item(elem, item);
 				if (!res.has_value())
+				{
+					data.clear();
 					return std::unexpected(res.error());
+				}
+				data.push_back(elem);
 			}
 			return {};
 		}
@@ -712,17 +743,24 @@ namespace greaper::refl
 			{
 				auto res = ValueCat::FromStream(elem, stream);
 				if (!res.has_value())
+				{
+					data.clear();
 					return std::unexpected(res.error());
+				}
 				
 				auto resDynamicSize = ValueCat::GetDynamicSize(elem);
 				if (!resDynamicSize.has_value())
+				{
+					data.clear();
 					return std::unexpected(resDynamicSize.error());
+				}
 				dynamicSize += ValueCat::StaticSize + resDynamicSize.value();
 				size += res.value();
 			}
 			auto expectedSize = dynamicSize + StaticSize;
 			if (size == expectedSize)
 				return size;
+			data.clear();
 			return std::unexpected(std::format("[refl::ContainerType<vector>::FromStream] "
 				"Failure while reading from stream, not all data was read, expected:{} obtained:{}.",
 				expectedSize, size));
@@ -737,11 +775,17 @@ namespace greaper::refl
 			{
 				auto res = ValueCat::ToJSON_Item(elem);
 				if (!res.has_value())
+				{
+					cJSON_Delete(arrayObject);
 					return std::unexpected(res.error());
+				}
 				cJSON_bool ok = cJSON_AddItemToArray(arrayObject, res.value());
 				if (ok == 0)
+				{
+					cJSON_Delete(arrayObject);
 					return std::unexpected(std::format("[refl::ContainerType<vector>::ToJSON_Item] "
 						"Error while adding an item to the vector, idx {}.", i));
+				}
 				++i;
 			}
 			return arrayObject;
@@ -761,13 +805,20 @@ namespace greaper::refl
 			{
 				cJSON* item = cJSON_GetArrayItem(arrayObject, i);
 				if (item == nullptr)
+				{
+					data.clear();
 					return std::unexpected(std::format("[refl::ContainerType<vector>::FromJSON_Item] "
 						"Couldn't obtain the value from json, the vector "
 						"returned a null child at index {}.", i));
+				}
 				ArrayValueType elem;
 				auto res = ValueCat::FromJSON_Item(elem, item);
 				if (!res.has_value())
+				{
+					data.clear();
 					return std::unexpected(res.error());
+				}
+				data.push_back(elem);
 			}
 			return {};
 		}
@@ -900,17 +951,24 @@ namespace greaper::refl
 			{
 				auto res = ValueCat::FromStream(elem, stream);
 				if (!res.has_value())
+				{
+					data.clear();
 					return std::unexpected(res.error());
+				}
 				
 				auto resDynamicSize = ValueCat::GetDynamicSize(elem);
 				if (!resDynamicSize.has_value())
+				{
+					data.clear();
 					return std::unexpected(resDynamicSize.error());
+				}
 				dynamicSize += ValueCat::StaticSize + resDynamicSize.value();
 				size += res.value();
 			}
 			auto expectedSize = dynamicSize + StaticSize;
 			if (size == expectedSize)
 				return size;
+			data.clear();
 			return std::unexpected(std::format("[refl::ContainerType<deque>::FromStream] "
 				"Failure while reading from stream, not all data was read, expected:{} obtained:{}.",
 				expectedSize, size));
@@ -925,11 +983,17 @@ namespace greaper::refl
 			{
 				auto res = ValueCat::ToJSON_Item(elem);
 				if (!res.has_value())
+				{
+					cJSON_Delete(arrayObject);
 					return std::unexpected(res.error());
+				}
 				cJSON_bool ok = cJSON_AddItemToArray(arrayObject, res.value());
 				if (ok == 0)
+				{
+					cJSON_Delete(arrayObject);
 					return std::unexpected(std::format("[refl::ContainerType<deque>::ToJSON_Item] "
 						"Error while adding an item to the deque, idx {}.", i));
+				}
 			}
 			return arrayObject;
 		}
@@ -948,13 +1012,20 @@ namespace greaper::refl
 			{
 				cJSON* item = cJSON_GetArrayItem(arrayObject, i);
 				if (item == nullptr)
+				{
+					data.clear();
 					return std::unexpected(std::format("[refl::ContainerType<deque>::FromJSON_Item] "
 						"Couldn't obtain the value from json, the deque "
 						"returned a null child at index {}.", i));
+				}
 				ArrayValueType elem;
 				auto res = ValueCat::FromJSON_Item(elem, item);
 				if (!res.has_value())
+				{
+					data.clear();
 					return std::unexpected(res.error());
+				}
+				data.push_back(elem);
 			}
 			return {};
 		}
@@ -1080,24 +1151,32 @@ namespace greaper::refl
 			ReflectedSize_t size = 0;
 			size += stream.Read(&elemCount, sizeof(elemCount));
 			data.clear();
-			data.resize(elemCount);
 			ReflectedSize_t dynamicSize = 0;
 
-			for (ArrayValueType& elem : data)
+			for (sizet i = 0; i < elemCount; ++i)
 			{
-				auto res = ValueCat::FromStream(elem, stream);
-				if (!res.has_value())
+				auto res = ValueCat::CreateFromStream(stream);
+				if(!res.has_value())
+				{
+					data.clear();
 					return std::unexpected(res.error());
-				
+				}
+				auto elem = res.value().first;
+				size += res.value().second;
 				auto resDynamicSize = ValueCat::GetDynamicSize(elem);
 				if (!resDynamicSize.has_value())
+				{
+					data.clear();
 					return std::unexpected(resDynamicSize.error());
+				}
 				dynamicSize += ValueCat::StaticSize + resDynamicSize.value();
-				size += res.value();
+				data.insert(elem);
 			}
+
 			auto expectedSize = dynamicSize + StaticSize;
 			if (size == expectedSize)
 				return size;
+			data.clear();
 			return std::unexpected(std::format("[refl::ContainerType<set>::FromStream] "
 				"Failure while reading from stream, not all data was read, expected:{} obtained:{}.",
 				expectedSize, size));
@@ -1112,11 +1191,17 @@ namespace greaper::refl
 			{
 				auto res = ValueCat::ToJSON_Item(elem);
 				if (!res.has_value())
+				{
+					cJSON_Delete(arrayObject);
 					return std::unexpected(res.error());
+				}
 				cJSON_bool ok = cJSON_AddItemToArray(arrayObject, res.value());
 				if (ok == 0)
+				{
+					cJSON_Delete(arrayObject);
 					return std::unexpected(std::format("[refl::ContainerType<set>::ToJSON_Item] "
 						"Error while adding an item to the set, idx {}.", i));
+				}
 			}
 			return arrayObject;
 		}
@@ -1135,13 +1220,20 @@ namespace greaper::refl
 			{
 				cJSON* item = cJSON_GetArrayItem(arrayObject, i);
 				if (item == nullptr)
+				{
+					data.clear();
 					return std::unexpected(std::format("[refl::ContainerType<deque>::FromJSON_Item] "
 						"Couldn't obtain the value from json, the deque "
 						"returned a null child at index {}.", i));
+				}
 				ArrayValueType elem;
 				auto res = ValueCat::FromJSON_Item(elem, item);
 				if (!res.has_value())
+				{
+					data.clear();
 					return std::unexpected(res.error());
+				}
+				data.insert(elem);
 			}
 			return {};
 		}
@@ -1267,24 +1359,31 @@ namespace greaper::refl
 			ReflectedSize_t size = 0;
 			size += stream.Read(&elemCount, sizeof(elemCount));
 			data.clear();
-			data.resize(elemCount);
 			ReflectedSize_t dynamicSize = 0;
 
-			for (ArrayValueType& elem : data)
+			for (sizet i = 0; i < elemCount; ++i)
 			{
-				auto res = ValueCat::FromStream(elem, stream);
-				if (!res.has_value())
+				auto res = ValueCat::CreateFromStream(stream);
+				if(!res.has_value())
+				{
+					data.clear();
 					return std::unexpected(res.error());
-				
+				}
+				auto elem = res.value().first;
+				size += res.value().second;
 				auto resDynamicSize = ValueCat::GetDynamicSize(elem);
 				if (!resDynamicSize.has_value())
+				{
+					data.clear();
 					return std::unexpected(resDynamicSize.error());
+				}
 				dynamicSize += ValueCat::StaticSize + resDynamicSize.value();
-				size += res.value();
+				data.insert(elem);
 			}
 			auto expectedSize = dynamicSize + StaticSize;
 			if (size == expectedSize)
 				return size;
+			data.clear();
 			return std::unexpected(std::format("[refl::ContainerType<multiset>::FromStream] "
 				"Failure while reading from stream, not all data was read, expected:{} obtained:{}.",
 				expectedSize, size));
@@ -1299,11 +1398,17 @@ namespace greaper::refl
 			{
 				auto res = ValueCat::ToJSON_Item(elem);
 				if (!res.has_value())
+				{
+					cJSON_Delete(arrayObject);
 					return std::unexpected(res.error());
+				}
 				cJSON_bool ok = cJSON_AddItemToArray(arrayObject, res.value());
 				if (ok == 0)
+				{
+					cJSON_Delete(arrayObject);
 					return std::unexpected(std::format("[refl::ContainerType<multiset>::ToJSON_Item] "
 						"Error while adding an item to the multiset, idx {}.", i));
+				}
 			}
 			return arrayObject;
 		}
@@ -1322,13 +1427,20 @@ namespace greaper::refl
 			{
 				cJSON* item = cJSON_GetArrayItem(arrayObject, i);
 				if (item == nullptr)
+				{
+					data.clear();
 					return std::unexpected(std::format("[refl::ContainerType<deque>::FromJSON_Item] "
 						"Couldn't obtain the value from json, the deque "
 						"returned a null child at index {}.", i));
+				}
 				ArrayValueType elem;
 				auto res = ValueCat::FromJSON_Item(elem, item);
 				if (!res.has_value())
+				{
+					data.clear();
 					return std::unexpected(res.error());
+				}
+				data.insert(elem);
 			}
 			return {};
 		}
@@ -1454,24 +1566,31 @@ namespace greaper::refl
 			ReflectedSize_t size = 0;
 			size += stream.Read(&elemCount, sizeof(elemCount));
 			data.clear();
-			data.resize(elemCount);
 			ReflectedSize_t dynamicSize = 0;
 
-			for (ArrayValueType& elem : data)
+			for (sizet i = 0; i < elemCount; ++i)
 			{
-				auto res = ValueCat::FromStream(elem, stream);
-				if (!res.has_value())
+				auto res = ValueCat::CreateFromStream(stream);
+				if(!res.has_value())
+				{
+					data.clear();
 					return std::unexpected(res.error());
-				
+				}
+				auto elem = res.value().first;
+				size += res.value().second;
 				auto resDynamicSize = ValueCat::GetDynamicSize(elem);
 				if (!resDynamicSize.has_value())
+				{
+					data.clear();
 					return std::unexpected(resDynamicSize.error());
+				}
 				dynamicSize += ValueCat::StaticSize + resDynamicSize.value();
-				size += res.value();
+				data.insert(elem);
 			}
 			auto expectedSize = dynamicSize + StaticSize;
 			if (size == expectedSize)
 				return size;
+			data.clear();
 			return std::unexpected(std::format("[refl::ContainerType<unordered_set>::FromStream] "
 				"Failure while reading from stream, not all data was read, expected:{} obtained:{}.",
 				expectedSize, size));
@@ -1486,11 +1605,17 @@ namespace greaper::refl
 			{
 				auto res = ValueCat::ToJSON_Item(elem);
 				if (!res.has_value())
+				{
+					cJSON_Delete(arrayObject);
 					return std::unexpected(res.error());
+				}
 				cJSON_bool ok = cJSON_AddItemToArray(arrayObject, res.value());
 				if (ok == 0)
+				{
+					cJSON_Delete(arrayObject);
 					return std::unexpected(std::format("[refl::ContainerType<unordered_set>::ToJSON_Item] "
 						"Error while adding an item to the unordered_set, idx {}.", i));
+				}
 			}
 			return arrayObject;
 		}
@@ -1509,13 +1634,20 @@ namespace greaper::refl
 			{
 				cJSON* item = cJSON_GetArrayItem(arrayObject, i);
 				if (item == nullptr)
+				{
+					data.clear();
 					return std::unexpected(std::format("[refl::ContainerType<deque>::FromJSON_Item] "
 						"Couldn't obtain the value from json, the deque "
 						"returned a null child at index {}.", i));
+				}
 				ArrayValueType elem;
 				auto res = ValueCat::FromJSON_Item(elem, item);
 				if (!res.has_value())
+				{
+					data.clear();
 					return std::unexpected(res.error());
+				}
+				data.insert(elem);
 			}
 			return {};
 		}
@@ -1641,24 +1773,31 @@ namespace greaper::refl
 			ReflectedSize_t size = 0;
 			size += stream.Read(&elemCount, sizeof(elemCount));
 			data.clear();
-			data.resize(elemCount);
 			ReflectedSize_t dynamicSize = 0;
 
-			for (ArrayValueType& elem : data)
+			for (sizet i = 0; i < elemCount; ++i)
 			{
-				auto res = ValueCat::FromStream(elem, stream);
-				if (!res.has_value())
+				auto res = ValueCat::CreateFromStream(stream);
+				if(!res.has_value())
+				{
+					data.clear();
 					return std::unexpected(res.error());
-				
+				}
+				auto elem = res.value().first;
+				size += res.value().second;
 				auto resDynamicSize = ValueCat::GetDynamicSize(elem);
 				if (!resDynamicSize.has_value())
+				{
+					data.clear();
 					return std::unexpected(resDynamicSize.error());
+				}
 				dynamicSize += ValueCat::StaticSize + resDynamicSize.value();
-				size += res.value();
+				data.insert(elem);
 			}
 			auto expectedSize = dynamicSize + StaticSize;
 			if (size == expectedSize)
 				return size;
+			data.clear();
 			return std::unexpected(std::format("[refl::ContainerType<unordered_multiset>::FromStream] "
 				"Failure while reading from stream, not all data was read, expected:{} obtained:{}.",
 				expectedSize, size));
@@ -1673,11 +1812,17 @@ namespace greaper::refl
 			{
 				auto res = ValueCat::ToJSON_Item(elem);
 				if (!res.has_value())
+				{
+					cJSON_Delete(arrayObject);
 					return std::unexpected(res.error());
+				}
 				cJSON_bool ok = cJSON_AddItemToArray(arrayObject, res.value());
 				if (ok == 0)
+				{
+					cJSON_Delete(arrayObject);
 					return std::unexpected(std::format("[refl::ContainerType<unordered_multiset>::ToJSON_Item] "
 						"Error while adding an item to the unordered_multiset, idx {}.", i));
+				}
 			}
 			return arrayObject;
 		}
@@ -1696,13 +1841,20 @@ namespace greaper::refl
 			{
 				cJSON* item = cJSON_GetArrayItem(arrayObject, i);
 				if (item == nullptr)
+				{
+					data.clear();
 					return std::unexpected(std::format("[refl::ContainerType<deque>::FromJSON_Item] "
 						"Couldn't obtain the value from json, the deque "
 						"returned a null child at index {}.", i));
+				}
 				ArrayValueType elem;
 				auto res = ValueCat::FromJSON_Item(elem, item);
 				if (!res.has_value())
+				{
+					data.clear();
 					return std::unexpected(res.error());
+				}
+				data.insert(elem);
 			}
 			return {};
 		}
@@ -1837,38 +1989,50 @@ namespace greaper::refl
 			ReflectedSize_t size = 0;
 			size += stream.Read(&elemCount, sizeof(elemCount));
 			data.clear();
-			data.resize(elemCount);
 			ReflectedSize_t dynamicSize = 0;
 
-			for (decltype(elemCount) i = 0; i < elemCount; ++i)
+			for (sizet i = 0; i < elemCount; ++i)
 			{
-				K key;
-				auto kres = KeyCat::FromStream(key, stream);
-				if (!kres.has_value())
+				auto kres = KeyCat::CreateFromStream(stream);
+				if(!kres.has_value())
+				{
+					data.clear();
 					return std::unexpected(kres.error());
+				}
+				auto key = kres.value().first;
+				size += kres.value().second;
 				
 				auto kresDynamicSize = KeyCat::GetDynamicSize(key);
 				if (!kresDynamicSize.has_value())
+				{
+					data.clear();
 					return std::unexpected(kresDynamicSize.error());
+				}
 				dynamicSize += KeyCat::StaticSize + kresDynamicSize.value();
-				size += kres.value();
 
-				V value;
-				auto vres = ValueCat::FromStream(value, stream);
-				if (!vres.has_value())
+				auto vres = ValueCat::CreateFromStream(stream);
+				if(!vres.has_value())
+				{
+					data.clear();
 					return std::unexpected(vres.error());
+				}
+				auto value = vres.value().first;
+				size += vres.value().second;
 				
 				auto vresDynamicSize = ValueCat::GetDynamicSize(value);
 				if (!vresDynamicSize.has_value())
+				{
+					data.clear();
 					return std::unexpected(vresDynamicSize.error());
+				}
 				dynamicSize += ValueCat::StaticSize + vresDynamicSize.value();
-				size += vres.value();
 
 				data.emplace(key, value);
 			}
 			auto expectedSize = dynamicSize + StaticSize;
 			if (size == expectedSize)
 				return size;
+			data.clear();
 			return std::unexpected(std::format("[refl::ContainerType<map>::FromStream] "
 				"Failure while reading from stream, not all data was read, expected:{} obtained:{}.",
 				expectedSize, size));
@@ -1882,15 +2046,24 @@ namespace greaper::refl
 				cJSON* obj = cJSON_CreateObject();
 				auto kres = KeyCat::ToJSON(elem, obj, "key"sv);
 				if (!kres.has_value())
+				{
+					cJSON_Delete(arrayObject);
 					return std::unexpected(kres.error());
+				}
 				auto vres = ValueCat::ToJSON(elem, obj, "value"sv);
 				if (!vres.has_value())
+				{
+					cJSON_Delete(arrayObject);
 					return std::unexpected(vres.error());
+				}
 
 				cJSON_bool ok = cJSON_AddItemToArray(arrayObject, obj);
 				if (ok == 0)
+				{
+					cJSON_Delete(arrayObject);
 					return std::unexpected("[refl::ContainerType<map>::ToJSON_Item] "
 						"Error while adding a key-value item to the map.");
+				}
 			}
 			return arrayObject;
 		}
@@ -1904,27 +2077,34 @@ namespace greaper::refl
 			sizet arraySize = cJSON_GetArraySize(arrayObject);
 			
 			data.clear();
-			sizet i = 0;
-			for (ArrayValueType& elem : data)
+			for (sizet i = 0; i < arraySize; ++i)
 			{
 				cJSON* item = cJSON_GetArrayItem(arrayObject, i);
 				if (item == nullptr)
+				{
+					data.clear();
 					return std::unexpected(std::format("[refl::ContainerType<map>::FromJSON_Item] "
 						"Couldn't obtain the value from json, the map "
 						"returned a null child at index {}.", i));
+				}
 				
 				K key;
 				auto kres = KeyCat::FromJSON(key, item, "key"sv);
 				if (!kres.has_value())
+				{
+					data.clear();
 					return std::unexpected(kres.error());
+				}
 
 				V value;
 				auto vres = KeyCat::FromJSON(value, item, "value"sv);
 				if (!vres.has_value())
+				{
+					data.clear();
 					return std::unexpected(vres.error());
+				}
 				
 				data.emplace(key, value);
-				++i;
 			}
 			return {};
 		}
@@ -2081,38 +2261,50 @@ namespace greaper::refl
 			ReflectedSize_t size = 0;
 			size += stream.Read(&elemCount, sizeof(elemCount));
 			data.clear();
-			data.resize(elemCount);
 			ReflectedSize_t dynamicSize = 0;
 
-			for (decltype(elemCount) i = 0; i < elemCount; ++i)
+			for (sizet i = 0; i < elemCount; ++i)
 			{
-				K key;
-				auto kres = KeyCat::FromStream(key, stream);
-				if (!kres.has_value())
+				auto kres = KeyCat::CreateFromStream(stream);
+				if(!kres.has_value())
+				{
+					data.clear();
 					return std::unexpected(kres.error());
+				}
+				auto key = kres.value().first;
+				size += kres.value().second;
 				
 				auto kresDynamicSize = KeyCat::GetDynamicSize(key);
 				if (!kresDynamicSize.has_value())
+				{
+					data.clear();
 					return std::unexpected(kresDynamicSize.error());
+				}
 				dynamicSize += KeyCat::StaticSize + kresDynamicSize.value();
-				size += kres.value();
 
-				V value;
-				auto vres = ValueCat::FromStream(value, stream);
-				if (!vres.has_value())
+				auto vres = ValueCat::CreateFromStream(stream);
+				if(!vres.has_value())
+				{
+					data.clear();
 					return std::unexpected(vres.error());
+				}
+				auto value = vres.value().first;
+				size += vres.value().second;
 				
 				auto vresDynamicSize = ValueCat::GetDynamicSize(value);
 				if (!vresDynamicSize.has_value())
+				{
+					data.clear();
 					return std::unexpected(vresDynamicSize.error());
+				}
 				dynamicSize += ValueCat::StaticSize + vresDynamicSize.value();
-				size += vres.value();
 
 				data.emplace(key, value);
 			}
 			auto expectedSize = dynamicSize + StaticSize;
 			if (size == expectedSize)
 				return size;
+			data.clear();
 			return std::unexpected(std::format("[refl::ContainerType<multimap>::FromStream] "
 				"Failure while reading from stream, not all data was read, expected:{} obtained:{}.",
 				expectedSize, size));
@@ -2126,15 +2318,24 @@ namespace greaper::refl
 				cJSON* obj = cJSON_CreateObject();
 				auto kres = KeyCat::ToJSON(elem, obj, "key"sv);
 				if (!kres.has_value())
+				{
+					cJSON_Delete(arrayObject);
 					return std::unexpected(kres.error());
+				}
 				auto vres = ValueCat::ToJSON(elem, obj, "value"sv);
 				if (!vres.has_value())
+				{
+					cJSON_Delete(arrayObject);
 					return std::unexpected(vres.error());
+				}
 
 				cJSON_bool ok = cJSON_AddItemToArray(arrayObject, obj);
 				if (ok == 0)
+				{
+					cJSON_Delete(arrayObject);
 					return std::unexpected("[refl::ContainerType<map>::ToJSON_Item] "
 						"Error while adding a key-value item to the map.");
+				}
 			}
 			return arrayObject;
 		}
@@ -2148,27 +2349,34 @@ namespace greaper::refl
 			sizet arraySize = cJSON_GetArraySize(arrayObject);
 			
 			data.clear();
-			sizet i = 0;
-			for (ArrayValueType& elem : data)
+			for (sizet i = 0; i < arraySize; ++i)
 			{
 				cJSON* item = cJSON_GetArrayItem(arrayObject, i);
 				if (item == nullptr)
-					return std::unexpected(std::format("[refl::ContainerType<map>::FromJSON_Item] "
+				{
+					data.clear();
+					return std::unexpected(std::format("[refl::ContainerType<multimap>::FromJSON_Item] "
 						"Couldn't obtain the value from json, the map "
 						"returned a null child at index {}.", i));
+				}
 				
 				K key;
 				auto kres = KeyCat::FromJSON(key, item, "key"sv);
 				if (!kres.has_value())
+				{
+					data.clear();
 					return std::unexpected(kres.error());
+				}
 
 				V value;
 				auto vres = KeyCat::FromJSON(value, item, "value"sv);
 				if (!vres.has_value())
+				{
+					data.clear();
 					return std::unexpected(vres.error());
+				}
 				
 				data.emplace(key, value);
-				++i;
 			}
 			return {};
 		}
@@ -2325,38 +2533,50 @@ namespace greaper::refl
 			ReflectedSize_t size = 0;
 			size += stream.Read(&elemCount, sizeof(elemCount));
 			data.clear();
-			data.resize(elemCount);
 			ReflectedSize_t dynamicSize = 0;
 
-			for (decltype(elemCount) i = 0; i < elemCount; ++i)
+			for (sizet i = 0; i < elemCount; ++i)
 			{
-				K key;
-				auto kres = KeyCat::FromStream(key, stream);
-				if (!kres.has_value())
+				auto kres = KeyCat::CreateFromStream(stream);
+				if(!kres.has_value())
+				{
+					data.clear();
 					return std::unexpected(kres.error());
+				}
+				auto key = kres.value().first;
+				size += kres.value().second;
 				
 				auto kresDynamicSize = KeyCat::GetDynamicSize(key);
 				if (!kresDynamicSize.has_value())
+				{
+					data.clear();
 					return std::unexpected(kresDynamicSize.error());
+				}
 				dynamicSize += KeyCat::StaticSize + kresDynamicSize.value();
-				size += kres.value();
 
-				V value;
-				auto vres = ValueCat::FromStream(value, stream);
-				if (!vres.has_value())
+				auto vres = ValueCat::CreateFromStream(stream);
+				if(!vres.has_value())
+				{
+					data.clear();
 					return std::unexpected(vres.error());
+				}
+				auto value = vres.value().first;
+				size += vres.value().second;
 				
 				auto vresDynamicSize = ValueCat::GetDynamicSize(value);
 				if (!vresDynamicSize.has_value())
+				{
+					data.clear();
 					return std::unexpected(vresDynamicSize.error());
+				}
 				dynamicSize += ValueCat::StaticSize + vresDynamicSize.value();
-				size += vres.value();
 
 				data.emplace(key, value);
 			}
 			auto expectedSize = dynamicSize + StaticSize;
 			if (size == expectedSize)
 				return size;
+			data.clear();
 			return std::unexpected(std::format("[refl::ContainerType<unordered_map>::FromStream] "
 				"Failure while reading from stream, not all data was read, expected:{} obtained:{}.",
 				expectedSize, size));
@@ -2370,15 +2590,24 @@ namespace greaper::refl
 				cJSON* obj = cJSON_CreateObject();
 				auto kres = KeyCat::ToJSON(elem, obj, "key"sv);
 				if (!kres.has_value())
+				{
+					cJSON_Delete(arrayObject);
 					return std::unexpected(kres.error());
+				}
 				auto vres = ValueCat::ToJSON(elem, obj, "value"sv);
 				if (!vres.has_value())
+				{
+					cJSON_Delete(arrayObject);
 					return std::unexpected(vres.error());
+				}
 
 				cJSON_bool ok = cJSON_AddItemToArray(arrayObject, obj);
 				if (ok == 0)
+				{
+					cJSON_Delete(arrayObject);
 					return std::unexpected("[refl::ContainerType<unordered_map>::ToJSON_Item] "
 						"Error while adding a key-value item to the map.");
+				}
 			}
 			return arrayObject;
 		}
@@ -2392,27 +2621,34 @@ namespace greaper::refl
 			sizet arraySize = cJSON_GetArraySize(arrayObject);
 			
 			data.clear();
-			sizet i = 0;
-			for (ArrayValueType& elem : data)
+			for (sizet i = 0; i < arraySize; ++i)
 			{
 				cJSON* item = cJSON_GetArrayItem(arrayObject, i);
 				if (item == nullptr)
-					return std::unexpected(std::format("[refl::ContainerType<map>::FromJSON_Item] "
+				{
+					data.clear();
+					return std::unexpected(std::format("[refl::ContainerType<unordered_map>::FromJSON_Item] "
 						"Couldn't obtain the value from json, the map "
 						"returned a null child at index {}.", i));
+				}
 				
 				K key;
 				auto kres = KeyCat::FromJSON(key, item, "key"sv);
 				if (!kres.has_value())
+				{
+					data.clear();
 					return std::unexpected(kres.error());
+				}
 
 				V value;
 				auto vres = KeyCat::FromJSON(value, item, "value"sv);
 				if (!vres.has_value())
+				{
+					data.clear();
 					return std::unexpected(vres.error());
+				}
 				
 				data.emplace(key, value);
-				++i;
 			}
 			return {};
 		}
@@ -2569,38 +2805,50 @@ namespace greaper::refl
 			ReflectedSize_t size = 0;
 			size += stream.Read(&elemCount, sizeof(elemCount));
 			data.clear();
-			data.resize(elemCount);
 			ReflectedSize_t dynamicSize = 0;
 
-			for (decltype(elemCount) i = 0; i < elemCount; ++i)
+			for (sizet i = 0; i < elemCount; ++i)
 			{
-				K key;
-				auto kres = KeyCat::FromStream(key, stream);
-				if (!kres.has_value())
+				auto kres = KeyCat::CreateFromStream(stream);
+				if(!kres.has_value())
+				{
+					data.clear();
 					return std::unexpected(kres.error());
+				}
+				auto key = kres.value().first;
+				size += kres.value().second;
 				
 				auto kresDynamicSize = KeyCat::GetDynamicSize(key);
 				if (!kresDynamicSize.has_value())
+				{
+					data.clear();
 					return std::unexpected(kresDynamicSize.error());
+				}
 				dynamicSize += KeyCat::StaticSize + kresDynamicSize.value();
-				size += kres.value();
 
-				V value;
-				auto vres = ValueCat::FromStream(value, stream);
-				if (!vres.has_value())
+				auto vres = ValueCat::CreateFromStream(stream);
+				if(!vres.has_value())
+				{
+					data.clear();
 					return std::unexpected(vres.error());
+				}
+				auto value = vres.value().first;
+				size += vres.value().second;
 				
 				auto vresDynamicSize = ValueCat::GetDynamicSize(value);
 				if (!vresDynamicSize.has_value())
+				{
+					data.clear();
 					return std::unexpected(vresDynamicSize.error());
+				}
 				dynamicSize += ValueCat::StaticSize + vresDynamicSize.value();
-				size += vres.value();
 
 				data.emplace(key, value);
 			}
 			auto expectedSize = dynamicSize + StaticSize;
 			if (size == expectedSize)
 				return size;
+			data.clear();
 			return std::unexpected(std::format("[refl::ContainerType<unordered_multimap>::FromStream] "
 				"Failure while reading from stream, not all data was read, expected:{} obtained:{}.",
 				expectedSize, size));
@@ -2614,15 +2862,24 @@ namespace greaper::refl
 				cJSON* obj = cJSON_CreateObject();
 				auto kres = KeyCat::ToJSON(elem, obj, "key"sv);
 				if (!kres.has_value())
+				{
+					cJSON_Delete(arrayObject);
 					return std::unexpected(kres.error());
+				}
 				auto vres = ValueCat::ToJSON(elem, obj, "value"sv);
 				if (!vres.has_value())
+				{
+					cJSON_Delete(arrayObject);
 					return std::unexpected(vres.error());
+				}
 
 				cJSON_bool ok = cJSON_AddItemToArray(arrayObject, obj);
 				if (ok == 0)
+				{
+					cJSON_Delete(arrayObject);
 					return std::unexpected("[refl::ContainerType<unordered_multimap>::ToJSON_Item] "
 						"Error while adding a key-value item to the map.");
+				}
 			}
 			return arrayObject;
 		}
@@ -2636,27 +2893,34 @@ namespace greaper::refl
 			sizet arraySize = cJSON_GetArraySize(arrayObject);
 			
 			data.clear();
-			sizet i = 0;
-			for (ArrayValueType& elem : data)
+			for (sizet i = 0; i < arraySize; ++i)
 			{
 				cJSON* item = cJSON_GetArrayItem(arrayObject, i);
 				if (item == nullptr)
+				{
+					data.clear();
 					return std::unexpected(std::format("[refl::ContainerType<unordered_multimap>::FromJSON_Item] "
-						"Couldn't obtain the value from json, the unordered_multimap "
+						"Couldn't obtain the value from json, the map "
 						"returned a null child at index {}.", i));
+				}
 				
 				K key;
 				auto kres = KeyCat::FromJSON(key, item, "key"sv);
 				if (!kres.has_value())
+				{
+					data.clear();
 					return std::unexpected(kres.error());
+				}
 
 				V value;
 				auto vres = KeyCat::FromJSON(value, item, "value"sv);
 				if (!vres.has_value())
+				{
+					data.clear();
 					return std::unexpected(vres.error());
+				}
 				
 				data.emplace(key, value);
-				++i;
 			}
 			return {};
 		}

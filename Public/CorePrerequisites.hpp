@@ -29,7 +29,10 @@ using namespace std::string_view_literals;
 
 namespace greaper
 {
+	class Uuid;
 	class IStream;
+	class MemoryStream;
+	class FileStream;
 
 	template<typename T>
 	using BasicString = std::basic_string<T, std::char_traits<T>>;
@@ -93,11 +96,6 @@ namespace greaper
 	using Clock_t = std::chrono::high_resolution_clock;
 	using Timepoint_t = Clock_t::time_point;
 	using Duration_t = Clock_t::duration;
-
-	class IProperty;
-	template<class T> class TProperty;
-	class Uuid;
-	class IGreaperLibrary;
 
 	using ReflectedFieldID_t = uint16;
 	using ReflectedTypeID_t = uint32;
@@ -184,14 +182,14 @@ CREATE_TYPEINFO(double, greaper::refl::RTI_Double, PlainType);
 CREATE_TYPEINFO(long double, greaper::refl::RTI_LongDouble, PlainType);
 
 CREATE_TYPEINFO_CNAME(greaper::Uuid, greaper::refl::RTI_UUID, PlainType, "UUID");
-CREATE_TYPEINFO_CNAME(greaper::IProperty, greaper::refl::RTI_Property, ComplexType, "Property");
+//CREATE_TYPEINFO_CNAME(greaper::IProperty, greaper::refl::RTI_Property, ComplexType, "Property");
 CREATE_TYPEINFO_CNAME(greaper::String, greaper::refl::RTI_String, ContainerType, "String");
 CREATE_TYPEINFO_CNAME(greaper::WString, greaper::refl::RTI_WString, ContainerType, "WString");
 
 namespace greaper::refl
 {
 	template<class T> struct TypeInfo<TEnum<T>> { static constexpr ReflectedTypeID_t ID = RTI_Enum; using Type = PlainType<TEnum<T>>; static constexpr StringView Name = "Enum"sv; };
-	template<typename T> struct TypeInfo<TProperty<T>> { static constexpr ReflectedTypeID_t ID = RTI_Property; using Type = ComplexType<TProperty<T>>; static constexpr StringView Name = "Property"sv; };
+	//template<typename T> struct TypeInfo<TProperty<T>> { static constexpr ReflectedTypeID_t ID = RTI_Property; using Type = ComplexType<TProperty<T>>; static constexpr StringView Name = "Property"sv; };
 	template<typename F, typename S> struct TypeInfo<std::pair<F, S>> { static constexpr ReflectedTypeID_t ID = RTI_Pair; using Type = PlainType<std::pair<F, S>>; static constexpr StringView Name = "pair"sv; };
 	template<typename T, sizet N> struct TypeInfo<std::array<T, N>> { static constexpr ReflectedTypeID_t ID = RTI_Array; using Type = ContainerType<std::array<T, N>>; static constexpr StringView Name = "array"sv; };
 	template<typename T> struct TypeInfo<Vector<T>> { static constexpr ReflectedTypeID_t ID = RTI_Vector; using Type = ContainerType<Vector<T>>; static constexpr StringView Name = "vector"sv; };
