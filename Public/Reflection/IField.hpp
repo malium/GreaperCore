@@ -282,4 +282,13 @@ namespace greaper::refl
 	}
 }
 
+
+#define CREATE_FIELD_CUSTOM_NAME(fieldName, fieldCustomName, fieldType, className)\
+std::make_shared<greaper::refl::TField<fieldType>>(#fieldCustomName##sv, \
+	(greaper::refl::IField::GetValueFn)[](const void* obj)->const void* { return &(((className*)obj)->fieldName); },  \
+	(greaper::refl::IField::SetValueFn)[](void* obj, const void* value) -> \
+		void { ((className*)obj)->fieldName = *((const fieldType*)value); })
+
+#define CREATE_FIELD(fieldName, fieldType, className) CREATE_FIELD_CUSTOM_NAME(fieldName, fieldName, fieldType, className)
+
 #endif /* CORE_REFLECTION_I_FIELD_HPP */

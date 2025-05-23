@@ -42,3 +42,5 @@
 #define PlatformAlignedAlloc(bytes, alignment) _aligned_malloc(bytes, alignment)
 #define PlatformAlignedDealloc(mem) _aligned_free(mem)
 #define DEBUG_OUTPUT(x) OutputDebugStringA(x)
+
+#include "MiniWindows.hpp"

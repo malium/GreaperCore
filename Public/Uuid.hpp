@@ -108,7 +108,6 @@ namespace greaper
 
 		INLINE constexpr void ViewToUUID(const StringView& view, uint32 data[4]) noexcept
 		{
-			std::cout << view.size() << std::endl;
 			if (view.size() < (8 * 4 + 3))
 				return;
 
