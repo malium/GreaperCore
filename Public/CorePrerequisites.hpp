@@ -24,6 +24,8 @@
 #include <set>
 #include <unordered_set>
 #include <stack>
+#include <utility>
+#include <memory>
 
 using namespace std::string_view_literals;
 
@@ -199,19 +201,44 @@ CREATE_TYPEINFO_CNAME_TEMPLATELESS(std::list<T>, greaper::refl::RTI_List, Contai
 template<typename K, typename C>
 CREATE_TYPEINFO_CNAME_TEMPLATELESS(std::set<K MACRO_COMMA C>, greaper::refl::RTI_Set, ContainerType, "Set");
 template<typename K, typename C>
-CREATE_TYPEINFO_CNAME_TEMPLATELESS(std::multiset<K MACRO_COMMA C>, greaper::refl::RTI_MultiSet, ContainerType, "MultiSet");
+CREATE_TYPEINFO_CNAME_TEMPLATELESS(std::multiset<K MACRO_COMMA C>, greaper::refl::RTI_MultiSet, ContainerType,         \
+	"MultiSet");
 template<typename T, typename H, typename C>
-CREATE_TYPEINFO_CNAME_TEMPLATELESS(std::unordered_set<T MACRO_COMMA H MACRO_COMMA C>, greaper::refl::RTI_UnorderedSet, ContainerType, "UnorderedSet");
+CREATE_TYPEINFO_CNAME_TEMPLATELESS(std::unordered_set<T MACRO_COMMA H MACRO_COMMA C>, greaper::refl::RTI_UnorderedSet, \
+	ContainerType, "UnorderedSet");
 template<typename T, typename H, typename C>
-CREATE_TYPEINFO_CNAME_TEMPLATELESS(std::unordered_multiset<T MACRO_COMMA H MACRO_COMMA C>, greaper::refl::RTI_UnorderedMultiSet, ContainerType, "UnorderedMultiSet");
+CREATE_TYPEINFO_CNAME_TEMPLATELESS(std::unordered_multiset<T MACRO_COMMA H MACRO_COMMA C>,                             \
+	greaper::refl::RTI_UnorderedMultiSet, ContainerType, "UnorderedMultiSet");
 template<typename K, typename V, typename C>
-CREATE_TYPEINFO_CNAME_TEMPLATELESS(std::map<K MACRO_COMMA V MACRO_COMMA C>, greaper::refl::RTI_Map, ContainerType, "Map");
+CREATE_TYPEINFO_CNAME_TEMPLATELESS(std::map<K MACRO_COMMA V MACRO_COMMA C>, greaper::refl::RTI_Map, ContainerType,     \
+	"Map");
 template<typename K, typename V, typename C>
-CREATE_TYPEINFO_CNAME_TEMPLATELESS(std::multimap<K MACRO_COMMA V MACRO_COMMA C>, greaper::refl::RTI_MultiMap, ContainerType, "MultiMap");
+CREATE_TYPEINFO_CNAME_TEMPLATELESS(std::multimap<K MACRO_COMMA V MACRO_COMMA C>, greaper::refl::RTI_MultiMap,          \
+	ContainerType, "MultiMap");
 template<typename K, typename V, typename H, typename C>
-CREATE_TYPEINFO_CNAME_TEMPLATELESS(std::unordered_map<K MACRO_COMMA V MACRO_COMMA H MACRO_COMMA C>, greaper::refl::RTI_UnorderedMap, ContainerType, "UnorderedMap");
+CREATE_TYPEINFO_CNAME_TEMPLATELESS(std::unordered_map<K MACRO_COMMA V MACRO_COMMA H MACRO_COMMA C>,                    \
+	greaper::refl::RTI_UnorderedMap, ContainerType, "UnorderedMap");
 template<typename K, typename V, typename H, typename C>
-CREATE_TYPEINFO_CNAME_TEMPLATELESS(std::unordered_multimap<K MACRO_COMMA V MACRO_COMMA H MACRO_COMMA C>, greaper::refl::RTI_UnorderedMultiMap, ContainerType, "UnorderedMultiMap");
+CREATE_TYPEINFO_CNAME_TEMPLATELESS(std::unordered_multimap<K MACRO_COMMA V MACRO_COMMA H MACRO_COMMA C>,               \
+	greaper::refl::RTI_UnorderedMultiMap, ContainerType, "UnorderedMultiMap");
+
+#ifndef USE_CXX_STACKTRACE
+#if __has_cpp_attribute(__cpp_lib_stacktrace)
+#define USE_CXX_STACKTRACE 1
+#include <stacktrace>
+#else
+#define USE_CXX_STACKTRACE 0
+#endif
+#endif
+
+#ifndef USE_CXX_FORMAT
+#if __has_cpp_attribute(__cpp_lib_format)
+#define USE_CXX_FORMAT 1
+#include <format>
+#else
+#define USE_CXX_FORMAT 0
+#endif
+#endif
 
 #include "Base/Verify.hpp"
 
