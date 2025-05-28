@@ -47,8 +47,14 @@
 #define ARCHITECTURE_X64 0
 #endif
 
-#if !ARCHITECTURE_X64
-#error "Unsopported Architecture! Requires x64 architecture!"
+#if (defined(__aarch64__) || defined(_M_ARM64))
+#define ARCHITECTURE_A64 1
+#else
+#define ARCHITECTURE_A64 0
+#endif
+
+#if (!ARCHITECTURE_X64 && !ARCHITECTURE_A64)
+#error "Unsopported Architecture! Requires x64 or arm64 architecture!"
 #endif
 
 #ifndef COMPILER_GCC

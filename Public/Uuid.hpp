@@ -12,7 +12,6 @@
 #if PLT_LINUX
 #include <uuid/uuid.h>
 #endif
-#include <exception>
 #include "Reflection/BaseType.hpp"
 
 /***********************************************************************************************************************

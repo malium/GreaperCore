@@ -7,6 +7,7 @@
 
 #include <cstring>
 #include <type_traits>
+#include <bit>
 
 /***********************************************************************************************************************
  *                                                 HELPER FUNCTIONS                                                    *
@@ -162,17 +163,12 @@ NODISCARD INLINE constexpr int16 ClampShort(const int32 i)
 /** Retruns true if value is NaN */
 NODISCARD INLINE constexpr bool IsNaN(const float f) noexcept
 {
-	union { float f32; uint32 u32; }a;
-	a.f32 = f;
-	return (a.u32 & 0x7FFFFFFF) > 0x7F800000;
+	return (std::bit_cast<uint32>(f) & 0x7FFFFFFF) > 0x7F800000;
 }
 /** Returns true if a value is finite */
 NODISCARD INLINE constexpr bool IsFinite(const float f)
 {
-	union { float f32; uint32 u32; }a;
-	a.f32 = f;
-	return (a.u32 & 0x7F800000) != 0x7F800000;
-	//return (*reinterpret_cast<const uint32*>(&f) & 0x7F800000) != 0x7F800000;
+	return (std::bit_cast<uint32>(f) & 0x7F800000) != 0x7F800000;
 }
 /** Returns true if a value is infinite */
 NODISCARD INLINE constexpr bool IsInfinite(const float f)
