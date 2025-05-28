@@ -307,3 +307,5 @@ NODISCARD INLINE bool IsMemoryCleared(const T& data) noexcept
  
  #define _MACRO_CONCAT(A, B) A##B
  #define MACRO_CONCAT(A, B) _MACRO_CONCAT(A, B)
+
+ #define MACRO_COMMA ,

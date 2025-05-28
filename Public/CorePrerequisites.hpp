@@ -158,15 +158,15 @@ namespace greaper
 	}
 }
 
-#define CREATE_TYPEINFO(type, RTIType, categoryType)                                                                   \
-template<> struct greaper::refl::TypeInfo<type> {                                                                      \
-	static constexpr ReflectedTypeID_t ID = RTIType; using Type = greaper::refl:: categoryType<type>;                  \
-	static constexpr StringView Name = #type##sv ; }
-
-#define CREATE_TYPEINFO_CNAME(type, RTIType, categoryType, name)                                                       \
-template<> struct greaper::refl::TypeInfo<type> {                                                                      \
+#define CREATE_TYPEINFO_CNAME_TEMPLATELESS(type, RTIType, categoryType, name)                                          \
+struct greaper::refl::TypeInfo<type> {                                                                                 \
 	static constexpr ReflectedTypeID_t ID = RTIType; using Type = greaper::refl:: categoryType<type>;                  \
 	static constexpr StringView Name = name##sv ; }
+
+#define CREATE_TYPEINFO_CNAME(type, RTIType, categoryType, name)                                                       \
+template<> CREATE_TYPEINFO_CNAME_TEMPLATELESS(type, RTIType, categoryType, name)
+
+#define CREATE_TYPEINFO(type, RTIType, categoryType) CREATE_TYPEINFO_CNAME(type, RTIType, categoryType, #type)
 
 CREATE_TYPEINFO(bool, greaper::refl::RTI_Bool, PlainType);
 CREATE_TYPEINFO(int8, greaper::refl::RTI_Int8, PlainType);
@@ -182,31 +182,36 @@ CREATE_TYPEINFO(double, greaper::refl::RTI_Double, PlainType);
 CREATE_TYPEINFO(long double, greaper::refl::RTI_LongDouble, PlainType);
 
 CREATE_TYPEINFO_CNAME(greaper::Uuid, greaper::refl::RTI_UUID, PlainType, "UUID");
-//CREATE_TYPEINFO_CNAME(greaper::IProperty, greaper::refl::RTI_Property, ComplexType, "Property");
 CREATE_TYPEINFO_CNAME(greaper::String, greaper::refl::RTI_String, ContainerType, "String");
 CREATE_TYPEINFO_CNAME(greaper::WString, greaper::refl::RTI_WString, ContainerType, "WString");
-
-namespace greaper::refl
-{
-	template<class T> struct TypeInfo<TEnum<T>> { static constexpr ReflectedTypeID_t ID = RTI_Enum; using Type = PlainType<TEnum<T>>; static constexpr StringView Name = "Enum"sv; };
-	//template<typename T> struct TypeInfo<TProperty<T>> { static constexpr ReflectedTypeID_t ID = RTI_Property; using Type = ComplexType<TProperty<T>>; static constexpr StringView Name = "Property"sv; };
-	template<typename F, typename S> struct TypeInfo<std::pair<F, S>> { static constexpr ReflectedTypeID_t ID = RTI_Pair; using Type = PlainType<std::pair<F, S>>; static constexpr StringView Name = "pair"sv; };
-	template<typename T, sizet N> struct TypeInfo<std::array<T, N>> { static constexpr ReflectedTypeID_t ID = RTI_Array; using Type = ContainerType<std::array<T, N>>; static constexpr StringView Name = "array"sv; };
-	template<typename T> struct TypeInfo<Vector<T>> { static constexpr ReflectedTypeID_t ID = RTI_Vector; using Type = ContainerType<Vector<T>>; static constexpr StringView Name = "vector"sv; };
-	template<typename T> struct TypeInfo<Deque<T>> { static constexpr ReflectedTypeID_t ID = RTI_Deque; using Type = ContainerType<Deque<T>>; static constexpr StringView Name = "deque"sv; };
-	template<typename T> struct TypeInfo<List<T>> { static constexpr ReflectedTypeID_t ID = RTI_List; using Type = ContainerType<List<T>>; static constexpr StringView Name = "list"sv; };
-	template<typename K, typename C> struct TypeInfo<Set<K, C>> { static constexpr ReflectedTypeID_t ID = RTI_Set; using Type = ContainerType<Set<K, C>>; static constexpr StringView Name = "set"sv; };
-	template<typename K, typename V, typename C> struct TypeInfo<Map<K, V, C>> { static constexpr ReflectedTypeID_t ID = RTI_Map; using Type = ContainerType<Map<K, V, C>>; static constexpr StringView Name = "map"sv; };
-	template<typename K, typename C> struct TypeInfo<MultiSet<K, C>> { static constexpr ReflectedTypeID_t ID = RTI_MultiSet; using Type = ContainerType<MultiSet<K, C>>; static constexpr StringView Name = "multiset"sv; };
-	template<typename K, typename V, typename C> struct TypeInfo<MultiMap<K, V, C>> { static constexpr ReflectedTypeID_t ID = RTI_MultiMap; using Type = ContainerType<MultiMap<K, V, C>>; static constexpr StringView Name = "multimap"sv; };
-	template<typename T, typename H, typename C> struct TypeInfo<UnorderedSet<T, H, C>> { static constexpr ReflectedTypeID_t ID = RTI_UnorderedSet; using Type = ContainerType<UnorderedSet<T, H, C>>; static constexpr StringView Name = "unordered_set"sv; };
-	template<typename K, typename V, typename H, typename C> struct TypeInfo<UnorderedMap<K, V, H, C>> { static constexpr ReflectedTypeID_t ID = RTI_UnorderedMap; using Type = ContainerType<UnorderedMap<K, V, H, C>>; static constexpr StringView Name = "unordered_map"sv; };
-	template<typename K, typename V, typename H, typename C> struct TypeInfo<UnorderedMultiMap<K, V, H, C>> { static constexpr ReflectedTypeID_t ID = RTI_UnorderedMultiMap; using Type = ContainerType<UnorderedMultiMap<K, V, H, C>>; static constexpr StringView Name = "unordered_multimap"sv; };
-	template<typename T, typename H, typename C> struct TypeInfo<UnorderedMultiSet<T, H, C>> { static constexpr ReflectedTypeID_t ID = RTI_UnorderedMultiSet; using Type = ContainerType<UnorderedMultiSet<T, H, C>>; static constexpr StringView Name = "unordered_multiset"sv; };
-}
-
-//#undef CREATE_TYPEINFO
-//#undef CREATE_TYPEINFO_CNAME
+template<class T>
+CREATE_TYPEINFO_CNAME_TEMPLATELESS(TEnum<T>, greaper::refl::RTI_Enum, PlainType, "Enum");
+template<typename F, typename S>
+CREATE_TYPEINFO_CNAME_TEMPLATELESS(std::pair<F MACRO_COMMA S>, greaper::refl::RTI_Pair, PlainType, "Pair");
+template<typename T, sizet N>
+CREATE_TYPEINFO_CNAME_TEMPLATELESS(std::array<T MACRO_COMMA N>, greaper::refl::RTI_Array, ContainerType, "Array");
+template<class T>
+CREATE_TYPEINFO_CNAME_TEMPLATELESS(std::vector<T>, greaper::refl::RTI_Vector, ContainerType, "Vector");
+template<class T>
+CREATE_TYPEINFO_CNAME_TEMPLATELESS(std::deque<T>, greaper::refl::RTI_Deque, ContainerType, "Deque");
+template<class T>
+CREATE_TYPEINFO_CNAME_TEMPLATELESS(std::list<T>, greaper::refl::RTI_List, ContainerType, "List");
+template<typename K, typename C>
+CREATE_TYPEINFO_CNAME_TEMPLATELESS(std::set<K MACRO_COMMA C>, greaper::refl::RTI_Set, ContainerType, "Set");
+template<typename K, typename C>
+CREATE_TYPEINFO_CNAME_TEMPLATELESS(std::multiset<K MACRO_COMMA C>, greaper::refl::RTI_MultiSet, ContainerType, "MultiSet");
+template<typename T, typename H, typename C>
+CREATE_TYPEINFO_CNAME_TEMPLATELESS(std::unordered_set<T MACRO_COMMA H MACRO_COMMA C>, greaper::refl::RTI_UnorderedSet, ContainerType, "UnorderedSet");
+template<typename T, typename H, typename C>
+CREATE_TYPEINFO_CNAME_TEMPLATELESS(std::unordered_multiset<T MACRO_COMMA H MACRO_COMMA C>, greaper::refl::RTI_UnorderedMultiSet, ContainerType, "UnorderedMultiSet");
+template<typename K, typename V, typename C>
+CREATE_TYPEINFO_CNAME_TEMPLATELESS(std::map<K MACRO_COMMA V MACRO_COMMA C>, greaper::refl::RTI_Map, ContainerType, "Map");
+template<typename K, typename V, typename C>
+CREATE_TYPEINFO_CNAME_TEMPLATELESS(std::multimap<K MACRO_COMMA V MACRO_COMMA C>, greaper::refl::RTI_MultiMap, ContainerType, "MultiMap");
+template<typename K, typename V, typename H, typename C>
+CREATE_TYPEINFO_CNAME_TEMPLATELESS(std::unordered_map<K MACRO_COMMA V MACRO_COMMA H MACRO_COMMA C>, greaper::refl::RTI_UnorderedMap, ContainerType, "UnorderedMap");
+template<typename K, typename V, typename H, typename C>
+CREATE_TYPEINFO_CNAME_TEMPLATELESS(std::unordered_multimap<K MACRO_COMMA V MACRO_COMMA H MACRO_COMMA C>, greaper::refl::RTI_UnorderedMultiMap, ContainerType, "UnorderedMultiMap");
 
 #include "Base/Verify.hpp"
 
