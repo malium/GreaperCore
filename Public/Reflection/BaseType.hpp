@@ -9,7 +9,6 @@
 #define CORE_REFLECTION_BASETYPE_HPP 1
 
 #include "../CorePrerequisites.hpp"
-#include <expected>
 #include "../Base/cJSON.hpp"
 #include "../Base/IStream.hpp"
 
